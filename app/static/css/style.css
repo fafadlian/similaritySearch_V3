@@ -1,0 +1,235 @@
+:root {
+    --primary-color: #2B3E50; /* greyish dark blue */
+    --secondary-color: #F8F9FA;
+    --text-color: #2B3E50; /* a dark grey for text */
+    --nav-background: #ffffff; 
+    --divider-color: #2B3E50; /* Blue-greyish color */
+    /* Define --primary-color-light if needed */
+
+    --font-family-sans-serif: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+    --font-family-monospace: SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+
+    /* Spacing */
+    --space-sm: 0.5rem;
+    --space-md: 1rem;
+    --space-lg: 2rem;
+
+    /* Font sizes */
+    --font-size-small: 0.8rem;
+    --font-size-base: 1rem; /* Assume this is your default font size */
+    --font-size-large: 1.2rem;
+}
+
+
+
+#sidebar-wrapper {
+    background-color: var(--nav-background);
+    border-right: 1px solid var(--divider-color);
+}
+
+#sidebar {
+    background-color: var(--nav-background);
+    border-right: 2px solid var(--divider-color); /* Adjust the thickness as needed */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 220px; /* Adjust width as needed */
+    height: 100vh;
+    padding: 1rem;
+}
+
+body {
+    background-color: var(--secondary-color);
+    color: var(--text-color);
+    font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica Neue, Arial, Noto Sans, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", Segoe UI Symbol, "Noto Color Emoji";
+}
+
+.site-header, .site-footer {
+    background-color: var(--primary-color);
+    color: var(--secondary-color);
+}
+
+.text-primary-custom {
+    color: var(--primary-color);
+    font-weight: bold;
+}
+
+.loading {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    background: rgba(43, 62, 80, 0.8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1050;
+    color: var(--secondary-color);
+}
+
+.spinner-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+input, button, .btn {
+    border: 1px solid var(--primary-color);
+    background-color: var(--secondary-color);
+    color: var(--text-color);
+}
+
+input::placeholder {
+    color: var(--primary-color);
+    opacity: 0.7;
+}
+
+input:focus, button:focus {
+    /* Adjust with a specific lighter color or use a preprocessor */
+    outline: none;
+}
+
+button:hover, .btn:hover {
+    /* Adjust with a specific lighter color or use a preprocessor */
+    color: var(--secondary-color);
+}
+
+.vertical-nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 200px;
+    height: 100vh;
+    background-color: var(--nav-background);
+    padding: 1rem;
+}
+
+.navbar-brand {
+    display: flex;
+    justify-content: center; /* Center logo horizontally */
+    align-items: center; /* Center logo vertically, if necessary */
+    width: 100%; /* Ensure the link takes up the full width of the sidebar */
+    margin-bottom: 1rem;
+}
+
+.navbar-brand img {
+    max-height: 120px; /* Increase as necessary, but keep it within sidebar dimensions */
+    max-width: 100%; /* Ensure the image does not exceed the sidebar's width */
+    margin: 0 auto; /* Center the image within the .navbar-brand */
+}
+
+.nav-link {
+    color: var(--primary-color); /* or var(--secondary-color) based on your preference */
+    text-decoration: none;
+    padding: 0.5rem 0;
+    font-weight: bold;
+    display: flex;
+    border-radius: 8px;
+    align-items: center;
+    justify-content: center;
+}
+
+.nav-link-container {
+    padding-top: 0rem; /* Reduced from 1rem */
+}
+
+.nav-link:hover {
+    /* Define or adjust --primary-color-light or use a specific color */
+    border-radius: 0.25rem;
+}
+
+.nav-link.active {
+    background-color: var(--primary-color); /* Use your primary color */
+    color: var(--secondary-color); /* Use your secondary color for the text */
+}
+
+.select2-container .select2-dropdown .select2-results {
+    max-height: 200px; /* Adjust the height as needed */
+    overflow-y: auto;
+}
+
+@media (max-width: 1580px) {
+    #sidebar {
+        position: relative; /* Change from fixed to relative */
+        width: 100%; /* Full width */
+        height: auto; /* Adjust height automatically */
+        padding: 0.5rem 1rem; /* Adjust padding as needed */
+        border-right: none; /* Remove the border */
+        border-bottom: 2px solid var(--divider-color); /* Add a bottom border if needed */
+    }
+
+    .vertical-nav {
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .nav-link {
+        padding: 0.5rem; /* Adjust padding for smaller screens */
+        margin: 0 0.5rem; /* Add margin between links */
+    }
+
+    .navbar-brand {
+        margin-bottom: 0; /* Adjust or remove margin as needed */
+    }
+
+    .details-hover {
+        display: none;
+        position: absolute;
+        background-color: #f9f9f9;
+        border: 1px solid #ddd;
+        z-index: 1;
+        /* Additional styling */
+    }
+    
+    tr:hover .details-hover {
+        display: block;
+    }
+
+    .hover-details {
+        position: relative;
+        cursor: pointer;
+      }
+      
+      .hover-details:hover::after {
+        content: attr(title); /* Use the title attribute's text as content */
+        position: absolute;
+        left: 100%;
+        white-space: nowrap;
+        z-index: 20;
+        background-color: #f9f9f9;
+        border: 1px solid #ddd;
+        padding: 5px;
+        margin-left: 5px; /* Slight space between cell and tooltip */
+        /* Additional styling as needed */
+      }
+
+    .details-row {
+        background-color: #f9f9f9; /* Light gray background */
+    }
+    
+    .details-cell {
+        padding: 10px;
+        border-top: 1px solid #eee; /* Light border for separation */
+    }
+    
+    .btn-details {
+        font-size: 0.8rem; /* Smaller font size for the button */
+        margin: 0; /* Remove margins */
+    }
+
+    .details-cell .table {
+        margin-bottom: 0; /* Remove bottom margin */
+    }
+    
+    .details-cell .table th,
+    .details-cell .table td {
+        padding: 0.25rem; /* Reduce padding */
+        border-top: none; /* Remove top border for a cleaner look */
+    }
+    
+
+    /* Adjust other elements as necessary for smaller screens */
+}
