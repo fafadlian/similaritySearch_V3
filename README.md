@@ -6,7 +6,7 @@ The Similarity Search WebApp is a Python-Flask-based web application designed to
 ## Installation
 To run this application, ensure you have Docker installed on your machine.
 
-1. Clone the repository to your local machine.
+1. Clone the repository to your local machine. You will need python 3.11 to run this project
 2. Navigate to the project directory.
 3. Install the required libraries ```` pip install requirements.txt ````
 5. Run the the following command: ````uvicorn run:app --host 0.0.0.0 --port 443 --log-level info````
@@ -30,8 +30,7 @@ ALL THE SEARCH PARAMETER NEEDS TO BE FILLED.
 | Origin IATA        | 3-letter IATA code for origin airport         | DXB            |
 | Destination IATA   | 3-letter IATA code for destination airport    | ATH            |
 | City Address       | Name of the city on the person's address      | Dubai          |
-| Address            | the person's address                          | 75655 Wilson Junction. Lake Johnshire, MH 63787
-          |
+| Address            | the person's address                          | 75655 Wilson Junction. Lake Johnshire, MH 63787  |
 | Nationality        | Person's Nationality                          | Macau          |
 | Sex                | Person's Sex                                  | Female           |
 | Name Threshold     | Threshold for the name similarity (0 to 100)  | 70            |
