@@ -147,7 +147,10 @@ def find_similar_passengers(airport_data_access, firstname, surname, name, dob, 
 
     
     # Parse each XML file and aggregate data
-    all_data = process_files_in_parallel(data_files, parse_json)
+    # all_data = process_files_in_parallel(data_files, parse_json)
+    for file_path in data_files:
+        data = parse_json(file_path)
+        all_data = pd.concat([all_data, data], ignore_index=True)   
 
     logging.info(f"all_data shape: {all_data.shape}")
 
