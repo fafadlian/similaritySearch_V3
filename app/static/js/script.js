@@ -29,6 +29,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     //Populating dropdowns
     populateNationalityDropdown();
+    populateAirportDropdowns();
 
     const displayedColumns = ['Confidence Level', 'Compound Similarity Score', 'Name', 'DOB', 'Sex', 'Nationality','Travel Doc Number', 'BookingID']; // Directly displayed columns
     const hoverColumns = ['FNSimilarity','SNSimilarity','AgeSimilarity', 'DOBSimilarity', 'strAddressSimilarity', 'natMatch', 'sexMatch', 'originSimilarity', 'destinationSimilarity']; // Columns to display on hover
@@ -83,7 +84,7 @@ document.addEventListener('DOMContentLoaded', function () {
     document.getElementById('searchForm').addEventListener('submit', function(e) {
         e.preventDefault();
         showLoadingIndicator();  // Show loading indicator
-
+    
         var firstname = document.getElementById('firstname').value || '';
         var surname = document.getElementById('surname').value || '';
         var dob = document.getElementById('dob').value || '';
@@ -91,12 +92,29 @@ document.addEventListener('DOMContentLoaded', function () {
         var iata_d = document.getElementById('iata_d').value || '';
         var city_name = document.getElementById('city_name').value || '';
         var address = document.getElementById('address').value || '';
-        var sex = document.getElementById('sex').value || '';
-        var nationality = document.getElementById('nationality').value || '';
-        var nameThreshold = parseFloat(document.getElementById('nameThreshold').value) || null;
-        var ageThreshold = parseFloat(document.getElementById('ageThreshold').value) || null;
-        var locationThreshold = parseFloat(document.getElementById('locationThreshold').value) || null;
-
+        var sex = document.getElementById('sex').value || 'None';
+        var nationality = document.getElementById('nationality').value || 'None';
+        var nameThreshold = parseFloat(document.getElementById('nameThreshold').value);
+        var ageThreshold = parseFloat(document.getElementById('ageThreshold').value);
+        var locationThreshold = parseFloat(document.getElementById('locationThreshold').value);
+    
+        // Validate threshold values
+        if (isNaN(nameThreshold) || nameThreshold < 0 || nameThreshold > 100) {
+            alert('Name Threshold must be a number between 0 and 100.');
+            hideLoadingIndicator();
+            return;
+        }
+        if (isNaN(ageThreshold) || ageThreshold < 0 || ageThreshold > 100) {
+            alert('Age Threshold must be a number between 0 and 100.');
+            hideLoadingIndicator();
+            return;
+        }
+        if (isNaN(locationThreshold) || locationThreshold < 0 || locationThreshold > 100) {
+            alert('Location Threshold must be a number between 0 and 100.');
+            hideLoadingIndicator();
+            return;
+        }
+    
         var task_id = localStorage.getItem('task_id');  // Retrieve task_id from local storage
         var requestData = {
             task_id: task_id,
@@ -113,9 +131,9 @@ document.addEventListener('DOMContentLoaded', function () {
             ageThreshold: ageThreshold,
             locationThreshold: locationThreshold
         };
-
+    
         lastSearchQuery = requestData;
-
+    
         sendRequest('/perform_similarity_search', requestData, function(response) {
             document.getElementById('loadingIndicator').style.display = 'none'; // Hide loading indicator
             if (response && response.data) {
@@ -128,116 +146,56 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 
-
-
-    document.getElementById('downloadCsv').addEventListener('click', function() {
-        var data = globalResponseData;
     
-        var searchQuery = lastSearchQuery;
-        var headers = [
-            "arrivalDateFrom", "arrivalDateTo",
-            "FirstName", "Surname", "DOB", "originIATA", "destinationIATA", "cityAddress", "Address", "Nationality", "Sex",
-            "nameSimilarityThreshold", "ageSimilarityThreshold", "locationSimilarityThreshold",
-            "FilePath", "Booking ID", "Full Name", "Origin IATA", "Origin Lat", "Origin Lon", "Destination IATA", "Destination Lat", "Destination Lon", "DOB", "City Name", "City Lat", "City Lon", "Nationality", "Sex", "Name Similarity", "Origin Distance", "Destination Distance", "City Distance", "Age Similarity", "Compound Similarity"
-        ];
     
-        var csvContent = "data:text/csv;charset=utf-8,";
-        csvContent += headers.join(",") + "\n";
+    var downloadJsonButton = document.getElementById('downloadJson');
+    if (downloadJsonButton) {
+        downloadJsonButton.addEventListener('click', function() {
+            console.log("Download JSON button clicked");
+            var dateTimeString = new Date().toISOString().replace(/[^0-9]/g, '');
+            var searchQuery = lastSearchQuery;
+            var data = globalResponseData;
+            console.log("Print globalResponseData", globalResponseData);
+            console.log("Print data", data);
+            var jsonData = {
+                "PNR_Timeframe": {
+                    "arrivalDateFrom": searchQuery.arrivalDateFrom,
+                    "arrivalDateTo": searchQuery.arrivalDateTo,
+                },
+                "searchedIndividual": {
+                    "FirstName": searchQuery.firstname,
+                    "Surname": searchQuery.surname,
+                    "DOB": searchQuery.dob,
+                    "originIATA": searchQuery.iata_o,
+                    "destinationIATA": searchQuery.iata_d,
+                    "cityAddress": searchQuery.city_name,
+                    "Address": searchQuery.address,
+                    "Nationality": searchQuery.nationality,
+                    "Sex": searchQuery.sex
+                },
+                "thresholds": {
+                    "nameSimilarityThreshold": searchQuery.nameThreshold,
+                    "ageSimilarityThreshold": searchQuery.ageThreshold,
+                    "locationSimilarityThreshold": searchQuery.locationThreshold,
+                },
+                "results": data
+            };
     
-        data.forEach(function(item) {
-            var row = [
-                searchQuery.arrivalDateFrom,
-                searchQuery.arrivalDateTo,
-                searchQuery.firstname,
-                searchQuery.surname,
-                searchQuery.dob,
-                searchQuery.iata_o,
-                searchQuery.iata_d,
-                searchQuery.city_name,
-                searchQuery.address,
-                searchQuery.nationality,
-                searchQuery.sex,
-                searchQuery.nameThreshold,
-                searchQuery.ageThreshold,
-                searchQuery.locationThreshold,
-                item["FilePath"], 
-                item["Booking ID"], 
-                item["Full Name"], 
-                item["Origin IATA"], 
-                item["Origin Lat"], 
-                item["Origin Lon"], 
-                item["Destination IATA"], 
-                item["Destination Lat"], 
-                item["Destination Lon"], 
-                item["DOB"], 
-                item["City Name"], 
-                item["City Lat"], 
-                item["City Lon"], 
-                item["Nationality"], 
-                item["Sex"], 
-                item["Name Similarity"], 
-                item["Origin Distance"], 
-                item["Destination Distance"], 
-                item["City Distance"], 
-                item["Age Similarity"], 
-                item["Compound Similarity"]
-            ];
-            csvContent += row.map(value => `"${value}"`).join(",") + "\n";
+            var jsonString = JSON.stringify(jsonData, null, 2);
+            var fileName = `similar_passengers_${dateTimeString}.json`;
+            var blob = new Blob([jsonString], { type: "application/json" });
+            var url = URL.createObjectURL(blob);
+            var link = document.createElement("a");
+            link.setAttribute("href", url);
+            link.setAttribute("download", fileName);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
         });
-    
-        var fileName = `similar_passengers_${new Date().toISOString()}.csv`;
-        var encodedUri = encodeURI(csvContent);
-        var link = document.createElement("a");
-        link.setAttribute("href", encodedUri);
-        link.setAttribute("download", fileName);
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-    });
-    
-    
-
-    document.getElementById('downloadJson').addEventListener('click', function() {
-        var dateTimeString = new Date().toISOString().replace(/[^0-9]/g, '');
-        var searchQuery = lastSearchQuery;
-        var data = globalResponseData; // Assuming this is an array of objects
-        console.log("Print globalResponseData", globalResponseData)
-        console.log("Print data", data)
-        var jsonData = {
-            "PNR_Timeframe": {
-                "arrivalDateFrom": searchQuery.arrivalDateFrom,
-                "arrivalDateTo": searchQuery.arrivalDateTo,
-            },
-            "searchedIndividual": {
-                "FirstName": searchQuery.firstname,
-                "Surname": searchQuery.surname,
-                "DOB": searchQuery.dob,
-                "originIATA": searchQuery.iata_o,
-                "destinationIATA": searchQuery.iata_d,
-                "cityAddress": searchQuery.city_name,
-                "Address": searchQuery.address,
-                "Nationality": searchQuery.nationality,
-                "Sex":searchQuery.sex
-            },
-            "thresholds": {
-                "nameSimilarityThreshold": searchQuery.nameThreshold,
-                "ageSimilarityThreshold": searchQuery.ageThreshold,
-                "location Similarity Threshold": searchQuery.locationThreshold,
-            },
-            "results": data // Assuming data is structured as needed
-        };
-    
-        var jsonString = JSON.stringify(jsonData, null, 2);
-        var fileName = `similar_passengers_${dateTimeString}.json`;
-        var blob = new Blob([jsonString], {type: "application/json"});
-        var url = URL.createObjectURL(blob);
-        var link = document.createElement("a");
-        link.setAttribute("href", url);
-        link.setAttribute("download", fileName);
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-    });
+        console.log("Download JSON button event listener attached");
+    } else {
+        console.log("Download JSON button not found");
+    }
 
     document.getElementById('deleteTask').addEventListener('click', function() {
         var task_id = localStorage.getItem('task_id');
@@ -499,6 +457,12 @@ document.addEventListener('DOMContentLoaded', function () {
     
                 const addedNationalities = new Set(); // To track already added nationalities
     
+                // Add "Unknown" option
+                const unknownOption = document.createElement('option');
+                unknownOption.value = '';
+                unknownOption.textContent = 'Unknown';
+                nationalitySelect.appendChild(unknownOption);
+    
                 nationalities.forEach(nationality => {
                     const countryName = nationality.countryName.trim();
                     const hhIso = nationality.HH_ISO.trim();
@@ -515,6 +479,66 @@ document.addEventListener('DOMContentLoaded', function () {
     
                 // Initialize Select2 with search and limited scroll
                 $(nationalitySelect).select2({
+                    placeholder: "Select Nationality",
+                    allowClear: true,
+                    width: '100%', // Adjust width to fit your layout
+                    dropdownAutoWidth: true
+                });
+            }
+        });
+    }
+    
+    function populateAirportDropdowns() {
+        const originSelect = document.getElementById('iata_o');
+        const destinationSelect = document.getElementById('iata_d');
+        const csvPath = '/static/data/geoCrosswalk/GeoCrossWalkMed.csv'; // Adjust based on your setup
+    
+        Papa.parse(csvPath, {
+            download: true,
+            header: true,
+            complete: function(results) {
+                let airports = results.data;
+                
+                // Sort airports by IATA code alphabetically
+                airports = airports.sort((a, b) => a['IATA'].localeCompare(b['IATA']));
+    
+                const addedAirports = new Set(); // To track already added IATA codes
+    
+                // Add "Unknown" option
+                const unknownOption = document.createElement('option');
+                unknownOption.value = '';
+                unknownOption.textContent = 'Unknown';
+                originSelect.appendChild(unknownOption);
+                destinationSelect.appendChild(unknownOption.cloneNode(true));
+    
+                airports.forEach(airport => {
+                    const iataCode = airport['IATA'].trim();
+                    const airportName = airport['airportName'].trim();
+                    const city = airport['City'].trim();
+                    const country = airport['countryName'].trim();
+    
+                    if (iataCode && airportName && !addedAirports.has(iataCode)) {
+                        const option = document.createElement('option');
+                        option.value = iataCode;
+                        option.innerHTML = `${iataCode} - ${airportName}, ${city}, ${country}`;
+                        originSelect.appendChild(option);
+                        destinationSelect.appendChild(option.cloneNode(true));
+    
+                        addedAirports.add(iataCode);
+                    }
+                });
+    
+                // Initialize Select2 with search and limited scroll
+                $(originSelect).select2({
+                    placeholder: "Origin Airport (IATA)",
+                    allowClear: true,
+                    width: '100%', // Adjust width to fit your layout
+                    dropdownAutoWidth: true
+                });
+    
+                $(destinationSelect).select2({
+                    placeholder: "Destination Airport (IATA)",
+                    allowClear: true,
                     width: '100%', // Adjust width to fit your layout
                     dropdownAutoWidth: true
                 });
@@ -533,6 +557,33 @@ document.addEventListener('DOMContentLoaded', function () {
         var arrivalDateFrom = document.getElementById('arrivalDateFrom').value;
         var arrivalDateTo = document.getElementById('arrivalDateTo').value;
         var flightNbr = document.getElementById('flightNbr').value;
+    
+        var dateFrom = new Date(arrivalDateFrom);
+        var dateTo = new Date(arrivalDateTo);
+        var minDate = new Date('2019-01-01');
+        var maxDate = new Date('2019-12-31');
+        var errorMessages = document.getElementById('errorMessages');
+        errorMessages.textContent = '';
+
+        document.getElementById('loadingIndicator').style.display = 'none';
+
+        if (dateFrom > dateTo) {
+            errorMessages.textContent = 'Arrival Date From must be before Arrival Date To.';
+            return;
+        }
+
+    
+        if (dateFrom < minDate || dateFrom > maxDate || dateTo < minDate || dateTo > maxDate) {
+            errorMessages.textContent = 'Dates must be within the year 2019.';
+            return;
+        }
+    
+        // Check if the range is within 2 weeks
+        var twoWeeks = 14 * 24 * 60 * 60 * 1000; // 14 days in milliseconds
+        if ((dateTo - dateFrom) > twoWeeks) {
+            errorMessages.textContent = 'The date range must be within 2 weeks.';
+            return;
+        }
     
         var data = {
             arrival_date_from: arrivalDateFrom,
@@ -555,16 +606,5 @@ document.addEventListener('DOMContentLoaded', function () {
     
         lastParam = data;
     }
-    
 
-
-
-    
-    
-    
-
-
-
-    // Add more functions as needed
-    // ...
 });

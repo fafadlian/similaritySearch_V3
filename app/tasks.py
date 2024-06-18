@@ -1,5 +1,5 @@
 from app.models import Task
-from app.data_fetcher import fetch_pnr_data, save_xml_data_for_flight_id
+from app.data_fetcher import fetch_pnr_data, save_json_data_for_flight_id
 from app.azure_blob_storage import upload_to_blob_storage, download_from_blob_storage, delete_from_blob_storage
 from azure.storage.blob import ContainerClient
 from app.database import SessionLocal
@@ -50,7 +50,7 @@ def process_task(task_id, arrival_date_from, arrival_date_to, flight_number, fol
             print(f"Task {task_id} has {task.flight_count} unique flights")
 
             for flight in flight_ids:
-                save_xml_data_for_flight_id(flight, folder_name)
+                save_json_data_for_flight_id(flight, folder_name)
 
             task.status = 'completed'
             logging.info(f"Task {task_id} completed")

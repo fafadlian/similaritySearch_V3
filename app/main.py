@@ -2,7 +2,7 @@ from fastapi import APIRouter, HTTPException, Request, Depends
 from fastapi.responses import HTMLResponse, JSONResponse
 from app.tasks import process_task, delete_old_tasks
 from app.models import Task
-from app.data_fetcher import fetch_pnr_data, count_unique_flight_ids
+from app.data_fetcher import fetch_pnr_data
 from app.similarity_search import find_similar_passengers
 from app.loc_access import LocDataAccess
 from app.database import get_db
@@ -12,6 +12,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy.sql import text
 from app.azure_blob_storage import delete_from_blob_storage
 from dotenv import load_dotenv
+import numpy as np
 
 load_dotenv('environment.env')
 
@@ -51,7 +52,7 @@ async def submit_param(flight_search: FlightSearchRequest, db: Session = Depends
         db.add(task)
         db.commit()
 
-        # logging.info(f"Task {task_id} created with folder {folder_name}")
+        logging.info(f"Task {task_id} created with folder {folder_name}")
 
         process_task.delay(task_id, arrival_date_from, arrival_date_to, flight_nbr, folder_name)
 
@@ -134,8 +135,10 @@ async def handle_similarity_search(similarity_search: SimilaritySearchRequest, d
         similar_passengers = find_similar_passengers(
             airport_data_access, firstname, surname, name, dob, iata_o, iata_d, city_name, address, sex, nationality, folder_path, nameThreshold, ageThreshold, locationThreshold)
 
+
+        similar_passengers.replace([np.inf, -np.inf, np.nan], None, inplace=True)
         logging.info(f"perform_similarity_search: similar_passengers")
-        similar_passengers_json = similar_passengers.where(pd.notnull(similar_passengers), None).to_dict(orient='records')
+        similar_passengers_json = similar_passengers.to_dict(orient='records')
         response_data = {
             'data': similar_passengers_json,
             'message': 'Similar passengers found successfully'

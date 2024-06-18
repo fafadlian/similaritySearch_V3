@@ -13,7 +13,7 @@ def upload_to_blob_storage(blob_name, data):
     try:
         # logging.info(f"Uploading {blob_name} to blob storage from {data}...")
         blob_client = blob_service_client.get_blob_client(container=CONTAINER_NAME, blob=blob_name)
-        blob_client.upload_blob(data, overwrite=True, content_settings=ContentSettings(content_type='application/xml'))
+        blob_client.upload_blob(data, overwrite=True, content_settings=ContentSettings(content_type='application/json'))
 
         print(f"Uploaded {blob_name} to blob storage.")
     except Exception as e:

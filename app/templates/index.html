@@ -9,8 +9,7 @@
         <link rel="stylesheet" href="static/css/style.css">
 
         <!-- Add these lines in the <head> section of your HTML -->
-        <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
+        <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 
 
     </head>
@@ -51,24 +50,34 @@
                         <div class="form-row align-items-center mb-3">
                             <div class="col-md-4">Arrival Date From (ISO 8601 format):</div>
                             <div class="col-md-4 text-secondary">Datetime</div>
-                            <div class="col-md-4"><input type="datetime-local" id="arrivalDateFrom" name="arrivalDateFrom" class="form-control"></div>
-                          </div>
-        
-                          <div class="form-row align-items-center mb-3">
+                            <div class="col-md-4">
+                                <input type="datetime-local" id="arrivalDateFrom" name="arrivalDateFrom" class="form-control">
+                            </div>
+                        </div>
+                    
+                        <div class="form-row align-items-center mb-3">
                             <div class="col-md-4">Arrival Date To (ISO 8601 format):</div>
                             <div class="col-md-4 text-secondary">Datetime</div>
-                            <div class="col-md-4"><input type="datetime-local" id="arrivalDateTo" name="arrivalDateTo" class="form-control"></div>
-                          </div>
-
-                          <div class="form-row align-items-center mb-3">
+                            <div class="col-md-4">
+                                <input type="datetime-local" id="arrivalDateTo" name="arrivalDateTo" class="form-control">
+                            </div>
+                        </div>
+                    
+                        <div class="form-row align-items-center mb-3">
                             <div class="col-md-4">Flight Number:</div>
                             <div class="col-md-4 text-secondary">Number</div>
-                            <div class="col-md-4"><input type="int" id="flightNbr" name="flightNbr" placeholder="Flight Number" class="form-control"></div>
-                          </div>
-        
-                          <div class="form-row justify-content-end">
-                            <div class="col-md-4"><input type="submit" value="Submit Param" class="btn btn-primary"></div>
-                          </div>
+                            <div class="col-md-4">
+                                <input type="int" id="flightNbr" name="flightNbr" placeholder="Flight Number" class="form-control">
+                            </div>
+                        </div>
+                    
+                        <div id="errorMessages" class="text-danger mb-3"></div> <!-- Error message container -->
+                    
+                        <div class="form-row justify-content-end">
+                            <div class="col-md-4">
+                                <input type="submit" value="Submit Param" class="btn btn-primary">
+                            </div>
+                        </div>
                         <!-- Repeat for other fields -->
                     </form>
                 </div>
@@ -87,74 +96,75 @@
                 </div>
                 <div class="card-body">
 
-                <form id="searchForm" class="container mt-3">
-                    <!-- Group 1: Name with one threshold -->
-                    <div class="row">
-                        <div class="col-md-3"><strong>Description</strong></div>
-                        <div class="col-md-6"><strong>Value</strong></div>
-                        <div class="col-md-3"><strong>Threshold Value</strong></div>
-                    </div>
-                    <div class="row mb-2">
-                        <div class="col-md-3">Passenger Name:</div>
-                        <div class="col-md-6">
-                            <input type="text" id="firstname" placeholder="First Name" class="form-control mb-2">
-                            <input type="text" id="surname" placeholder="Surname" class="form-control">
+                    <form id="searchForm" class="container mt-3">
+                        <!-- Group 1: Name with one threshold -->
+                        <div class="row">
+                            <div class="col-md-3"><strong>Description</strong></div>
+                            <div class="col-md-6"><strong>Value</strong></div>
+                            <div class="col-md-3"><strong>Threshold Value</strong></div>
                         </div>
-                        <div class="col-md-3">
-                            <input type="int" id="nameThreshold" placeholder="Name Threshold" class="form-control">
-                        </div>
-                    </div>
-                    
-                    <!-- Group 2: Age with its own threshold -->
-                    <div class="row mb-2">
-                        <div class="col-md-3">Known DOB:</div>
-                        <div class="col-md-6">
-                            <input type="date" id="dob" placeholder="DOB" class="form-control mb-2"> </div>
+                        <div class="row mb-2">
+                            <div class="col-md-3">Passenger Name:</div>
+                            <div class="col-md-6">
+                                <input type="text" id="firstname" placeholder="First Name" class="form-control mb-2">
+                                <input type="text" id="surname" placeholder="Surname" class="form-control">
+                            </div>
                             <div class="col-md-3">
-                            <input type="int" id="ageThreshold" placeholder="Age Threshold" class="form-control">
-                        </div>
-                    </div>
-                    
-                    <!-- Group 3: Locations with one threshold -->
-                    <div class="row mb-2">
-                        <div class="col-md-3">Known Locations:</div>
-                        <div class="col-md-6">
-                            <input type="text" id="iata_o" placeholder="Origin Airport (IATA)" class="form-control mb-2">
-                            <input type="text" id="iata_d" placeholder="Destination Airport (IATA)" class="form-control mb-2">
-                            <input type="text" id="city_name" placeholder="Address (City)" class="form-control mb-2">
-                            <input type="text" id="address" placeholder="Address" class="form-control">
-                        </div>
-                        <div class="col-md-3">
-                            <input type="int" id="locationThreshold" placeholder="Location Threshold" class="form-control">
-                            <small class="form-text text-muted">
-                                Threshold value where 100 means exact similarity, and lower values indicate less similarity.
-                            </small>
+                                <input type="number" id="nameThreshold" placeholder="Name Threshold" class="form-control" min="0" max="100" required>
+                            </div>
                         </div>
                         
-                    </div>
-                    <!-- Group 3: Other Information -->
-                    <div class="row mb-2">
-                        <div class="col-md-3">Other Information:</div>
-                        <div class="col-md-6">
-                            <select id="sex" class="form-control mb-2">
-                                <option value="">Select Sex</option>
-                                <option value="M">Male</option>
-                                <option value="F">Female</option>
-                            </select>
-                            <select id="nationality" class="form-control mb-2">
-                                <!-- Add more options as needed -->
-                            </select>
+                        <!-- Group 2: Age with its own threshold -->
+                        <div class="row mb-2">
+                            <div class="col-md-3">Known DOB:</div>
+                            <div class="col-md-6">
+                                <input type="date" id="dob" placeholder="DOB" class="form-control mb-2"> </div>
+                                <div class="col-md-3">
+                                <input type="number" id="ageThreshold" placeholder="Age Threshold" class="form-control" min="0" max="100" required>
+                            </div>
                         </div>
                         
-                    </div>
-                    
-                    <!-- Submit Button -->
-                    <div class="row justify-content-end">
-                        <div class="col-md-1">
-                            <button type="submit" class="btn btn-primary">Search</button>
+                        <!-- Group 3: Locations with one threshold -->
+                        <div class="row mb-2">
+                            <div class="col-md-3">Known Locations:</div>
+                            <div class="col-md-6">
+                                <select id="iata_o" class="form-control mb-2" style="padding: 6px;"></select>
+                                <select id="iata_d" class="form-control mb-2" style="padding: 6px;"></select>
+                                <input type="text" id="city_name" placeholder="Address (City)" class="form-control mb-2">
+                                <input type="text" id="address" placeholder="Address" class="form-control">
+                            </div>
+                            <div class="col-md-3">
+                                <input type="number" id="locationThreshold" placeholder="Location Threshold" class="form-control" min="0" max="100" required>
+                                <small class="form-text text-muted">
+                                    Threshold value where 100 means exact similarity, and lower values indicate less similarity.
+                                </small>
+                            </div>
+                            
                         </div>
-                    </div>
-                </form>
+                        <!-- Group 3: Other Information -->
+                        <div class="row mb-2">
+                            <div class="col-md-3">Other Information:</div>
+                            <div class="col-md-6">
+                                <select id="sex" class="form-control mb-2">
+                                    <option value="None">Select Sex</option>
+                                    <option value="None">None</option>
+                                    <option value="M">Male</option>
+                                    <option value="F">Female</option>
+                                </select>
+                                <select id="nationality" class="form-control mb-2">
+                                    <!-- Add more options as needed -->
+                                </select>
+                            </div>
+                            
+                        </div>
+                        
+                        <!-- Submit Button -->
+                        <div class="row justify-content-end">
+                            <div class="col-md-1">
+                                <button type="submit" class="btn btn-primary">Search</button>
+                            </div>
+                        </div>
+                    </form>
                 
 
                 </div>
@@ -169,7 +179,8 @@
             
             <!-- <button id="downloadCsv" style="margin-top: 10px;" class="btn btn-primary">Download CSV</button> -->
             <button id="downloadJson" style="margin-top: 10px;" class="btn btn-primary">Download JSON</button>
-            <button id="deleteTask" style = "margin-top: 10px;"class="btn btn-danger">Delete Task</button>
+            <button id="deleteTask" style="margin-top: 10px;" class="btn btn-danger">Delete Task</button>
+
             <!-- <button id="downloadXml" style="margin-top: 10px;" class="btn btn-primary">Download XML</button> -->
         </section>
         <section id="anomalyDetectionSection" style="display:none;">
@@ -189,7 +200,7 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
     <script src="static/js/script.js"></script>
 

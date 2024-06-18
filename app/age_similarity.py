@@ -5,9 +5,14 @@ import numpy as np
 def calculate_age(dob):
     """Calculate age from DOB."""
     if pd.isnull(dob) or dob is None:
-        return None
+        return np.nan
+
     today = datetime.today()
-    dob = datetime.strptime(dob, "%Y-%m-%d")
+    try:
+        dob = datetime.strptime(dob, "%Y-%m-%d")
+    except ValueError:
+        return np.nan 
+
     return today.year - dob.year - ((today.month, today.day) < (dob.month, dob.day))
 
 def age_similarity_score(query_dob, dob):
@@ -15,11 +20,17 @@ def age_similarity_score(query_dob, dob):
     if dob is None or query_dob is None:
         return np.nan
     
+    if pd.isnull(dob) or pd.isnull(query_dob):
+        return np.nan
+    
     actual_age = calculate_age(dob)
     query_age = calculate_age(query_dob)
 
     if actual_age is None or query_age is None:
         return np.nan
+    
+    if actual_age is np.nan or query_age is np.nan:
+        return 0
     
     age_difference = abs(query_age - actual_age)
 
