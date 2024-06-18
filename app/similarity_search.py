@@ -2,6 +2,7 @@ import os
 import requests
 import json
 import pandas as pd
+import numpy as np
 import joblib
 
 import xml.etree.ElementTree as ET
@@ -141,15 +142,15 @@ def find_similar_passengers(airport_data_access, firstname, surname, name, dob, 
     city_org = airport_data_access.get_city_by_airport_iata(iata_o)
     city_dest = airport_data_access.get_city_by_airport_iata(iata_d)
     similar_passengers = perform_similarity_search(firstname, surname, name, iata_o, lat_o, lon_o, city_org, ctry_org, iata_d, lat_d, lon_d, city_dest, ctry_dest, dob, city_name, lat_c, lon_c, country, nationality, sex, address, all_data, nameThreshold, ageThreshold, locationThreshold)
-
+    logging.info(f"similar_passengers shape: {similar_passengers.shape}")
     return similar_passengers
 
 def perform_similarity_search(firstname, surname, name, iata_o, lat_o, lon_o, city_org, ctry_org, iata_d, lat_d, lon_d, city_dest, ctry_dest, dob, city_name, lat_c, lon_c, country,  nationality, sex, address, df, nameThreshold, ageThreshold, locationThreshold):
     similar_items = []
-    max_distance = 20037.5
+    max_distance = 12000
     similarity_df = pd.DataFrame()
     num_records = df.shape[0]
-    model_path = 'model/None_xgboost_model.joblib'
+    model_path = 'model/f1_xgboost_model.joblib'
     df.reset_index(inplace=True)
     df.rename(columns={'index': 'unique_id'}, inplace=True)
 
@@ -217,8 +218,8 @@ def perform_similarity_search(firstname, surname, name, iata_o, lat_o, lon_o, ci
     similarity_df.reset_index(inplace=True)
     similarity_df.rename(columns={'index': 'unique_id'}, inplace=True)
     expected_columns = ['FNSimilarity', 'FN_rarity1', 'FN_rarity2', 'FN_prob1', 'FN_prob2', 
-                    'SNSimilarity', 'SN_rarity1', 'SN_rarity2', 'SN_prob1', 'SN_prob2', 
-                    'AgeSimilarity', 'jcdAddressSimilarity', 'cityAddressMatch', 'cityAddressRarity1', 
+                    'SNSimilarity', 'SN_rarity1', 'SN_rarity2', 'SN_prob1', 'SN_prob2', 'DOBSimilarity', 'DOB_rarity1', 'DOB_rarity2', 'DOB_prob1', 'DOB_prob2',
+                    'AgeSimilarity', 'strAddressSimilarity', 'jcdAddressSimilarity', 'cityAddressMatch', 'cityAddressRarity1', 
                     'cityAddressProb1', 'cityAddressRarity2', 'cityAddressProb2', 'countryAddressMatch', 
                     'countryAddressRarity1', 'countryAddressProb1', 'countryAddressRarity2', 'countryAddressProb2', 
                     'sexMatch', 'sexRarity1', 'sexProb1', 'sexRarity2', 'sexProb2', 'natMatch', 
@@ -234,8 +235,7 @@ def perform_similarity_search(firstname, surname, name, iata_o, lat_o, lon_o, ci
                     'destinationCountryProb1', 'destinationCountryRarity2', 'destinationCountryProb2', 'orgdesCountryMatch', 
                     'desorgCountryMatch', 'originSimilarity', 'originExpScore', 'destinationSimilarity', 
                     'destinationExpScore', 'orgdesSimilarity', 'orgdesExpScore', 'desorgSimilarity', 'desorgExpScore']
-    coldrop = ['Class', 'Mark', 'DOBSimilarity', 'strAddressSimilarity',
-               'DOB_rarity1', 'DOB_rarity2', 'DOB_prob1', 'DOB_prob2',
+    coldrop = ['Class', 'Mark',
                'unique_id']
     test = similarity_df.drop(columns=coldrop, errors='ignore')
     for col in expected_columns:
@@ -246,18 +246,37 @@ def perform_similarity_search(firstname, surname, name, iata_o, lat_o, lon_o, ci
     test = test[expected_columns]
 
     model = joblib.load(model_path)
-    predictions = model.predict(test)
-    df['predictions'] = predictions
+    logging.info(f"Loading model from {model_path}")
+    feature_importances = model.feature_importances_
+    normalised_importances = feature_importances / np.sum(feature_importances)
+
+    logging.info(f"similarity_df shape: {similarity_df.shape}, normalised_importances len: {len(normalised_importances)}")
+    extra_columns = [col for col in similarity_df.columns if col not in expected_columns and col not in ['unique_id']]
+    logging.info(f"Extra columns in similarity_df: {extra_columns}")
+
+    # Create a DataFrame for relevant columns
+    relevant_similarities = similarity_df[expected_columns].copy()
+    relevant_similarities = relevant_similarities.multiply(normalised_importances, axis=1)
+    # relevant_similarities = relevant_similarities.applymap(lambda x: np.round(x, 3) if isinstance(x, (int, float)) else x)
+
+
+    logging.info(f"predicted")
+    df['Confidence Level'] = model.predict_proba(test)[:, 1]*100
+    similarity_df['Compound Similarity Score'] = relevant_similarities.sum(axis=1)
     result_df = pd.merge(df, similarity_df, on='unique_id', how='inner')
+    result_df = result_df.applymap(lambda x: np.round(x, 4) if isinstance(x, (int, float)) else x)
+    logging.info(f"result_df")
     nameThreshold = float(nameThreshold) if nameThreshold else 0
     ageThreshold = float(ageThreshold) if ageThreshold else 0
     locationThreshold = float(locationThreshold) if locationThreshold else 0
+
 
     filtered_result_df = result_df[(result_df['FNSimilarity'] >= nameThreshold) &
                         (result_df['SNSimilarity'] >= nameThreshold) &
                         (result_df['AgeSimilarity'] >= ageThreshold)
                         ]
     # filtered_result_df.to_csv('test/filtered_resilt_df.csv')
-    filtered_result_df.sort_values(by = ['predictions'], ascending = False, inplace = True)
+    filtered_result_df.sort_values(by = ['Confidence Level', 'Compound Similarity Score'], ascending = False, inplace = True)
+    logging.info(f"Filtered result shape: {filtered_result_df.shape}")
     # filtered_result_df.to_csv('filtered_result_df.csv')
     return filtered_result_df

@@ -30,8 +30,8 @@ document.addEventListener('DOMContentLoaded', function () {
     //Populating dropdowns
     populateNationalityDropdown();
 
-    const displayedColumns = ['predictions', 'Name', 'DOB', 'Sex', 'Nationality','Travel Doc Number', 'BookingID', 'FilePath']; // Directly displayed columns
-    const hoverColumns = ['FNSimilarity','SNSimilarity','AgeSimilarity', 'DOBSimilarity', 'strAddressSimilarity', 'natMatch', 'sexMatch', 'originSimilarity', 'destinationSimilarity', 'predictions']; // Columns to display on hover
+    const displayedColumns = ['Confidence Level', 'Compound Similarity Score', 'Name', 'DOB', 'Sex', 'Nationality','Travel Doc Number', 'BookingID']; // Directly displayed columns
+    const hoverColumns = ['FNSimilarity','SNSimilarity','AgeSimilarity', 'DOBSimilarity', 'strAddressSimilarity', 'natMatch', 'sexMatch', 'originSimilarity', 'destinationSimilarity']; // Columns to display on hover
     var globalResponseData = [];  // Global variable to store the response data
 
 
@@ -132,16 +132,57 @@ document.addEventListener('DOMContentLoaded', function () {
 
     document.getElementById('downloadCsv').addEventListener('click', function() {
         var data = globalResponseData;
-        var csvContent = "data:text/csv;charset=utf-8,";
     
-        // Define headers based on your JSON object keys
-        var headers = ["FilePath", "Booking ID", "Full Name", "Origin IATA", "Origin Lat", "Origin Lon", "Destination IATA", "Destination Lat", "Destination Lon", "DOB", "City Name", "City Lat", "City Lon", "Nationality", "Sex", "Name Similarity", "Origin Distance", "Destination Distance", "City Distance", "Age Similarity", "Compound Similarity"];
+        var searchQuery = lastSearchQuery;
+        var headers = [
+            "arrivalDateFrom", "arrivalDateTo",
+            "FirstName", "Surname", "DOB", "originIATA", "destinationIATA", "cityAddress", "Address", "Nationality", "Sex",
+            "nameSimilarityThreshold", "ageSimilarityThreshold", "locationSimilarityThreshold",
+            "FilePath", "Booking ID", "Full Name", "Origin IATA", "Origin Lat", "Origin Lon", "Destination IATA", "Destination Lat", "Destination Lon", "DOB", "City Name", "City Lat", "City Lon", "Nationality", "Sex", "Name Similarity", "Origin Distance", "Destination Distance", "City Distance", "Age Similarity", "Compound Similarity"
+        ];
+    
+        var csvContent = "data:text/csv;charset=utf-8,";
         csvContent += headers.join(",") + "\n";
     
-        // Iterate through each object in the data array and create a row for each
         data.forEach(function(item) {
-            var row = headers.map(header => item[header]).join(",");
-            csvContent += row + "\n";
+            var row = [
+                searchQuery.arrivalDateFrom,
+                searchQuery.arrivalDateTo,
+                searchQuery.firstname,
+                searchQuery.surname,
+                searchQuery.dob,
+                searchQuery.iata_o,
+                searchQuery.iata_d,
+                searchQuery.city_name,
+                searchQuery.address,
+                searchQuery.nationality,
+                searchQuery.sex,
+                searchQuery.nameThreshold,
+                searchQuery.ageThreshold,
+                searchQuery.locationThreshold,
+                item["FilePath"], 
+                item["Booking ID"], 
+                item["Full Name"], 
+                item["Origin IATA"], 
+                item["Origin Lat"], 
+                item["Origin Lon"], 
+                item["Destination IATA"], 
+                item["Destination Lat"], 
+                item["Destination Lon"], 
+                item["DOB"], 
+                item["City Name"], 
+                item["City Lat"], 
+                item["City Lon"], 
+                item["Nationality"], 
+                item["Sex"], 
+                item["Name Similarity"], 
+                item["Origin Distance"], 
+                item["Destination Distance"], 
+                item["City Distance"], 
+                item["Age Similarity"], 
+                item["Compound Similarity"]
+            ];
+            csvContent += row.map(value => `"${value}"`).join(",") + "\n";
         });
     
         var fileName = `similar_passengers_${new Date().toISOString()}.csv`;
@@ -151,7 +192,9 @@ document.addEventListener('DOMContentLoaded', function () {
         link.setAttribute("download", fileName);
         document.body.appendChild(link);
         link.click();
+        document.body.removeChild(link);
     });
+    
     
 
     document.getElementById('downloadJson').addEventListener('click', function() {

@@ -12,7 +12,6 @@ def calculate_age(dob):
 
 def age_similarity_score(query_dob, dob):
     """Calculate a normalized similarity score for age."""
-
     if dob is None or query_dob is None:
         return np.nan
     
@@ -22,30 +21,18 @@ def age_similarity_score(query_dob, dob):
     if actual_age is None or query_age is None:
         return np.nan
     
-    
-
     age_difference = abs(query_age - actual_age)
 
-    # Define dynamic age range based on query_age
-    if query_age < 18:
-        age_range = 2
-    elif 18 <= query_age <= 25:
-        age_range = 4
-    elif 25 < query_age <= 60:
-        age_range = 10
-    else:
-        age_range = 5
+    # Use logarithmic scale for age similarity
+    if age_difference == 0:
+        return 100
+    max_age = max(actual_age, query_age)
+    min_age = min(actual_age, query_age)
+    log_age_diff = np.log(max_age / min_age)
 
-    # Adjusted calculation to scale score to 0-100
-    # If the age difference is within the age range, calculate a diminishing score
-    if age_difference <= age_range:
-        # Scale factor to adjust the effect of age difference within the range
-        scale_factor = 100 / age_range
-        # Calculate the similarity score such that it decreases with age difference
-        score = 100 - (age_difference * scale_factor)
-    else:
-        # If the age difference is beyond the range, consider the score as 0 for simplicity
-        score = 0
+    # Scale log_age_diff to a 0-100 score
+    score = max(0, 100 - (log_age_diff * 100))
+
     return score
 
 # Example Usage

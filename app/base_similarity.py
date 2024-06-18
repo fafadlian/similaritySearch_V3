@@ -7,13 +7,13 @@ def count_likelihood2(x, counter, num_records):
     """
     Calculates the likelihood based on counts from the counter, with internal defaults for unseen categories.
 
-    :param type: The category to look up.
+    :param x: The category to look up.
     :param counter: A collection with counts of each category.
     :param num_records: The total number of records.
     :return: A pandas Series containing the rarity and probability.
     """
     # Default values for unseen categories
-    default_rarity = 1.0  # Adjust as needed, e.g., for very rare categories
+    default_rarity = 100.0  # Adjust as needed, e.g., for very rare categories
     default_prob = 0.0  # or some other sensible default for your use case
     if isinstance(x, pd.Series):
         x = x.iloc[0] if not x.empty else np.nan
@@ -26,8 +26,8 @@ def count_likelihood2(x, counter, num_records):
     
     # Calculate rarity and probability
     if x_count > 0 and num_records > 0:
-        rarity = x_count / num_records
-        prob = 1 / (x_count + 1)  # Adding 1 for Laplace smoothing to avoid division by zero
+        rarity = min((x_count / num_records) * 100, 100)  # Scale rarity to 0-100
+        prob = min((1 / x_count) * 100, 100)  # Scale probability to 0-100
     else:
         rarity = default_rarity
         prob = default_prob
@@ -51,7 +51,6 @@ def string_similarity(string1, string2, string_counts, num_records):
     
     # Handle NaN values
     if pd.isnull(string1) or pd.isnull(string2):
-        # print("One or both strings are NaN.")
         return pd.Series([np.nan, string1, string2, np.nan, np.nan, np.nan, np.nan])
     
     # Calculate string similarity
@@ -61,29 +60,26 @@ def string_similarity(string1, string2, string_counts, num_records):
         print(f"Error calculating string similarity: {e}")
         return pd.Series([np.nan, string1, string2, np.nan, np.nan, np.nan, np.nan])
     
-    # Initialize default values for inverse likelihoods
-    str1_ll_inverse = str2_ll_inverse = np.nan
+    # Initialize default values for rarity and probabilities
+    rarity1 = rarity2 = prob1 = prob2 = np.nan
     
-    # Attempt to calculate likelihoods, handling division by zero
+    # Attempt to calculate counts and likelihoods, handling division by zero
     try:
-        str1_ll = string_counts.get(string1.lower(), 0)
-        str2_ll = string_counts.get(string2.lower(), 0)
+        count1 = string_counts.get(string1.lower(), 0)
+        count2 = string_counts.get(string2.lower(), 0)
         
-        str1_ll_inverse = 1 if str1_ll == 0 else 1 / str1_ll
-        str2_ll_inverse = 1 if str2_ll == 0 else 1 / str2_ll
+        # Calculate rarity scores (direct count scaled to 0-100)
+        rarity1 = min((count1 / num_records) * 100, 100)
+        rarity2 = min((count2 / num_records) * 100, 100)
+
+        # Calculate probability scores (1 / count scaled to 0-100)
+        prob1 = 100 if count1 == 0 else min((1 / count1) * 100, 100)
+        prob2 = 100 if count2 == 0 else min((1 / count2) * 100, 100)
     except ZeroDivisionError:
         print("Division by zero encountered in likelihood calculation.")
+        prob1 = prob2 = 0
     except Exception as e:
         print(f"Error during likelihood calculation: {e}")
-    
-    # Calculate probabilities, handling division by zero explicitly
-    try:
-        prob1 = 0 if str1_ll == 0 else 1 / (str1_ll * num_records)
-        prob2 = 0 if str2_ll == 0 else 1 / (str2_ll * num_records)
-    except ZeroDivisionError:
-        prob1 = prob2 = 0  
-    except Exception as e:
-        print(f"Error during probability calculation: {e}")
         prob1 = prob2 = np.nan
     
-    return pd.Series([str_similarity, string1, string2, str1_ll_inverse, str2_ll_inverse, prob1, prob2])
+    return pd.Series([str_similarity, string1, string2, rarity1, rarity2, prob1, prob2])
