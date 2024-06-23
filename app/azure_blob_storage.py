@@ -15,7 +15,18 @@ def upload_to_blob_storage(blob_name, data):
         blob_client = blob_service_client.get_blob_client(container=CONTAINER_NAME, blob=blob_name)
         blob_client.upload_blob(data, overwrite=True, content_settings=ContentSettings(content_type='application/json'))
 
-        print(f"Uploaded {blob_name} to blob storage.")
+        # print(f"Uploaded {blob_name} to blob storage.")
+    except Exception as e:
+        logging.error(f"Error uploading {blob_name} to blob storage: {str(e)}")
+
+def upload_to_blob_storage_txt(blob_name, data):
+    try:
+        blob_client = blob_service_client.get_blob_client(container=CONTAINER_NAME, blob=blob_name)
+        if isinstance(data, str):
+            blob_client.upload_blob(data, overwrite=True, content_settings=ContentSettings(content_type='text/plain'))
+        else:
+            blob_client.upload_blob(data, overwrite=True)
+        # logging.info(f"Uploaded {blob_name} to blob storage.")
     except Exception as e:
         logging.error(f"Error uploading {blob_name} to blob storage: {str(e)}")
 
@@ -23,7 +34,7 @@ def download_from_blob_storage(blob_name):
     try:
         blob_client = blob_service_client.get_blob_client(container=CONTAINER_NAME, blob=blob_name)
         data = blob_client.download_blob().readall()
-        print(f"Downloaded {blob_name} from blob storage.")
+        # print(f"Downloaded {blob_name} from blob storage.")
         return data
     except Exception as e:
         logging.error(f"Error downloading {blob_name} from blob storage: {str(e)}")

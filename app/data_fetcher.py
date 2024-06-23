@@ -3,6 +3,8 @@ import requests
 import json
 import shutil
 from datetime import datetime
+import asyncio
+import aiohttp
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from app.azure_blob_storage import upload_to_blob_storage, delete_from_blob_storage, download_from_blob_storage, delete_all_files_in_directory
 import logging
@@ -159,3 +161,28 @@ def save_json_data_for_flight_id(flight_id, directory):
     
     except Exception as e:
         logging.error(f"Error processing task {directory}: {str(e)}")
+
+async def fetch_all_pnr_data(flight_ids, directory, access_token):
+    async with aiohttp.ClientSession() as session:
+        tasks = []
+        for flight_id in flight_ids:
+            task = asyncio.create_task(fetch_and_save_pnr_data(session, flight_id, directory, access_token))
+            tasks.append(task)
+        await asyncio.gather(*tasks)
+
+async def fetch_and_save_pnr_data(session, flight_id, folder_name, access_token):
+    api_url = f'https://tenacity-rmt.eurodyn.com/api/dataset/flight/{flight_id}'
+    headers = {'Authorization': f'Bearer {access_token}'}
+    
+    try:
+        async with session.get(api_url, headers=headers) as response:
+            if response.status == 200:
+                data = await response.read()
+                blob_name = f"{folder_name}/flight_id_{flight_id}.json"
+                upload_to_blob_storage(blob_name, data)
+                logging.info(f"Uploaded JSON data for flight ID {flight_id} to Azure Blob Storage as {blob_name}")
+            else:
+                logging.warning(f"Failed to retrieve JSON data for flight ID {flight_id}: {await response.text()}")
+    
+    except Exception as e:
+        logging.error(f"Error fetching PNR data for flight ID {flight_id}: {str(e)}")

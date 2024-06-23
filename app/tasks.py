@@ -1,10 +1,15 @@
 from app.models import Task
-from app.data_fetcher import fetch_pnr_data, save_json_data_for_flight_id
-from app.azure_blob_storage import upload_to_blob_storage, download_from_blob_storage, delete_from_blob_storage
+from app.data_fetcher import fetch_pnr_data, save_json_data_for_flight_id, fetch_all_pnr_data
+from app.azure_blob_storage import upload_to_blob_storage, download_from_blob_storage, delete_from_blob_storage, upload_to_blob_storage_txt
+from app.similarity_search import find_similar_passengers
+from app.loc_access import LocDataAccess
 from azure.storage.blob import ContainerClient
 from app.database import SessionLocal
 from app.celery_init import celery
+import numpy as np
 import os
+import time
+import asyncio
 from datetime import datetime, timedelta
 import shutil
 import logging
@@ -19,7 +24,6 @@ container_client = ContainerClient.from_connection_string(AZURE_STORAGE_CONNECTI
 
 @celery.task
 def process_task(task_id, arrival_date_from, arrival_date_to, flight_number, folder_name):
-    # from app import celery  # Import here to avoid circular import issues
     session = SessionLocal()
 
     try:
@@ -33,24 +37,30 @@ def process_task(task_id, arrival_date_from, arrival_date_to, flight_number, fol
             'ft_flight_leg_flight_number': flight_number
         }
 
-        print(f"Processing task {task_id}")
+        # Time measurement for the first approach
+        start_time = time.time()
         pnr_data, total_pages = fetch_pnr_data(api_url, access_token, params)
-        print(f"Total pages: {total_pages}")
-        
+        end_time = time.time()
+        time_first_approach = end_time - start_time
+        logging.info(f"Time for fetching PNR data (first approach): {time_first_approach:.2f} seconds")
+
         task = session.query(Task).get(task_id)
 
         if not task:
             logging.error(f"Task with ID {task_id} not found.")
             return
-        
-        if pnr_data:
-            flight_ids = [flight['flight_id'] for flight in pnr_data]  # Extract flight IDs
-            task.flight_ids = ",".join(flight_ids)  # Assuming Task model has a flight_ids field
-            task.flight_count = len(set(flight_ids))
-            print(f"Task {task_id} has {task.flight_count} unique flights")
 
-            for flight in flight_ids:
-                save_json_data_for_flight_id(flight, folder_name)
+        if pnr_data:
+            flight_ids = [flight['flight_id'] for flight in pnr_data]
+            task.flight_ids = ",".join(flight_ids)
+            task.flight_count = len(set(flight_ids))
+
+            # Time measurement for the concurrent fetching approach
+            start_time = time.time()
+            asyncio.run(fetch_all_pnr_data(flight_ids, folder_name, access_token))
+            end_time = time.time()
+            time_concurrent_approach = end_time - start_time
+            logging.info(f"Time for fetching PNR data concurrently: {time_concurrent_approach:.2f} seconds")
 
             task.status = 'completed'
             logging.info(f"Task {task_id} completed")
@@ -60,10 +70,21 @@ def process_task(task_id, arrival_date_from, arrival_date_to, flight_number, fol
 
         session.commit()
 
+        # Save time measurements to a string
+        time_comparison_content = (
+            f"Time for fetching PNR data (first approach): {time_first_approach:.2f} seconds\n"
+            f"Time for fetching PNR data concurrently: {time_concurrent_approach:.2f} seconds\n"
+        )
+
+        # Save the string as a blob in Azure Blob Storage
+        blob_name = f"{folder_name}/time_comparison.txt"
+        upload_to_blob_storage_txt(blob_name, time_comparison_content)
+        logging.info(f"Uploaded time comparison results to Azure Blob Storage as {blob_name}")
+
     except Exception as e:
         task.status = 'failed'
         session.commit()
-        print(f"Error processing task {task_id}: {e}")
+        logging.error(f"Error processing task {task_id}: {e}")
     finally:
         session.close()
 
@@ -88,3 +109,18 @@ def delete_old_tasks():
         print(f"Error deleting old tasks: {e}")
     finally:
         session.close()
+
+
+@celery.task
+def perform_similarity_search_task(task_id, firstname, surname, dob, iata_o, iata_d, city_name, address, sex, nationality, folder_path, nameThreshold, ageThreshold, locationThreshold):
+    airport_data_access = LocDataAccess.get_instance()
+    similar_passengers = find_similar_passengers(
+        airport_data_access, firstname, surname, f"{firstname} {surname}", dob, iata_o, iata_d, city_name, address, sex, nationality, folder_path, nameThreshold, ageThreshold, locationThreshold)
+    
+    similar_passengers.replace([np.inf, -np.inf, np.nan], None, inplace=True)
+    # Convert DataFrame to JSON-serializable format
+    similar_passengers_json = similar_passengers.to_dict(orient='records')
+    
+    # Here you could save the result to a database or a file
+    return {"status": "success", "data": similar_passengers_json}
+

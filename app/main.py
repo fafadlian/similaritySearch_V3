@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException, Request, Depends
 from fastapi.responses import HTMLResponse, JSONResponse
-from app.tasks import process_task, delete_old_tasks
+from app.tasks import process_task, delete_old_tasks, perform_similarity_search_task
 from app.models import Task
 from app.data_fetcher import fetch_pnr_data
 from app.similarity_search import find_similar_passengers
@@ -60,17 +60,6 @@ async def submit_param(flight_search: FlightSearchRequest, db: Session = Depends
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-
-@router.post("/count_unique_flight_ids")
-async def count_flight_ids(request: Request):
-    data = await request.json()
-    file_name = data['fileName']
-    try:
-        file_path = f'jsonData/{file_name}'
-        count = count_unique_flight_ids(file_path)
-        return {"unique_flight_id_count": count}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error processing the file: {str(e)}")
     
 
 @router.get("/flight_ids/{task_id}")
@@ -130,15 +119,16 @@ async def handle_similarity_search(similarity_search: SimilaritySearchRequest, d
 
         folder_path = task.folder_path  # Use the folder path associated with the task
 
-        airport_data_access = LocDataAccess.get_instance()
-        logging.info(f"perform_similarity_search: find_similar_passengers")
-        similar_passengers = find_similar_passengers(
-            airport_data_access, firstname, surname, name, dob, iata_o, iata_d, city_name, address, sex, nationality, folder_path, nameThreshold, ageThreshold, locationThreshold)
+        # Start Celery task
+        celery_task = perform_similarity_search_task.delay(task_id, firstname, surname, dob, iata_o, iata_d, city_name, address, sex, nationality, folder_path, nameThreshold, ageThreshold, locationThreshold)
 
+        # Wait for task completion
+        result = celery_task.get(timeout=300)  # Timeout after 5 minutes
+        if result["status"] != "success":
+            raise HTTPException(status_code=500, detail="Error during similarity search")
 
-        similar_passengers.replace([np.inf, -np.inf, np.nan], None, inplace=True)
-        logging.info(f"perform_similarity_search: similar_passengers")
-        similar_passengers_json = similar_passengers.to_dict(orient='records')
+        similar_passengers_json = result["data"]
+
         response_data = {
             'data': similar_passengers_json,
             'message': 'Similar passengers found successfully'

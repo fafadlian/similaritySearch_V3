@@ -4,8 +4,9 @@ import json
 import pandas as pd
 import numpy as np
 import joblib
-from multiprocessing import Pool
+import concurrent.futures
 from functools import partial
+import time
 
 import xml.etree.ElementTree as ET
 from concurrent.futures import ThreadPoolExecutor, as_completed
@@ -18,6 +19,7 @@ from app.azure_blob_storage import upload_to_blob_storage, download_from_blob_st
 from azure.storage.blob import BlobServiceClient, BlobClient, ContainerClient
 import logging
 
+
 logging.basicConfig(level=logging.INFO)
 
 
@@ -28,62 +30,27 @@ blob_service_client = BlobServiceClient.from_connection_string(AZURE_STORAGE_CON
 
 def process_files_in_parallel(file_paths, parse_function, num_workers=None):
     if num_workers is None:
-        num_workers = os.cpu_count() - 1  # Leave one core free
-    with Pool(num_workers) as pool:
-        dfs = pool.map(parse_function, file_paths)
+        num_workers = max(os.cpu_count() - 1, 1)  # Leave at least one core free
+
+    with concurrent.futures.ThreadPoolExecutor(max_workers=num_workers) as executor:
+        futures = {executor.submit(parse_function, file_path): file_path for file_path in file_paths}
+        dfs = []
+        for future in concurrent.futures.as_completed(futures):
+            try:
+                dfs.append(future.result())
+            except Exception as exc:
+                logging.error(f'File {futures[future]} generated an exception: {exc}')
+
     all_data = pd.concat(dfs, ignore_index=True)
     return all_data
 
 
-
-def parse_xml(file_path):
-    logging.info(f"Parsing XML file: {file_path}")
-    airport_data_access = LocDataAccess.get_instance()  # Access the singleton instance
-    xml_content = download_from_blob_storage(file_path)  # Download XML content from Azure Blob Storage
-    logging.info(f"ready to parse: {file_path}")
-    logging.info(f"xml_content: {xml_content}")
-    root = ET.fromstring(xml_content)
-    logging.info(f"rooting success: {root}")
-    data = []
-
-    origin_code = root.find('.//FlightLeg/DepartureAirport').get('LocationCode') if root.find('.//FlightLeg/DepartureAirport') is not None else None
-    destination_code = root.find('.//FlightLeg/ArrivalAirport').get('LocationCode') if root.find('.//FlightLeg/ArrivalAirport') is not None else None
-    origin_lon, origin_lat = airport_data_access.get_airport_lon_lat_by_iata(origin_code) if origin_code else (None, None)
-    destination_lon, destination_lat = airport_data_access.get_airport_lon_lat_by_iata(destination_code) if destination_code else (None, None)
-
-    for pnr in root.findall('.//PNR'):
-        bookID = pnr.find('.//BookingRefID').get('ID') if pnr.find('.//BookingRefID') is not None else 'Unknown'
-        for passenger in pnr.findall('.//Passenger'):
-            firstname = passenger.find('.//GivenName').text.strip()
-            surname = passenger.find('.//Surname').text.strip()
-            name = f"{firstname} {surname}"
-            travel_doc_nbr = passenger.find('.//DOC_SSR/DOCO').get('TravelDocNbr') if passenger.find('.//DOC_SSR/DOCO') is not None else 'Unknown'
-            place_of_issue = passenger.find('.//DOC_SSR/DOCO').get('PlaceOfIssue') if passenger.find('.//DOC_SSR/DOCO') is not None else 'Unknown'
-            date_of_birth = passenger.find('.//DOC_SSR/DOCS').get('DateOfBirth') if passenger.find('.//DOC_SSR/DOCS') is not None else 'Unknown'
-            nationality = passenger.find('.//DOC_SSR/DOCS').get('PaxNationality') if passenger.find('.//DOC_SSR/DOCS') is not None else 'Unknown'
-            sex = passenger.find('.//DOC_SSR/DOCS').get('Gender') if passenger.find('.//DOC_SSR/DOCS') is not None else 'Unknown'
-            city_name = passenger.find('.//DOC_SSR/DOCA').get('CityName') if passenger.find('.//DOC_SSR/DOCA') is not None else None
-            address = passenger.find('.//DOC_SSR/DOCA').get('Address') if passenger.find('.//DOC_SSR/DOCA') is not None else None
-            
-            city_lat, city_lon = airport_data_access.get_airport_lon_lat_by_city(city_name) if city_name else (None, None)
-            city_org = airport_data_access.get_city_by_airport_iata(origin_code) if origin_code else (None)
-            city_dest = airport_data_access.get_city_by_airport_iata(destination_code) if destination_code else (None)
-            ctry_org = airport_data_access.get_country_by_airport_iata(origin_code) if origin_code else (None)
-            ctry_dest = airport_data_access.get_country_by_airport_iata(destination_code) if destination_code else (None)
-            country_of_address = airport_data_access.get_country_by_city(city_name) if city_name else (None)
-
-            data.append((file_path, bookID, firstname, surname, name, travel_doc_nbr, place_of_issue, origin_code, city_org, ctry_org, origin_lat, origin_lon, destination_code, city_dest, ctry_dest, destination_lat, destination_lon, date_of_birth, city_name, city_lat, city_lon, address,  country_of_address, nationality, sex))
-    
-    columns = ['FilePath', 'BookingID', 'Firstname', 'Surname', 'Name', 'Travel Doc Number', 'Place of Issue', 'OriginIATA', 'OriginCity', 'OriginCountry', 'OriginLat', 'OriginLon', 'DestinationIATA', 'DestinationCity', 'DestinationCountry', 'DestinationLat', 'DestinationLon', 'DOB', 'CityName', 'CityLat', 'CityLon', 'Address', 'Country of Address', 'Nationality', 'Sex']
-    df = pd.DataFrame(data, columns=columns)
-    return df
 
 def parse_json(file_path):
     logging.info(f"Parsing JSON file: {file_path}")
     airport_data_access = LocDataAccess.get_instance()  # Access the singleton instance
     json_content = download_from_blob_storage(file_path)  # Download JSON content from Azure Blob Storage
     logging.info(f"ready to parse: {file_path}")
-    logging.info(f"json_content: {json_content}")
     data = json.loads(json_content)
 
     flight_data = data['iata_pnrgov_notif_rq_obj']
@@ -135,26 +102,25 @@ def find_similar_passengers(airport_data_access, firstname, surname, name, dob, 
     name_comb = firstname + " " + surname
 
     # List all XML files in the directory
-    logging.info(f"Searching for XML files in the directory {data_dir}")
+    logging.info(f"Searching for JSON files in the directory {data_dir}")
     data_files = [blob.name for blob in blob_service_client.get_container_client(CONTAINER_NAME).list_blobs(name_starts_with=data_dir) if blob.name.endswith('.json')]
-    logging.info(f"Found {len(data_files)} XML files in the directory")
+    logging.info(f"Found {len(data_files)} JSON files in the directory")
     # json_files = [blob.name for blob in blob_service_client.get_container_client(CONTAINER_NAME).list_blobs(name_starts_with=data_dir) if blob.name.endswith('.json')]
-
-    # Parse each XML file and aggregate data
-    # for file_path in data_files:
-    #     data = parse_xml(file_path)
-    #     all_data = pd.concat([all_data, data], ignore_index=True)
 
     
     # Parse each XML file and aggregate data
-    # all_data = process_files_in_parallel(data_files, parse_json)
-    for file_path in data_files:
-        data = parse_json(file_path)
-        all_data = pd.concat([all_data, data], ignore_index=True)   
+    start_time = time.time()
+    all_data = process_files_in_parallel(data_files, parse_json)
+    end_time = time.time()
+    logging.info(f"Time for fetching JSON data concurrently: {end_time - start_time:.2f} seconds")
+    # for file_path in data_files:
+    #     data = parse_json(file_path)
+    #     all_data = pd.concat([all_data, data], ignore_index=True)   
 
     logging.info(f"all_data shape: {all_data.shape}")
 
     # Perform similarity search on the aggregated data
+    start_time = time.time()
     lon_o, lat_o = airport_data_access.get_airport_lon_lat_by_iata(iata_o)
     lon_d, lat_d = airport_data_access.get_airport_lon_lat_by_iata(iata_d)
     lon_c, lat_c = airport_data_access.get_airport_lon_lat_by_city(city_name)
@@ -163,8 +129,14 @@ def find_similar_passengers(airport_data_access, firstname, surname, name, dob, 
     ctry_dest = airport_data_access.get_country_by_airport_iata(iata_d)
     city_org = airport_data_access.get_city_by_airport_iata(iata_o)
     city_dest = airport_data_access.get_city_by_airport_iata(iata_d)
+    end_time = time.time()
+    logging.info(f"Time for fetching location data: {end_time - start_time:.2f} seconds")
+    start_time = time.time()
     similar_passengers = perform_similarity_search(firstname, surname, name, iata_o, lat_o, lon_o, city_org, ctry_org, iata_d, lat_d, lon_d, city_dest, ctry_dest, dob, city_name, lat_c, lon_c, country, nationality, sex, address, all_data, nameThreshold, ageThreshold, locationThreshold)
+    end_time = time.time()
+    logging.info(f"Time for similarity search: {end_time - start_time:.2f} seconds")
     logging.info(f"similar_passengers shape: {similar_passengers.shape}")
+    similar_passengers.replace([np.inf, -np.inf, np.nan], None, inplace=True)
     return similar_passengers
 
 def perform_similarity_search(firstname, surname, name, iata_o, lat_o, lon_o, city_org, ctry_org, iata_d, lat_d, lon_d, city_dest, ctry_dest, dob, city_name, lat_c, lon_c, country,  nationality, sex, address, df, nameThreshold, ageThreshold, locationThreshold):
@@ -176,6 +148,7 @@ def perform_similarity_search(firstname, surname, name, iata_o, lat_o, lon_o, ci
     df.reset_index(inplace=True)
     df.rename(columns={'index': 'unique_id'}, inplace=True)
 
+    start_time = time.time()
     gender_counts = df['Sex'].str.lower().value_counts(normalize=True)
     origin_airport_counts = df['OriginIATA'].str.lower().value_counts(normalize=True)
     origin_city_counts = df['OriginCity'].str.lower().value_counts(normalize=True)
@@ -189,9 +162,12 @@ def perform_similarity_search(firstname, surname, name, iata_o, lat_o, lon_o, ci
     DOB_counts = df['DOB'].value_counts(normalize=True)
     firstname_counts = df['Firstname'].str.lower().value_counts(normalize=True)
     surname_counts = df['Surname'].str.lower().value_counts(normalize=True)
+    end_time = time.time()
+    logging.info(f"Time for calculating counts: {end_time - start_time:.2f} seconds")
     logging.info(f"Counts calculated")
 
 
+    start_time = time.time()
     similarity_df[['FNSimilarity', 'FN1', 'FN2', 'FN_rarity1', 'FN_rarity2', 'FN_prob1', 'FN_prob2']] = df['Firstname'].apply(lambda x: string_similarity(firstname, x, firstname_counts, num_records))
     similarity_df[['SNSimilarity', 'SN1', 'SN2', 'SN_rarity1', 'SN_rarity2', 'SN_prob1', 'SN_prob2']] = df['Surname'].apply(lambda x: string_similarity(surname, x, surname_counts, num_records))
     similarity_df[['DOBSimilarity', 'DOB1', 'DOB2', 'DOB_rarity1', 'DOB_rarity2', 'DOB_prob1', 'DOB_prob2']] = df['DOB'].apply(lambda x: string_similarity(dob, x, DOB_counts, num_records))
@@ -237,7 +213,9 @@ def perform_similarity_search(firstname, surname, name, iata_o, lat_o, lon_o, ci
     similarity_df[['destinationSimilarity', 'destinationExpScore']] = df.apply(lambda row: location_similarity_score(lon_d, lat_d, row['DestinationLon'], row['DestinationLat'], max_distance), axis=1, result_type='expand')
     similarity_df[['orgdesSimilarity', 'orgdesExpScore']] = df.apply(lambda row: location_similarity_score(lon_o, lat_o, row['DestinationLon'], row['DestinationLat'], max_distance), axis=1, result_type='expand')
     similarity_df[['desorgSimilarity', 'desorgExpScore']] = df.apply(lambda row: location_similarity_score(lon_d, lat_d, row['OriginLon'], row['OriginLat'], max_distance), axis=1, result_type='expand')
-    
+    end_time = time.time()
+    logging.info(f"Time for calculating similarities: {end_time - start_time:.2f} seconds")
+
     similarity_df.reset_index(inplace=True)
     similarity_df.rename(columns={'index': 'unique_id'}, inplace=True)
     expected_columns = ['FNSimilarity', 'FN_rarity1', 'FN_rarity2', 'FN_prob1', 'FN_prob2', 
@@ -284,10 +262,13 @@ def perform_similarity_search(firstname, surname, name, iata_o, lat_o, lon_o, ci
 
 
     logging.info(f"predicted")
+    start_time = time.time()
     df['Confidence Level'] = model.predict_proba(test)[:, 1]*100
     similarity_df['Compound Similarity Score'] = relevant_similarities.sum(axis=1)
     result_df = pd.merge(df, similarity_df, on='unique_id', how='inner')
     result_df = result_df.applymap(lambda x: np.round(x, 4) if isinstance(x, (int, float)) else x)
+    end_time = time.time()
+    logging.info(f"Time for calculating compound similarity and ML Model: {end_time - start_time:.2f} seconds")
     logging.info(f"result_df")
     nameThreshold = float(nameThreshold) if nameThreshold else 0
     ageThreshold = float(ageThreshold) if ageThreshold else 0
@@ -310,3 +291,50 @@ def perform_similarity_search(firstname, surname, name, iata_o, lat_o, lon_o, ci
     logging.info(f"Filtered result shape: {filtered_result_df.shape}")
     # filtered_result_df.to_csv('filtered_result_df.csv')
     return filtered_result_df
+
+
+
+
+
+
+def parse_xml(file_path):
+    logging.info(f"Parsing XML file: {file_path}")
+    airport_data_access = LocDataAccess.get_instance()  # Access the singleton instance
+    xml_content = download_from_blob_storage(file_path)  # Download XML content from Azure Blob Storage
+    logging.info(f"ready to parse: {file_path}")
+    logging.info(f"xml_content: {xml_content}")
+    root = ET.fromstring(xml_content)
+    logging.info(f"rooting success: {root}")
+    data = []
+
+    origin_code = root.find('.//FlightLeg/DepartureAirport').get('LocationCode') if root.find('.//FlightLeg/DepartureAirport') is not None else None
+    destination_code = root.find('.//FlightLeg/ArrivalAirport').get('LocationCode') if root.find('.//FlightLeg/ArrivalAirport') is not None else None
+    origin_lon, origin_lat = airport_data_access.get_airport_lon_lat_by_iata(origin_code) if origin_code else (None, None)
+    destination_lon, destination_lat = airport_data_access.get_airport_lon_lat_by_iata(destination_code) if destination_code else (None, None)
+
+    for pnr in root.findall('.//PNR'):
+        bookID = pnr.find('.//BookingRefID').get('ID') if pnr.find('.//BookingRefID') is not None else 'Unknown'
+        for passenger in pnr.findall('.//Passenger'):
+            firstname = passenger.find('.//GivenName').text.strip()
+            surname = passenger.find('.//Surname').text.strip()
+            name = f"{firstname} {surname}"
+            travel_doc_nbr = passenger.find('.//DOC_SSR/DOCO').get('TravelDocNbr') if passenger.find('.//DOC_SSR/DOCO') is not None else 'Unknown'
+            place_of_issue = passenger.find('.//DOC_SSR/DOCO').get('PlaceOfIssue') if passenger.find('.//DOC_SSR/DOCO') is not None else 'Unknown'
+            date_of_birth = passenger.find('.//DOC_SSR/DOCS').get('DateOfBirth') if passenger.find('.//DOC_SSR/DOCS') is not None else 'Unknown'
+            nationality = passenger.find('.//DOC_SSR/DOCS').get('PaxNationality') if passenger.find('.//DOC_SSR/DOCS') is not None else 'Unknown'
+            sex = passenger.find('.//DOC_SSR/DOCS').get('Gender') if passenger.find('.//DOC_SSR/DOCS') is not None else 'Unknown'
+            city_name = passenger.find('.//DOC_SSR/DOCA').get('CityName') if passenger.find('.//DOC_SSR/DOCA') is not None else None
+            address = passenger.find('.//DOC_SSR/DOCA').get('Address') if passenger.find('.//DOC_SSR/DOCA') is not None else None
+            
+            city_lat, city_lon = airport_data_access.get_airport_lon_lat_by_city(city_name) if city_name else (None, None)
+            city_org = airport_data_access.get_city_by_airport_iata(origin_code) if origin_code else (None)
+            city_dest = airport_data_access.get_city_by_airport_iata(destination_code) if destination_code else (None)
+            ctry_org = airport_data_access.get_country_by_airport_iata(origin_code) if origin_code else (None)
+            ctry_dest = airport_data_access.get_country_by_airport_iata(destination_code) if destination_code else (None)
+            country_of_address = airport_data_access.get_country_by_city(city_name) if city_name else (None)
+
+            data.append((file_path, bookID, firstname, surname, name, travel_doc_nbr, place_of_issue, origin_code, city_org, ctry_org, origin_lat, origin_lon, destination_code, city_dest, ctry_dest, destination_lat, destination_lon, date_of_birth, city_name, city_lat, city_lon, address,  country_of_address, nationality, sex))
+    
+    columns = ['FilePath', 'BookingID', 'Firstname', 'Surname', 'Name', 'Travel Doc Number', 'Place of Issue', 'OriginIATA', 'OriginCity', 'OriginCountry', 'OriginLat', 'OriginLon', 'DestinationIATA', 'DestinationCity', 'DestinationCountry', 'DestinationLat', 'DestinationLon', 'DOB', 'CityName', 'CityLat', 'CityLon', 'Address', 'Country of Address', 'Nationality', 'Sex']
+    df = pd.DataFrame(data, columns=columns)
+    return df
