@@ -15,7 +15,7 @@ from app.loc_access import LocDataAccess
 from app.location_similarity import haversine, location_similarity_score, location_matching, address_str_similarity_score
 from app.age_similarity import age_similarity_score, calculate_age
 from app.base_similarity import count_likelihood2, string_similarity
-from app.azure_blob_storage import upload_to_blob_storage, download_from_blob_storage, delete_all_files_in_directory
+from app.azure_blob_storage import upload_to_blob_storage, download_from_blob_storage, delete_all_files_in_directory, fetch_combined_data
 from azure.storage.blob import BlobServiceClient, BlobClient, ContainerClient
 import logging
 
@@ -44,7 +44,86 @@ def process_files_in_parallel(file_paths, parse_function, num_workers=None):
     all_data = pd.concat(dfs, ignore_index=True)
     return all_data
 
+def enrich_data(df):
+    airport_data_access = LocDataAccess.get_instance()
 
+    # Fetch lat/lon for origin and destination airports using vectorized operations
+    origin_locs = df['OriginIATA'].map(lambda x: airport_data_access.get_airport_lon_lat_by_iata(x) if x else (None, None))
+    destination_locs = df['DestinationIATA'].map(lambda x: airport_data_access.get_airport_lon_lat_by_iata(x) if x else (None, None))
+
+    df[['OriginLat', 'OriginLon']] = pd.DataFrame(origin_locs.tolist(), index=df.index)
+    df[['DestinationLat', 'DestinationLon']] = pd.DataFrame(destination_locs.tolist(), index=df.index)
+
+    # Fetch city information using vectorized operations
+    city_locs = df['CityName'].map(lambda x: airport_data_access.get_airport_lon_lat_by_city(x) if x else (None, None))
+    df[['CityLat', 'CityLon']] = pd.DataFrame(city_locs.tolist(), index=df.index)
+    
+    df['OriginCity'] = df['OriginIATA'].map(lambda x: airport_data_access.get_city_by_airport_iata(x) if x else None)
+    df['DestinationCity'] = df['DestinationIATA'].map(lambda x: airport_data_access.get_city_by_airport_iata(x) if x else None)
+    
+    df['OriginCountry'] = df['OriginIATA'].map(lambda x: airport_data_access.get_country_by_airport_iata(x) if x else None)
+    df['DestinationCountry'] = df['DestinationIATA'].map(lambda x: airport_data_access.get_country_by_airport_iata(x) if x else None)
+    
+    df['Country of Address'] = df['CityName'].map(lambda x: airport_data_access.get_country_by_city(x) if x else None)
+    
+    return df
+
+
+def parse_combined_data(combined_data):
+    logging.info(f"Parsing combined JSON data")
+    start_time = time.time()
+
+    airport_data_access = LocDataAccess.get_instance()  # Access the singleton instance
+
+    all_data = []
+
+    for data in combined_data:
+        flight_data = data['iata_pnrgov_notif_rq_obj']
+        origin_code = flight_data.get('flight_leg_departure_airp_location_code')
+        destination_code = flight_data.get('flight_leg_arrival_airp_location_code')
+        flight_leg_flight_number = flight_data.get('flight_leg_flight_number', 'Unknown')
+        originator_airline_code = flight_data.get('originator_airline_code', 'Unknown')
+        origin_lon, origin_lat = airport_data_access.get_airport_lon_lat_by_iata(origin_code) if origin_code else (None, None)
+        destination_lon, destination_lat = airport_data_access.get_airport_lon_lat_by_iata(destination_code) if destination_code else (None, None)
+
+        pnr_data = [
+            (pnr, flight, passenger)
+            for pnr in flight_data['pnr_obj']
+            for flight in pnr['flight_obj']
+            for passenger in pnr['passenger_obj']
+        ]
+
+        for pnr, flight, passenger in pnr_data:
+            bookID = pnr.get('booking_refid', 'Unknown')
+            operating_airline_flight_number = flight.get('operating_airline_flight_number', 'Unknown')
+            departure_date_time = flight.get('departure_date_time', 'Unknown')
+            arrival_date_time = flight.get('arrival_date_time', 'Unknown')
+
+            firstname = passenger['doc_ssr_obj'].get('docs_first_givenname', '').strip()
+            surname = passenger['doc_ssr_obj'].get('docs_surname', '').strip()
+            name = f"{firstname} {surname}"
+            travel_doc_nbr = passenger['doc_ssr_obj'].get('doco_travel_doc_nbr', 'Unknown')
+            place_of_issue = passenger['doc_ssr_obj'].get('doco_placeof_issue', 'Unknown')
+            date_of_birth = passenger['doc_ssr_obj'].get('docs_dateof_birth', 'Unknown')
+            nationality = passenger['doc_ssr_obj'].get('docs_pax_nationality', 'Unknown')
+            sex = passenger['doc_ssr_obj'].get('docs_gender', 'Unknown')
+            city_name = passenger['doc_ssr_obj'].get('doca_city_name')
+            address = passenger['doc_ssr_obj'].get('doca_address')
+
+            all_data.append((
+                origin_code, destination_code, flight_leg_flight_number, originator_airline_code,
+                operating_airline_flight_number, departure_date_time, arrival_date_time, bookID,
+                firstname, surname, name, travel_doc_nbr, place_of_issue, date_of_birth, nationality, sex,
+                city_name, address
+            ))
+
+    columns = ['OriginIATA', 'DestinationIATA', 'FlightLegFlightNumber', 'OriginatorAirlineCode',
+                'OperatingAirlineFlightNumber', 'DepartureDateTime', 'ArrivalDateTime', 'BookingID',
+                'Firstname', 'Surname', 'Name', 'Travel Doc Number', 'Place of Issue', 'DOB', 'Nationality', 'Sex',
+                'CityName', 'Address']    
+    df = pd.DataFrame(all_data, columns=columns)
+    logging.info(f"Parsing completed in {time.time() - start_time:.2f} seconds")
+    return df
 
 def parse_json(file_path):
     logging.info(f"Parsing JSON file: {file_path}")
@@ -96,29 +175,18 @@ def parse_json(file_path):
     return df
 
 def find_similar_passengers(airport_data_access, firstname, surname, name, dob, iata_o, iata_d, city_name, address, sex, nationality, data_dir, nameThreshold, ageThreshold, locationThreshold):
-    airport_data_access = LocDataAccess.get_instance()  # Access the singleton instance
-    all_data = pd.DataFrame()
-    similar_passengers = pd.DataFrame()
-    name_comb = firstname + " " + surname
-
-    # List all XML files in the directory
-    logging.info(f"Searching for JSON files in the directory {data_dir}")
-    data_files = [blob.name for blob in blob_service_client.get_container_client(CONTAINER_NAME).list_blobs(name_starts_with=data_dir) if blob.name.endswith('.json')]
-    logging.info(f"Found {len(data_files)} JSON files in the directory")
-    # json_files = [blob.name for blob in blob_service_client.get_container_client(CONTAINER_NAME).list_blobs(name_starts_with=data_dir) if blob.name.endswith('.json')]
-
+    # Fetch the combined JSON data from Azure Blob Storage
+    blob_path = f"{data_dir}/combined_pnr_data.json"
+    combined_data = fetch_combined_data(blob_path)
     
-    # Parse each XML file and aggregate data
+    # Parse the combined data
+    all_data = parse_combined_data(combined_data)    
+    logging.info(f"all_data shape before enrichment: {all_data.shape}")
     start_time = time.time()
-    all_data = process_files_in_parallel(data_files, parse_json)
+    all_data = enrich_data(all_data)
     end_time = time.time()
-    logging.info(f"Time for fetching JSON data concurrently: {end_time - start_time:.2f} seconds")
-    # for file_path in data_files:
-    #     data = parse_json(file_path)
-    #     all_data = pd.concat([all_data, data], ignore_index=True)   
-
-    logging.info(f"all_data shape: {all_data.shape}")
-
+    logging.info(f"Time for enriching data: {end_time - start_time:.2f} seconds")
+    logging.info(f"all_data enriched shape: {all_data.shape}")
     # Perform similarity search on the aggregated data
     start_time = time.time()
     lon_o, lat_o = airport_data_access.get_airport_lon_lat_by_iata(iata_o)
@@ -166,49 +234,52 @@ def perform_similarity_search(firstname, surname, name, iata_o, lat_o, lon_o, ci
     logging.info(f"Time for calculating counts: {end_time - start_time:.2f} seconds")
     logging.info(f"Counts calculated")
 
+    if nameThreshold>50 and ageThreshold>50:
+        df = data_filtration(df, nameThreshold, ageThreshold, firstname, surname, dob)
+
 
     start_time = time.time()
-    similarity_df[['FNSimilarity', 'FN1', 'FN2', 'FN_rarity1', 'FN_rarity2', 'FN_prob1', 'FN_prob2']] = df['Firstname'].apply(lambda x: string_similarity(firstname, x, firstname_counts, num_records))
-    similarity_df[['SNSimilarity', 'SN1', 'SN2', 'SN_rarity1', 'SN_rarity2', 'SN_prob1', 'SN_prob2']] = df['Surname'].apply(lambda x: string_similarity(surname, x, surname_counts, num_records))
-    similarity_df[['DOBSimilarity', 'DOB1', 'DOB2', 'DOB_rarity1', 'DOB_rarity2', 'DOB_prob1', 'DOB_prob2']] = df['DOB'].apply(lambda x: string_similarity(dob, x, DOB_counts, num_records))
-    similarity_df['AgeSimilarity']= df['DOB'].apply(lambda x: age_similarity_score(dob, x))
-    similarity_df[['strAddressSimilarity', 'jcdAddressSimilarity']] = df['Address'].apply(lambda x: address_str_similarity_score(address, x))
-    similarity_df['cityAddressMatch'] = df['CityName'].apply(lambda x: location_matching(city_name, x))
+    similarity_df[['FNSimilarity', 'FN1', 'FN2', 'FN_rarity1', 'FN_rarity2', 'FN_prob1', 'FN_prob2']] = pd.DataFrame(df['Firstname'].map(lambda x: string_similarity(firstname, x, firstname_counts, num_records)).tolist(), index=df.index)
+    similarity_df[['SNSimilarity', 'SN1', 'SN2', 'SN_rarity1', 'SN_rarity2', 'SN_prob1', 'SN_prob2']] = pd.DataFrame(df['Surname'].map(lambda x: string_similarity(surname, x, surname_counts, num_records)).tolist(), index=df.index)
+    similarity_df[['DOBSimilarity', 'DOB1', 'DOB2', 'DOB_rarity1', 'DOB_rarity2', 'DOB_prob1', 'DOB_prob2']] = pd.DataFrame(df['DOB'].map(lambda x: string_similarity(dob, x, DOB_counts, num_records)).tolist(), index=df.index)
+    similarity_df['AgeSimilarity'] = df['DOB'].map(lambda x: age_similarity_score(dob, x))
+    similarity_df[['strAddressSimilarity', 'jcdAddressSimilarity']] = pd.DataFrame(df['Address'].map(lambda x: address_str_similarity_score(address, x)).tolist(), index=df.index)
+    similarity_df['cityAddressMatch'] = df['CityName'].map(lambda x: location_matching(city_name, x))
     similarity_df[['cityAddressRarity1', 'cityAddressProb1']] = count_likelihood2(city_name, city_address_counts, num_records)
-    similarity_df[['cityAddressRarity2', 'cityAddressProb2']] = df['CityName'].apply(lambda x: count_likelihood2(x, city_address_counts, num_records))
-    similarity_df['countryAddressMatch'] = df['Country of Address'].apply(lambda x: location_matching(country, x))
+    similarity_df[['cityAddressRarity2', 'cityAddressProb2']] = pd.DataFrame(df['CityName'].map(lambda x: count_likelihood2(x, city_address_counts, num_records)).tolist(), index=df.index)
+    similarity_df['countryAddressMatch'] = df['Country of Address'].map(lambda x: location_matching(country, x))
     similarity_df[['countryAddressRarity1', 'countryAddressProb1']] = count_likelihood2(country, country_address_counts, num_records)
-    similarity_df[['countryAddressRarity2', 'countryAddressProb2']] = df['Country of Address'].apply(lambda x: count_likelihood2(x, country_address_counts, num_records))
-    similarity_df['sexMatch'] = df['Sex'].apply(lambda x: location_matching(sex, x))
+    similarity_df[['countryAddressRarity2', 'countryAddressProb2']] = pd.DataFrame(df['Country of Address'].map(lambda x: count_likelihood2(x, country_address_counts, num_records)).tolist(), index=df.index)
+    similarity_df['sexMatch'] = df['Sex'].map(lambda x: location_matching(sex, x))
     similarity_df[['sexRarity1', 'sexProb1']] = count_likelihood2(sex, gender_counts, num_records)
-    similarity_df[['sexRarity2', 'sexProb2']] = df['Sex'].apply(lambda x: count_likelihood2(x, gender_counts, num_records))
-    similarity_df['natMatch'] = df['Nationality'].apply(lambda x: location_matching(nationality, x))
+    similarity_df[['sexRarity2', 'sexProb2']] = pd.DataFrame(df['Sex'].map(lambda x: count_likelihood2(x, gender_counts, num_records)).tolist(), index=df.index)
+    similarity_df['natMatch'] = df['Nationality'].map(lambda x: location_matching(nationality, x))
     similarity_df[['natRarity1', 'natProb1']] = count_likelihood2(nationality, nationality_counts, num_records)
-    similarity_df[['natRarity2', 'natProb2']] = df['Nationality'].apply(lambda x: count_likelihood2(x, nationality_counts, num_records))
-    similarity_df['originAirportMatch'] = df['OriginIATA'].apply(lambda x: location_matching(iata_o, x))
+    similarity_df[['natRarity2', 'natProb2']] = pd.DataFrame(df['Nationality'].map(lambda x: count_likelihood2(x, nationality_counts, num_records)).tolist(), index=df.index)
+    similarity_df['originAirportMatch'] = df['OriginIATA'].map(lambda x: location_matching(iata_o, x))
     similarity_df[['originAirportRarity1', 'originAirportProb1']] = count_likelihood2(iata_o, origin_airport_counts, num_records)
-    similarity_df[['originAirportRarity2', 'originAirportProb2']] = df['OriginIATA'].apply(lambda x: count_likelihood2(x, origin_airport_counts, num_records))
-    similarity_df['destinationAirportMatch'] = df['DestinationIATA'].apply(lambda x: location_matching(iata_d, x))
+    similarity_df[['originAirportRarity2', 'originAirportProb2']] = pd.DataFrame(df['OriginIATA'].map(lambda x: count_likelihood2(x, origin_airport_counts, num_records)).tolist(), index=df.index)
+    similarity_df['destinationAirportMatch'] = df['DestinationIATA'].map(lambda x: location_matching(iata_d, x))
     similarity_df[['destinationAirportRarity1', 'destinationAirportProb1']] = count_likelihood2(iata_o, origin_airport_counts, num_records)
-    similarity_df[['destinationAirportRarity2', 'destinationAirportProb2']] = df['DestinationIATA'].apply(lambda x: count_likelihood2(x, destination_airport_counts, num_records))    
-    similarity_df['orgdesAirportMatch'] = df['OriginIATA'].apply(lambda x:location_matching(iata_d, x))
-    similarity_df['desorgAirportMatch'] = df['DestinationIATA'].apply(lambda x:location_matching(iata_o, x))   
-    similarity_df['originCityMatch'] = df['OriginCity'].apply(lambda x: location_matching(city_org, x))
+    similarity_df[['destinationAirportRarity2', 'destinationAirportProb2']] = pd.DataFrame(df['DestinationIATA'].map(lambda x: count_likelihood2(x, destination_airport_counts, num_records)).tolist(), index=df.index)
+    similarity_df['orgdesAirportMatch'] = df['OriginIATA'].map(lambda x: location_matching(iata_d, x))
+    similarity_df['desorgAirportMatch'] = df['DestinationIATA'].map(lambda x: location_matching(iata_o, x))
+    similarity_df['originCityMatch'] = df['OriginCity'].map(lambda x: location_matching(city_org, x))
     similarity_df[['originCityRarity1', 'originCityProb1']] = count_likelihood2(city_org, origin_city_counts, num_records)
-    similarity_df[['originCityRarity2', 'originCityProb2']] = df['OriginCity'].apply(lambda x: count_likelihood2(x, origin_city_counts, num_records))
-    similarity_df['destinationCityMatch'] = df['DestinationCity'].apply(lambda x: location_matching(city_dest, x))
+    similarity_df[['originCityRarity2', 'originCityProb2']] = pd.DataFrame(df['OriginCity'].map(lambda x: count_likelihood2(x, origin_city_counts, num_records)).tolist(), index=df.index)
+    similarity_df['destinationCityMatch'] = df['DestinationCity'].map(lambda x: location_matching(city_dest, x))
     similarity_df[['destinationCityRarity1', 'destinationCityProb1']] = count_likelihood2(city_dest, destination_city_counts, num_records)
-    similarity_df[['destinationCityRarity2', 'destinationCityProb2']] = df['DestinationCity'].apply(lambda x: count_likelihood2(x, destination_city_counts, num_records))    
-    similarity_df['orgdesCityMatch'] = df['OriginCity'].apply(lambda x:location_matching(city_dest, x))
-    similarity_df['desorgCityMatch'] = df['DestinationCity'].apply(lambda x:location_matching(city_org, x))
-    similarity_df['originCountryMatch'] = df['OriginCountry'].apply(lambda x: location_matching(ctry_org, x))
+    similarity_df[['destinationCityRarity2', 'destinationCityProb2']] = pd.DataFrame(df['DestinationCity'].map(lambda x: count_likelihood2(x, destination_city_counts, num_records)).tolist(), index=df.index)
+    similarity_df['orgdesCityMatch'] = df['OriginCity'].map(lambda x: location_matching(city_dest, x))
+    similarity_df['desorgCityMatch'] = df['DestinationCity'].map(lambda x: location_matching(city_org, x))
+    similarity_df['originCountryMatch'] = df['OriginCountry'].map(lambda x: location_matching(ctry_org, x))
     similarity_df[['originCountryRarity1', 'originCountryProb1']] = count_likelihood2(ctry_org, origin_country_counts, num_records)
-    similarity_df[['originCountryRarity2', 'originCountryProb2']] = df['OriginCountry'].apply(lambda x: count_likelihood2(x, origin_country_counts, num_records))
-    similarity_df['destinationCountryMatch'] = df['DestinationCountry'].apply(lambda x: location_matching(ctry_dest, x))
+    similarity_df[['originCountryRarity2', 'originCountryProb2']] = pd.DataFrame(df['OriginCountry'].map(lambda x: count_likelihood2(x, origin_country_counts, num_records)).tolist(), index=df.index)
+    similarity_df['destinationCountryMatch'] = df['DestinationCountry'].map(lambda x: location_matching(ctry_dest, x))
     similarity_df[['destinationCountryRarity1', 'destinationCountryProb1']] = count_likelihood2(ctry_dest, destination_country_counts, num_records)
-    similarity_df[['destinationCountryRarity2', 'destinationCountryProb2']] = df['DestinationCountry'].apply(lambda x: count_likelihood2(x, destination_country_counts, num_records))   
-    similarity_df['orgdesCountryMatch'] = df['OriginCountry'].apply(lambda x:location_matching(ctry_dest, x))
-    similarity_df['desorgCountryMatch'] = df['DestinationCountry'].apply(lambda x:location_matching(ctry_org, x))
+    similarity_df[['destinationCountryRarity2', 'destinationCountryProb2']] = pd.DataFrame(df['DestinationCountry'].map(lambda x: count_likelihood2(x, destination_country_counts, num_records)).tolist(), index=df.index)
+    similarity_df['orgdesCountryMatch'] = df['OriginCountry'].map(lambda x: location_matching(ctry_dest, x))
+    similarity_df['desorgCountryMatch'] = df['DestinationCountry'].map(lambda x: location_matching(ctry_org, x))
     similarity_df[['originSimilarity', 'originExpScore']] = df.apply(lambda row: location_similarity_score(lon_o, lat_o, row['OriginLon'], row['OriginLat'], max_distance), axis=1, result_type='expand')
     similarity_df[['destinationSimilarity', 'destinationExpScore']] = df.apply(lambda row: location_similarity_score(lon_d, lat_d, row['DestinationLon'], row['DestinationLat'], max_distance), axis=1, result_type='expand')
     similarity_df[['orgdesSimilarity', 'orgdesExpScore']] = df.apply(lambda row: location_similarity_score(lon_o, lat_o, row['DestinationLon'], row['DestinationLat'], max_distance), axis=1, result_type='expand')
@@ -285,7 +356,7 @@ def perform_similarity_search(firstname, surname, name, iata_o, lat_o, lon_o, ci
     # filtered_result_df = result_df[(result_df['FNSimilarity'] >= nameThreshold) &
     #                     (result_df['SNSimilarity'] >= nameThreshold) &
     #                     (result_df['AgeSimilarity'] >= ageThreshold)]
-    filtered_result_df.drop_duplicates(subset=['Name', 'DOB', 'BookingID', 'FilePath', 'Travel Doc Number'], inplace=True)
+    filtered_result_df.drop_duplicates(subset=['Name', 'DOB', 'BookingID', 'Travel Doc Number', 'FlightLegFlightNumber', 'OriginatorAirlineCode', 'OperatingAirlineFlightNumber', 'DepartureDateTime', 'ArrivalDateTime'], inplace=True)
     # filtered_result_df.to_csv('test/filtered_resilt_df.csv')
     filtered_result_df.sort_values(by = ['Confidence Level', 'Compound Similarity Score'], ascending = False, inplace = True)
     logging.info(f"Filtered result shape: {filtered_result_df.shape}")
@@ -293,6 +364,22 @@ def perform_similarity_search(firstname, surname, name, iata_o, lat_o, lon_o, ci
     return filtered_result_df
 
 
+def data_filtration(df, nameThreshold, ageThreshold, firstname, surname, dob):
+    if nameThreshold == 100:
+        df = df[(df['Firstname'].str.lower() == firstname.lower()) & 
+                (df['Surname'].str.lower() == surname.lower())]
+    elif nameThreshold < 100:
+        df = df[(df['Firstname'].str.startswith(firstname[0].lower()) | 
+                 df['Firstname'].str.startswith(surname[0].lower())) &
+                (df['Surname'].str.startswith(firstname[0].lower()) | 
+                 df['Surname'].str.startswith(surname[0].lower()))]
+
+    if ageThreshold == 100:
+        df = df[df['DOB'] == dob]
+
+    return df
+
+        
 
 
 

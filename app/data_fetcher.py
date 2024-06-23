@@ -31,6 +31,23 @@ def recreate_directory(directory):
         shutil.rmtree(directory)
     os.makedirs(directory)
 
+async def reauthenticate(session):
+    api_url = 'https://tenacity-rmt.eurodyn.com/api/user/auth/token'
+    username = os.getenv("USERNAME")
+    password = os.getenv("PASSWORD")
+    data = {'username': username, 'password': password}
+
+    async with session.post(api_url, json=data) as response:
+        if response.status == 200:
+            tokens = await response.json()
+            os.environ["ACCESS_TOKEN"] = tokens["accessToken"]
+            os.environ["REFRESH_TOKEN"] = tokens["refreshToken"]
+            return tokens["accessToken"]
+        else:
+            logging.error(f"Failed to re-authenticate: {response.status} - {await response.text()}")
+            return None
+
+
 def authenticate():
     api_url = 'https://tenacity-rmt.eurodyn.com/api/user/auth/token'
     username = os.getenv("USERNAME")
@@ -102,40 +119,7 @@ def fetch_pnr_data(api_url, access_token, params):
     except Exception as err:
         print(f"Other error occurred: {err}")
     return None, 0
-    
 
-
-# def save_xml_data_for_flight_id(flight_id, directory):
-#     api_url = 'https://tenacity-rmt.eurodyn.com/api/pnr-notification/xml/by-id'
-#     access_token = os.getenv("ACCESS_TOKEN")
-#     headers = {'Authorization': f'Bearer {access_token}'}
-#     params = {'id': flight_id}
-    
-#     try:
-#         response = requests.get(api_url, headers=headers, params=params)
-#         logging.info(f"response code: {response.status_code}")
-        
-#         if response.status_code == 200:
-#             # if not os.path.exists(directory):
-#             #     os.makedirs(directory)
-#             #     logging.info(f"Directory {directory} created.")
-                
-#             file_path = os.path.join(directory, f'flight_id_{flight_id}.xml')
-#             blob_name = f"{directory}/flight_id_{flight_id}.xml"
-#             logging.info(f"response content: {response.content}")
-#             # with open(file_path, 'wb') as file:
-#             #     file.write(response.content)
-            
-#             logging.info(f"Saved XML data for flight ID {flight_id} to {file_path}")
-
-#             upload_to_blob_storage(blob_name, response.content)
-                
-#             logging.info(f"Uploaded XML data for flight ID {flight_id} to Azure Blob Storage as {blob_name}")
-#         else:
-#             logging.warning(f"Failed to retrieve XML data for flight ID {flight_id}: {response.text}")
-    
-#     except Exception as e:
-#         logging.error(f"Error processing task {directory}: {str(e)}")
 
 def save_json_data_for_flight_id(flight_id, directory):
     api_url = f'https://tenacity-rmt.eurodyn.com/api/dataset/flight/{flight_id}'
@@ -165,24 +149,46 @@ def save_json_data_for_flight_id(flight_id, directory):
 async def fetch_all_pnr_data(flight_ids, directory, access_token):
     async with aiohttp.ClientSession() as session:
         tasks = []
-        for flight_id in flight_ids:
-            task = asyncio.create_task(fetch_and_save_pnr_data(session, flight_id, directory, access_token))
-            tasks.append(task)
-        await asyncio.gather(*tasks)
+        combined_data = []
 
-async def fetch_and_save_pnr_data(session, flight_id, folder_name, access_token):
+        for flight_id in flight_ids:
+            task = asyncio.create_task(fetch_pnr_data_from_azure(session, flight_id, access_token, combined_data))
+            tasks.append(task)
+
+        await asyncio.gather(*tasks)
+        # Combine all the JSON data into one JSON object or list
+        combined_json = json.dumps(combined_data)
+        blob_name = f"{directory}/combined_pnr_data.json"
+        upload_to_blob_storage(blob_name, combined_json.encode('utf-8'))
+        logging.info(f"Uploaded combined JSON data to Azure Blob Storage as {blob_name}")
+
+async def fetch_pnr_data_from_azure(session, flight_id, access_token, combined_data):
     api_url = f'https://tenacity-rmt.eurodyn.com/api/dataset/flight/{flight_id}'
     headers = {'Authorization': f'Bearer {access_token}'}
     
     try:
         async with session.get(api_url, headers=headers) as response:
             if response.status == 200:
-                data = await response.read()
-                blob_name = f"{folder_name}/flight_id_{flight_id}.json"
-                upload_to_blob_storage(blob_name, data)
-                logging.info(f"Uploaded JSON data for flight ID {flight_id} to Azure Blob Storage as {blob_name}")
+                data = await response.json()
+                combined_data.append(data)
+                logging.info(f"Fetched JSON data for flight ID {flight_id}")
+            elif response.status == 401:
+                logging.warning(f"Token expired while fetching flight ID {flight_id}. Re-authenticating...")
+                new_token = await reauthenticate(session)
+                if new_token:
+                    # Retry the request with the new token
+                    headers = {'Authorization': f'Bearer {new_token}'}
+                    async with session.get(api_url, headers=headers) as retry_response:
+                        if retry_response.status == 200:
+                            data = await retry_response.json()
+                            combined_data.append(data)
+                            logging.info(f"Fetched JSON data for flight ID {flight_id} after re-authentication")
+                        else:
+                            logging.warning(f"Failed to retrieve JSON data for flight ID {flight_id} after re-authentication: {await retry_response.text()}")
+                else:
+                    logging.error(f"Re-authentication failed for flight ID {flight_id}")
             else:
                 logging.warning(f"Failed to retrieve JSON data for flight ID {flight_id}: {await response.text()}")
-    
     except Exception as e:
         logging.error(f"Error fetching PNR data for flight ID {flight_id}: {str(e)}")
+

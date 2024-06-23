@@ -2,6 +2,7 @@
 
 from azure.storage.blob import BlobServiceClient, ContentSettings
 import os
+import json
 import logging
 
 AZURE_STORAGE_CONNECTION_STRING = os.getenv('AZURE_STORAGE_CONNECTION_STRING')
@@ -29,6 +30,11 @@ def upload_to_blob_storage_txt(blob_name, data):
         # logging.info(f"Uploaded {blob_name} to blob storage.")
     except Exception as e:
         logging.error(f"Error uploading {blob_name} to blob storage: {str(e)}")
+
+def fetch_combined_data(blob_path):
+    blob_client = blob_service_client.get_blob_client(container=CONTAINER_NAME, blob=blob_path)
+    combined_json = blob_client.download_blob().readall()
+    return json.loads(combined_json)
 
 def download_from_blob_storage(blob_name):
     try:
