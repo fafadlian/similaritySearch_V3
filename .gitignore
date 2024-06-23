@@ -10,3 +10,4 @@ environment.env
 .DS_Store
 Thumbs.db
 commands.txt
+*.pyc
