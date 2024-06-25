@@ -1,9 +1,7 @@
 from fastapi import APIRouter, HTTPException, Request, Depends
 from fastapi.responses import HTMLResponse, JSONResponse
-from app.tasks import process_task, delete_old_tasks, perform_similarity_search_task
+from app.tasks import process_task, perform_similarity_search_task
 from app.models import Task
-from app.data_fetcher import fetch_pnr_data
-from app.similarity_search import find_similar_passengers
 from app.loc_access import LocDataAccess
 from app.database import get_db
 from app.schemas import FlightSearchRequest, SimilaritySearchRequest  # Import the new schemas
