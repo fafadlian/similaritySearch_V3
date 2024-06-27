@@ -4,32 +4,27 @@ import numpy as np
 
 def calculate_age(dob):
     """Calculate age from DOB."""
-    if pd.isnull(dob) or dob is None:
+    if not dob:
         return np.nan
 
-    today = datetime.today()
     try:
         dob = datetime.strptime(dob, "%Y-%m-%d")
     except ValueError:
         return np.nan 
 
-    return today.year - dob.year - ((today.month, today.day) < (dob.month, dob.day))
+    today = datetime.today()
+    age = today.year - dob.year - ((today.month, today.day) < (dob.month, dob.day))
+    return age
 
 def age_similarity_score(query_dob, dob):
     """Calculate a normalized similarity score for age."""
-    if dob is None or query_dob is None:
+    if not query_dob or not dob:
         return np.nan
     
-    if pd.isnull(dob) or pd.isnull(query_dob):
-        return np.nan
-    
-    actual_age = calculate_age(dob)
     query_age = calculate_age(query_dob)
+    actual_age = calculate_age(dob)
 
-    if actual_age is None or query_age is None:
-        return np.nan
-    
-    if actual_age is np.nan or query_age is np.nan:
+    if np.isnan(query_age) or np.isnan(actual_age):
         return 0
     
     age_difference = abs(query_age - actual_age)
@@ -37,6 +32,7 @@ def age_similarity_score(query_dob, dob):
     # Use logarithmic scale for age similarity
     if age_difference == 0:
         return 100
+
     max_age = max(actual_age, query_age)
     min_age = min(actual_age, query_age)
     log_age_diff = np.log(max_age / min_age)

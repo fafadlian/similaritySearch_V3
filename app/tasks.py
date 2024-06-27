@@ -41,6 +41,7 @@ def process_task(task_id, arrival_date_from, arrival_date_to, flight_number, fol
         start_time = time.time()
         loop = asyncio.get_event_loop()
         pnr_data, total_pages = loop.run_until_complete(fetch_all_pages(api_url, access_token, params))
+        loop.close()
 
         if pnr_data:
             print(f"Fetched data from {total_pages} pages")
@@ -62,7 +63,20 @@ def process_task(task_id, arrival_date_from, arrival_date_to, flight_number, fol
             task.flight_count = len(set(flight_ids))
 
             start_time = time.time()
-            asyncio.run(fetch_all_pnr_data(flight_ids, folder_name, access_token))
+
+            # Ensure a clean event loop for the second async call
+            try:
+                loop = asyncio.get_event_loop()
+                if loop.is_running():
+                    loop.close()
+            except RuntimeError:
+                pass
+
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
+            loop.run_until_complete(fetch_all_pnr_data(flight_ids, folder_name, access_token))
+            loop.close()
+
             end_time = time.time()
             time_second_approach = end_time - start_time
             logging.info(f"Time for fetching PNR data concurrently: {time_second_approach:.2f} seconds")
