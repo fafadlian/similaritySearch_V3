@@ -301,6 +301,10 @@ def perform_similarity_search(firstname, surname, name, iata_o, lat_o, lon_o, ci
     coldrop = ['Class', 'Mark',
                'unique_id']
     test = similarity_df.drop(columns=coldrop, errors='ignore')
+    logging.info(f"test shape: {test.shape}")
+    logging.info(f"similarity_df shape: {similarity_df.shape}")
+    # logging.info(f"expected_columns: {expected_columns}")
+    # logging.info(f"test columns: {test.columns}")
     for col in expected_columns:
         if col not in test.columns:
             test[col] = 0  # or some default value
@@ -318,7 +322,8 @@ def perform_similarity_search(firstname, surname, name, iata_o, lat_o, lon_o, ci
     logging.info(f"Extra columns in similarity_df: {extra_columns}")
 
     # Create a DataFrame for relevant columns
-    relevant_similarities = similarity_df[expected_columns].copy()
+    relevant_similarities = test[expected_columns].copy()
+    logging.info(f"relevant_similarities shape: {relevant_similarities.shape}")
     relevant_similarities = relevant_similarities.multiply(normalised_importances, axis=1)
     # relevant_similarities = relevant_similarities.applymap(lambda x: np.round(x, 3) if isinstance(x, (int, float)) else x)
 
