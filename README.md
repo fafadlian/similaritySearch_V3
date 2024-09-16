@@ -3,7 +3,7 @@
 ## Description
 The Similarity Search WebApp is a Python-Flask-based web application designed to perform advanced similarity searches across PNR data. Utilizing a combination of algorithms for distance and age similarity, it offers users the ability to find a person from a watchlist.
 
-## Installation
+## Terminal run and installation
 To run this application, ensure you have Docker installed on your machine.
 
 1. Clone the repository to your local machine. 
@@ -13,32 +13,14 @@ To run this application, ensure you have Docker installed on your machine.
 ```bash 
 pip install requirements.txt 
 ```
-5. Set up environment variables: create a environment.env file in the project root and provide the necessary configurations: 
+5. Set up environment variables: create a environment.enf file in the project root and provide the necessary configurations: 
 ```sh
-#local storage
 STORAGE_PATH=local_storage
-
-#celery config
 CELERY_BROKER_URL=redis://localhost:6379/0
 CELERY_RESULT_BACKEND=redis://localhost:6379/0
-
-#postgresql config
-POSTGRES_HOST=localhost
-POSTGRES_PORT=5432
-POSTGRES_DB=<your_db_name>
-POSTGRES_USER=<your_db_user/owner>
-POSTGRES_PASSWORD=<your_db_password>
-POSTGRES_SSLMODE=disable
 DATABASE_URL=postgresql+psycopg2://<db_username>:<db_password>@localhost:5432/similaritysearch
-
-#rmt api and app
-ACCESS_TOKEN=<your_RMT_access_token>
-REFRESH_TOKEN=<your_RMT_refresh_token>
-USERNAME=<your_RMT_username>
-PASSWORD=<your_RMT_password>
-APP_ENV=development
-APP_DEBUG=True
-APP_PORT=8000
+ACCESS_TOKEN=<your_access_token>
+REFRESH_TOKEN=<your_refresh_token> 
 ```
 5. Start redis from terminal: 
 ```sh 
@@ -51,6 +33,123 @@ celery -A app.celery_init.celery beat --loglevel=info
 ```
 
 5. Run the the following command: ````uvicorn run:app --host 0.0.0.0 --port 443 --log-level info````
+
+## Docker run and installation
+1. Docker: Make sure Docker is installed and running on your machine. You can download it from [Docker official website](https://www.docker.com/). 
+2. Docker Compose: Docker Compose should also be installed (it comes with Docker Desktop for Mac and Windows).
+3. Ensure you have an environment.env file in the root directory with the following settings:
+```sh 
+# Database settings
+POSTGRES_HOST=postgres
+POSTGRES_PORT=5433
+POSTGRES_DB=<your_db_name>>
+POSTGRES_USER=<your_db_username>
+POSTGRES_PASSWORD=<your_db_password>
+POSTGRES_SSLMODE=disable
+DATABASE_URL=postgresql+psycopg2://<your_db_username>:<your_db_password>@postgres:5433/<your_db_name>
+
+# Celery settings
+CELERY_BROKER_URL=redis://redis:6379/0
+CELERY_RESULT_BACKEND=redis://redis:6379/0
+
+# API authentication tokens (replace with valid tokens)
+ACCESS_TOKEN=<your_RMT_access_token>
+REFRESH_TOKEN=<your_RMT_refresh_token>
+USERNAME=<your_RMT_username>
+PASSWORD=<your_RMT_password>
+
+# Application settings
+APP_ENV=development
+APP_DEBUG=True
+APP_PORT=8000
+
+# Local Storage
+STORAGE_PATH=local_storage
+```
+
+4. You can use the following docker-compose.yml file to configure your application. This assumes you will fill out the credentials
+```sh 
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile.windows
+    container_name: fastapi_web
+    command: uvicorn run:app --host 0.0.0.0 --port 443
+    ports:
+      - "443:443"
+    depends_on:
+      - redis
+      - postgres
+    environment:
+      - DATABASE_URL=postgresql+psycopg2://<your_db_username>:<your_db_password>@postgres:5432/<your_db_name>
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+
+  celery_worker:
+    build:
+      context: .
+      dockerfile: Dockerfile.windows
+    container_name: celery_worker
+    command: celery -A app.celery_init.celery worker --loglevel=info --concurrency=4
+    depends_on:
+      - redis
+      - postgres
+    environment:
+      - DATABASE_URL=postgresql+psycopg2://<your_db_username>:<your_db_password>@postgres:5432/<your_db_name>
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+
+  celery_beat:
+    build:
+      context: .
+      dockerfile: Dockerfile.windows
+    container_name: celery_beat
+    command: celery -A app.celery_init.celery beat --loglevel=info
+    depends_on:
+      - redis
+      - postgres
+    environment:
+      - DATABASE_URL=postgresql+psycopg2://<your_db_username>:<your_db_password>@postgres:5432/<your_db_name>
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+
+  redis:
+    image: redis:alpine
+    container_name: redis
+    ports:
+      - "6379:6379"
+
+  postgres:
+    image: postgres:14-alpine
+    container_name: postgres
+    environment:
+      POSTGRES_DB: <your_db_name>
+      POSTGRES_USER: <your_db_username>
+      POSTGRES_PASSWORD: <your_db_password>
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:
+
+```
+
+4. Build the docker:
+```sh 
+docker-compose build
+```
+5. Run the docker:
+docker-compose up
+```sh 
+docker-compose up
+```
+
+6. You can use the Similarity Search Web App on:
+https://localhost:443
+
 
 
 ## Usage
