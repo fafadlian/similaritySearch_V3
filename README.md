@@ -13,7 +13,7 @@ To run this application, ensure you have Docker installed on your machine.
 ```bash 
 pip install requirements.txt 
 ```
-5. Set up environment variables: create a environment.enf file in the project root and provide the necessary configurations: 
+5. Set up environment variables: create a environment.env file in the project root and provide the necessary configurations: 
 ```sh
 #local storage
 STORAGE_PATH=local_storage
