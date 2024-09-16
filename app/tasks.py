@@ -2,6 +2,7 @@ from app.models import Task
 from app.data_fetcher import fetch_pnr_data, save_json_data_for_flight_id, fetch_all_pnr_data
 # from app.azure_blob_storage import upload_to_blob_storage, download_from_blob_storage, delete_from_blob_storage, upload_to_blob_storage_txt
 from app.local_storage import upload_to_local_storage, download_from_local_storage, delete_from_local_storage, upload_to_local_storage_txt, list_files_in_directory
+
 from app.similarity_search import find_similar_passengers
 from app.loc_access import LocDataAccess
 from azure.storage.blob import ContainerClient
@@ -26,21 +27,27 @@ load_dotenv('environment.env')
 @celery.task
 def process_task(task_id, arrival_date_from, arrival_date_to, flight_number, folder_name):
     session = SessionLocal()
+    task = None
 
     try:
         api_url = 'https://tenacity-rmt.eurodyn.com/api/datalist/flights'
         access_token = os.getenv("ACCESS_TOKEN")
-        refresh_token_value = os.getenv("REFRESH_TOKEN")
 
         params = {
-            'ft_flight_leg_arrival_date_time_from': arrival_date_from,
-            'ft_flight_leg_arrival_date_time_to': arrival_date_to,
+            'ft_flight_leg_arrival_date_time_from': arrival_date_from.isoformat(),
+            'ft_flight_leg_arrival_date_time_to': arrival_date_to.isoformat(),
             'ft_flight_leg_flight_number': flight_number
         }
 
-        # Time measurement for the first approach
         start_time = time.time()
-        pnr_data, total_pages = fetch_pnr_data(api_url, access_token, params)
+        loop = asyncio.get_event_loop()
+        pnr_data, total_pages = loop.run_until_complete(fetch_all_pages(api_url, access_token, params))
+        loop.close()
+
+        if pnr_data:
+            print(f"Fetched data from {total_pages} pages")
+        else:
+            print("Failed to fetch data")
         end_time = time.time()
         time_first_approach = end_time - start_time
         logging.info(f"Time for fetching PNR data (first approach): {time_first_approach:.2f} seconds")
@@ -56,28 +63,39 @@ def process_task(task_id, arrival_date_from, arrival_date_to, flight_number, fol
             task.flight_ids = ",".join(flight_ids)
             task.flight_count = len(set(flight_ids))
 
-            # Time measurement for the concurrent fetching approach
             start_time = time.time()
-            asyncio.run(fetch_all_pnr_data(flight_ids, folder_name, access_token))
+
+            # Ensure a clean event loop for the second async call
+            try:
+                loop = asyncio.get_event_loop()
+                if loop.is_running():
+                    loop.close()
+            except RuntimeError:
+                pass
+
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
+            loop.run_until_complete(fetch_all_pnr_data(flight_ids, folder_name, access_token))
+            loop.close()
+
             end_time = time.time()
-            time_concurrent_approach = end_time - start_time
-            logging.info(f"Time for fetching PNR data concurrently: {time_concurrent_approach:.2f} seconds")
+            time_second_approach = end_time - start_time
+            logging.info(f"Time for fetching PNR data concurrently: {time_second_approach:.2f} seconds")
 
             task.status = 'completed'
             logging.info(f"Task {task_id} completed")
         else:
             task.status = 'failed'
             logging.info(f"Task {task_id} failed")
+            time_second_approach = None
 
         session.commit()
 
-        # Save time measurements to a string
         time_comparison_content = (
             f"Time for fetching PNR data (first approach): {time_first_approach:.2f} seconds\n"
-            f"Time for fetching PNR data concurrently: {time_concurrent_approach:.2f} seconds\n"
+            f"Time for fetching PNR data concurrently: {time_second_approach:.2f} seconds\n"
         )
 
-        # Save the string as a blob in Azure Blob Storage
         blob_name = f"{folder_name}/time_comparison.txt"
         # upload_to_blob_storage_txt(blob_name, time_comparison_content)
         upload_to_local_storage_txt(blob_name, time_comparison_content)
@@ -85,8 +103,12 @@ def process_task(task_id, arrival_date_from, arrival_date_to, flight_number, fol
         logging.info(f"blob_name: {blob_name}")
 
     except Exception as e:
-        task.status = 'failed'
-        session.commit()
+        if task:
+            task.status = 'failed'
+            try:
+                session.commit()
+            except Exception as commit_err:
+                logging.error(f"Failed to commit session after setting task status to failed: {commit_err}")
         logging.error(f"Error processing task {task_id}: {e}")
     finally:
         session.close()

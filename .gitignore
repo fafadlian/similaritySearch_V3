@@ -11,3 +11,5 @@ environment.env
 Thumbs.db
 commands.txt
 *.pyc
+debugSectionScript.js
+combined_pnr_data.json
