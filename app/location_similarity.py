@@ -46,12 +46,9 @@ def location_similarity_score(lon1, lat1, lon2, lat2, max_distance):
     return pd.Series([similarity_score, exp_score])
 
 def address_str_similarity_score(string1, string2):
-    if string1 is None or string2 is None:
+    if not string1 or not string2:
         return pd.Series([np.nan, np.nan])
     
-    if pd.isnull(string1) or pd.isnull(string2):
-        return pd.Series([np.nan, np.nan])
-
     # Preprocess the strings: convert to lowercase and strip whitespace
     string1 = string1.lower().strip()
     string2 = string2.lower().strip()
