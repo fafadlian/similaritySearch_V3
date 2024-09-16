@@ -1,6 +1,7 @@
 from app.models import Task
 from app.data_fetcher import fetch_pnr_data, save_json_data_for_flight_id, fetch_all_pnr_data
-from app.azure_blob_storage import upload_to_blob_storage, download_from_blob_storage, delete_from_blob_storage, upload_to_blob_storage_txt
+# from app.azure_blob_storage import upload_to_blob_storage, download_from_blob_storage, delete_from_blob_storage, upload_to_blob_storage_txt
+from app.local_storage import upload_to_local_storage, download_from_local_storage, delete_from_local_storage, upload_to_local_storage_txt, list_files_in_directory
 from app.similarity_search import find_similar_passengers
 from app.loc_access import LocDataAccess
 from azure.storage.blob import ContainerClient
@@ -17,10 +18,10 @@ from dotenv import load_dotenv
 
 load_dotenv('environment.env')
 
-AZURE_STORAGE_CONNECTION_STRING = os.getenv('AZURE_STORAGE_CONNECTION_STRING')
-CONTAINER_NAME = 'taskfiles'
+# AZURE_STORAGE_CONNECTION_STRING = os.getenv('AZURE_STORAGE_CONNECTION_STRING')
+# CONTAINER_NAME = 'taskfiles'
 
-container_client = ContainerClient.from_connection_string(AZURE_STORAGE_CONNECTION_STRING, CONTAINER_NAME)
+# container_client = ContainerClient.from_connection_string(AZURE_STORAGE_CONNECTION_STRING, CONTAINER_NAME)
 
 @celery.task
 def process_task(task_id, arrival_date_from, arrival_date_to, flight_number, folder_name):
@@ -78,8 +79,10 @@ def process_task(task_id, arrival_date_from, arrival_date_to, flight_number, fol
 
         # Save the string as a blob in Azure Blob Storage
         blob_name = f"{folder_name}/time_comparison.txt"
-        upload_to_blob_storage_txt(blob_name, time_comparison_content)
-        logging.info(f"Uploaded time comparison results to Azure Blob Storage as {blob_name}")
+        # upload_to_blob_storage_txt(blob_name, time_comparison_content)
+        upload_to_local_storage_txt(blob_name, time_comparison_content)
+        # logging.info(f"Uploaded time comparison results to Azure Blob Storage as {blob_name}")
+        logging.info(f"blob_name: {blob_name}")
 
     except Exception as e:
         task.status = 'failed'
@@ -102,7 +105,7 @@ def delete_old_tasks():
         for task in old_tasks:
             print(f"Deleting task {task.id} created at {task.created_at}")
             folder_path = task.folder_path
-            blobs_to_delete = container_client.list_blobs(name_starts_with=folder_path)
+            blobs_to_delete = list_files_in_directory(name_starts_with=folder_path)
             session.delete(task)
         session.commit()
     except Exception as e:

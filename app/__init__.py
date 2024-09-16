@@ -4,7 +4,7 @@ from fastapi.templating import Jinja2Templates
 from dotenv import load_dotenv
 from app.database import engine
 from app.models import Base
-from app.celery_init import make_celery
+from app.celery_init import celery  # Import the initialized Celery instance
 # from starlette.staticfiles import StaticFiles
 
 import os
@@ -30,5 +30,4 @@ def create_app():
 
 
 app = create_app()
-celery = make_celery()
 

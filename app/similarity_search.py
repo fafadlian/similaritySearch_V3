@@ -15,8 +15,9 @@ from app.loc_access import LocDataAccess
 from app.location_similarity import haversine, location_similarity_score, location_matching, address_str_similarity_score
 from app.age_similarity import age_similarity_score, calculate_age
 from app.base_similarity import count_likelihood2, string_similarity
-from app.azure_blob_storage import upload_to_blob_storage, download_from_blob_storage, delete_all_files_in_directory, fetch_combined_data
-from azure.storage.blob import BlobServiceClient, BlobClient, ContainerClient
+# from app.azure_blob_storage import upload_to_blob_storage, download_from_blob_storage, delete_all_files_in_directory, fetch_combined_data
+from app.local_storage import upload_to_local_storage, download_from_local_storage, delete_all_files_in_directory, fetch_combined_data
+# from azure.storage.blob import BlobServiceClient, BlobClient, ContainerClient
 import logging
 
 
@@ -26,7 +27,7 @@ logging.basicConfig(level=logging.INFO)
 AZURE_STORAGE_CONNECTION_STRING = os.getenv('AZURE_STORAGE_CONNECTION_STRING')
 CONTAINER_NAME = os.getenv('CONTAINER_NAME')
 
-blob_service_client = BlobServiceClient.from_connection_string(AZURE_STORAGE_CONNECTION_STRING)
+# blob_service_client = BlobServiceClient.from_connection_string(AZURE_STORAGE_CONNECTION_STRING)
 
 def process_files_in_parallel(file_paths, parse_function, num_workers=None):
     if num_workers is None:
@@ -71,6 +72,7 @@ def enrich_data(df):
 
 def parse_combined_data(combined_data):
     logging.info(f"Parsing combined JSON data")
+    logging.info(f"combined_data type: {type(combined_data)}, content: {combined_data[:2]}")
     start_time = time.time()
 
     airport_data_access = LocDataAccess.get_instance()  # Access the singleton instance
@@ -128,7 +130,8 @@ def parse_combined_data(combined_data):
 def parse_json(file_path):
     logging.info(f"Parsing JSON file: {file_path}")
     airport_data_access = LocDataAccess.get_instance()  # Access the singleton instance
-    json_content = download_from_blob_storage(file_path)  # Download JSON content from Azure Blob Storage
+    # json_content = download_from_blob_storage(file_path)  # Download JSON content from Azure Blob Storage
+    json_content = download_from_local_storage(file_path)  # Download JSON content from local storage
     logging.info(f"ready to parse: {file_path}")
     data = json.loads(json_content)
 
@@ -387,7 +390,8 @@ def data_filtration(df, nameThreshold, ageThreshold, firstname, surname, dob):
 def parse_xml(file_path):
     logging.info(f"Parsing XML file: {file_path}")
     airport_data_access = LocDataAccess.get_instance()  # Access the singleton instance
-    xml_content = download_from_blob_storage(file_path)  # Download XML content from Azure Blob Storage
+    # xml_content = download_from_blob_storage(file_path)  # Download XML content from Azure Blob Storage
+    xml_content = download_from_local_storage(file_path)  # Download XML content from local storage
     logging.info(f"ready to parse: {file_path}")
     logging.info(f"xml_content: {xml_content}")
     root = ET.fromstring(xml_content)

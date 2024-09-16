@@ -51,34 +51,29 @@
                             <div class="col-md-4">Arrival Date From (ISO 8601 format):</div>
                             <div class="col-md-4 text-secondary">Datetime</div>
                             <div class="col-md-4">
-                                <input type="datetime-local" id="arrivalDateFrom" name="arrivalDateFrom" class="form-control">
+                                <input type="datetime-local" id="arrivalDateFrom" name="arrivalDateFrom" class="form-control" value="2019-05-01T15:00">
                             </div>
                         </div>
-                    
                         <div class="form-row align-items-center mb-3">
                             <div class="col-md-4">Arrival Date To (ISO 8601 format):</div>
                             <div class="col-md-4 text-secondary">Datetime</div>
                             <div class="col-md-4">
-                                <input type="datetime-local" id="arrivalDateTo" name="arrivalDateTo" class="form-control">
+                                <input type="datetime-local" id="arrivalDateTo" name="arrivalDateTo" class="form-control" value="2019-05-14T11:00">
                             </div>
                         </div>
-                    
                         <div class="form-row align-items-center mb-3">
                             <div class="col-md-4">Flight Number:</div>
                             <div class="col-md-4 text-secondary">Number</div>
                             <div class="col-md-4">
-                                <input type="int" id="flightNbr" name="flightNbr" placeholder="Flight Number" class="form-control">
+                                <input type="number" id="flightNbr" name="flightNbr" placeholder="Flight Number" class="form-control">
                             </div>
                         </div>
-                    
-                        <div id="errorMessages" class="text-danger mb-3"></div> <!-- Error message container -->
-                    
+                        <div id="errorMessages" class="text-danger mb-3"></div>
                         <div class="form-row justify-content-end">
                             <div class="col-md-4">
                                 <input type="submit" value="Submit Param" class="btn btn-primary">
                             </div>
                         </div>
-                        <!-- Repeat for other fields -->
                     </form>
                 </div>
                 <div class="card-footer">
