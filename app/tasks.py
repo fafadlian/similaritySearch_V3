@@ -1,5 +1,5 @@
 from app.models import Task
-from app.data_fetcher import fetch_pnr_data, save_json_data_for_flight_id, fetch_all_pnr_data
+from app.data_fetcher import fetch_pnr_data, save_json_data_for_flight_id, fetch_all_pnr_data, fetch_all_pages
 # from app.azure_blob_storage import upload_to_blob_storage, download_from_blob_storage, delete_from_blob_storage, upload_to_blob_storage_txt
 from app.local_storage import upload_to_local_storage, download_from_local_storage, delete_from_local_storage, upload_to_local_storage_txt, list_files_in_directory
 
