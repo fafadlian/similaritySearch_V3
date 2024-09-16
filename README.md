@@ -15,12 +15,30 @@ pip install requirements.txt
 ```
 5. Set up environment variables: create a environment.enf file in the project root and provide the necessary configurations: 
 ```sh
+#local storage
 STORAGE_PATH=local_storage
+
+#celery config
 CELERY_BROKER_URL=redis://localhost:6379/0
 CELERY_RESULT_BACKEND=redis://localhost:6379/0
+
+#postgresql config
+POSTGRES_HOST=localhost
+POSTGRES_PORT=5432
+POSTGRES_DB=<your_db_name>
+POSTGRES_USER=<your_db_user/owner>
+POSTGRES_PASSWORD=<your_db_password>
+POSTGRES_SSLMODE=disable
 DATABASE_URL=postgresql+psycopg2://<db_username>:<db_password>@localhost:5432/similaritysearch
-ACCESS_TOKEN=<your_access_token>
-REFRESH_TOKEN=<your_refresh_token> 
+
+#rmt api and app
+ACCESS_TOKEN=<your_RMT_access_token>
+REFRESH_TOKEN=<your_RMT_refresh_token>
+USERNAME=<your_RMT_username>
+PASSWORD=<your_RMT_password>
+APP_ENV=development
+APP_DEBUG=True
+APP_PORT=8000
 ```
 5. Start redis from terminal: 
 ```sh 
