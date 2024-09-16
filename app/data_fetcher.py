@@ -6,14 +6,27 @@ from datetime import datetime
 import asyncio
 import aiohttp
 from concurrent.futures import ThreadPoolExecutor, as_completed
-from app.azure_blob_storage import upload_to_blob_storage
-from app.token_manager import TokenManager
+
+# from app.azure_blob_storage import upload_to_blob_storage, delete_from_blob_storage, download_from_blob_storage, delete_all_files_in_directory
+from app.local_storage import upload_to_local_storage, delete_from_local_storage, delete_all_files_in_directory
 import logging
 from dotenv import load_dotenv
 
 logging.basicConfig(level=logging.INFO)
 
 load_dotenv('environment.env')
+
+# def delete_all_files_in_directory(directory):
+#     if os.path.exists(directory):
+#         for filename in os.listdir(directory):
+#             file_path = os.path.join(directory, filename)
+#             try:
+#                 if os.path.isfile(file_path) or os.path.islink(file_path):
+#                     os.unlink(file_path)
+#                 elif os.path.isdir(file_path):
+#                     shutil.rmtree(file_path)
+#             except Exception as e:
+#                 print(f"Failed to delete {file_path}. Reason: {e}")
 
 def delete_all_files_in_directory(directory):
     if os.path.exists(directory):
@@ -25,7 +38,7 @@ def delete_all_files_in_directory(directory):
                 elif os.path.isdir(file_path):
                     shutil.rmtree(file_path)
             except Exception as e:
-                print(f"Failed to delete {file_path}. Reason: {e}")
+                logging.error(f"Failed to delete {file_path}. Reason: {e}")
 
 def recreate_directory(directory):
     if os.path.exists(directory):
@@ -113,6 +126,33 @@ async def fetch_all_pages(api_url, access_token, params):
     return combined_data if combined_data else None, total_pages
 
 
+def save_json_data_for_flight_id(flight_id, directory):
+    api_url = f'https://tenacity-rmt.eurodyn.com/api/dataset/flight/{flight_id}'
+    access_token = os.getenv("ACCESS_TOKEN")
+    headers = {'Authorization': f'Bearer {access_token}'}
+    
+    try:
+        response = requests.get(api_url, headers=headers)
+        logging.info(f"response code: {response.status_code}")
+        
+        if response.status_code == 200:
+            file_path = os.path.join(directory, f'flight_id_{flight_id}.json')
+            blob_name = f"{directory}/flight_id_{flight_id}.json"
+            logging.info(f"response content: {response.content}")
+            
+            logging.info(f"Saved JSON data for flight ID {flight_id} to {file_path}")
+
+            # upload_to_blob_storage(blob_name, response.content)
+            upload_to_local_storage(blob_name, response.content)
+                
+            logging.info(f"Uploaded JSON data for flight ID {flight_id} to Azure Blob Storage as {blob_name}")
+        else:
+            logging.warning(f"Failed to retrieve JSON data for flight ID {flight_id}: {response.text}")
+    
+    except Exception as e:
+        logging.error(f"Error processing task {directory}: {str(e)}")
+
+
 async def fetch_all_pnr_data(flight_ids, directory, access_token):
     async with aiohttp.ClientSession() as session:
         tasks = []
@@ -126,7 +166,8 @@ async def fetch_all_pnr_data(flight_ids, directory, access_token):
         # Combine all the JSON data into one JSON object or list
         combined_json = json.dumps(combined_data)
         blob_name = f"{directory}/combined_pnr_data.json"
-        upload_to_blob_storage(blob_name, combined_json.encode('utf-8'))
+        # upload_to_blob_storage(blob_name, combined_json.encode('utf-8'))
+        upload_to_local_storage(blob_name, combined_json, is_json=True)
         logging.info(f"Uploaded combined JSON data to Azure Blob Storage as {blob_name}")
 
 async def fetch_pnr_data_to_azure(session, flight_id, combined_data):

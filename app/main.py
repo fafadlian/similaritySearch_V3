@@ -5,10 +5,11 @@ from app.models import Task
 from app.loc_access import LocDataAccess
 from app.database import get_db
 from app.schemas import FlightSearchRequest, SimilaritySearchRequest  # Import the new schemas
-from azure.storage.blob import ContainerClient
+# from azure.storage.blob import ContainerClient
 from sqlalchemy.orm import Session
 from sqlalchemy.sql import text
-from app.azure_blob_storage import delete_from_blob_storage
+# from app.azure_blob_storage import delete_from_blob_storage
+from app.local_storage import delete_from_local_storage, list_files_in_directory
 from dotenv import load_dotenv
 import numpy as np
 
@@ -27,7 +28,8 @@ router = APIRouter()
 
 AZURE_STORAGE_CONNECTION_STRING = os.getenv('AZURE_STORAGE_CONNECTION_STRING')
 CONTAINER_NAME = 'taskfiles'
-container_client = ContainerClient.from_connection_string(AZURE_STORAGE_CONNECTION_STRING, CONTAINER_NAME)
+# container_client = ContainerClient.from_connection_string(AZURE_STORAGE_CONNECTION_STRING, CONTAINER_NAME)
+# container_client = None
 
 
 @router.get("/", response_class=HTMLResponse)
@@ -153,9 +155,11 @@ async def delete_task(request: Request, db: Session = Depends(get_db)):
 
     try:
         # shutil.rmtree(task.folder_path)
-        blobs_to_delete = container_client.list_blobs(name_starts_with=task.folder_path)
+        blobs_to_delete = list_files_in_directory(task.folder_path)
         for blob in blobs_to_delete:
-            delete_from_blob_storage(blob.name)
+            # delete_from_blob_storage(blob.name)
+            delete_from_local_storage(blob)
+
         db.delete(task)
         db.commit()
         return {"status": "success", "message": "Task deleted successfully"}

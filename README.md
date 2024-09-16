@@ -6,14 +6,37 @@ The Similarity Search WebApp is a Python-Flask-based web application designed to
 ## Installation
 To run this application, ensure you have Docker installed on your machine.
 
-1. Clone the repository to your local machine. You will need python 3.11 to run this project
-2. Navigate to the project directory.
-3. Install the required libraries ```` pip install requirements.txt ````
+1. Clone the repository to your local machine. 
+2. You will need python 3.11 and postgreSQL to run this project
+3. Navigate to the project directory.
+4. Install the required libraries 
+```bash 
+pip install requirements.txt 
+```
+5. Set up environment variables: create a environment.enf file in the project root and provide the necessary configurations: 
+```sh
+STORAGE_PATH=local_storage
+CELERY_BROKER_URL=redis://localhost:6379/0
+CELERY_RESULT_BACKEND=redis://localhost:6379/0
+DATABASE_URL=postgresql+psycopg2://<db_username>:<db_password>@localhost:5432/similaritysearch
+ACCESS_TOKEN=<your_access_token>
+REFRESH_TOKEN=<your_refresh_token> 
+```
+5. Start redis from terminal: 
+```sh 
+redis-server 
+```
+6. Open two terminal tabs and run these to run celery workers: 
+```sh 
+celery -A app.celery_init.celery worker --loglevel=info
+celery -A app.celery_init.celery beat --loglevel=info 
+```
+
 5. Run the the following command: ````uvicorn run:app --host 0.0.0.0 --port 443 --log-level info````
 
 
 ## Usage
-After starting the application, navigate to `http://localhost:5002` in your web browser to access the web interface. Enter your search parameters to begin finding similarities in your data.
+After starting the application, navigate to `http://localhost:443` in your web browser to access the web interface. Enter your search parameters to begin finding similarities in your data.
 
 ## Query/Test Cases
 All test case initiated by submitting the PNR Timeframe Parameter (Arrival Date From and Arrival Date To). We're going to use 1 January 2019 to 30 November 2019. 

@@ -15,8 +15,11 @@ from app.data_parser import parse_combined_json, parse_combined_xml
 from app.location_similarity import haversine, location_similarity_score, location_matching, address_str_similarity_score
 from app.age_similarity import age_similarity_score
 from app.base_similarity import count_likelihood2, string_similarity
-from app.azure_blob_storage import download_from_blob_storage, fetch_combined_data, fetch_combined_data_XML
-from azure.storage.blob import BlobServiceClient, BlobClient, ContainerClient
+
+# from app.azure_blob_storage import upload_to_blob_storage, download_from_blob_storage, delete_all_files_in_directory, fetch_combined_data
+from app.local_storage import upload_to_local_storage, download_from_local_storage, delete_all_files_in_directory, fetch_combined_data
+# from azure.storage.blob import BlobServiceClient, BlobClient, ContainerClient
+
 import logging
 
 
@@ -26,7 +29,7 @@ logging.basicConfig(level=logging.INFO)
 AZURE_STORAGE_CONNECTION_STRING = os.getenv('AZURE_STORAGE_CONNECTION_STRING')
 CONTAINER_NAME = os.getenv('CONTAINER_NAME')
 
-blob_service_client = BlobServiceClient.from_connection_string(AZURE_STORAGE_CONNECTION_STRING)
+# blob_service_client = BlobServiceClient.from_connection_string(AZURE_STORAGE_CONNECTION_STRING)
 
 
 def enrich_data(df):
@@ -54,6 +57,114 @@ def enrich_data(df):
     return df
 
 
+
+def parse_combined_data(combined_data):
+    logging.info(f"Parsing combined JSON data")
+    logging.info(f"combined_data type: {type(combined_data)}, content: {combined_data[:2]}")
+    start_time = time.time()
+
+    airport_data_access = LocDataAccess.get_instance()  # Access the singleton instance
+
+    all_data = []
+
+    for data in combined_data:
+        flight_data = data['iata_pnrgov_notif_rq_obj']
+        origin_code = flight_data.get('flight_leg_departure_airp_location_code')
+        destination_code = flight_data.get('flight_leg_arrival_airp_location_code')
+        flight_leg_flight_number = flight_data.get('flight_leg_flight_number', 'Unknown')
+        originator_airline_code = flight_data.get('originator_airline_code', 'Unknown')
+        origin_lon, origin_lat = airport_data_access.get_airport_lon_lat_by_iata(origin_code) if origin_code else (None, None)
+        destination_lon, destination_lat = airport_data_access.get_airport_lon_lat_by_iata(destination_code) if destination_code else (None, None)
+
+        pnr_data = [
+            (pnr, flight, passenger)
+            for pnr in flight_data['pnr_obj']
+            for flight in pnr['flight_obj']
+            for passenger in pnr['passenger_obj']
+        ]
+
+        for pnr, flight, passenger in pnr_data:
+            bookID = pnr.get('booking_refid', 'Unknown')
+            operating_airline_flight_number = flight.get('operating_airline_flight_number', 'Unknown')
+            departure_date_time = flight.get('departure_date_time', 'Unknown')
+            arrival_date_time = flight.get('arrival_date_time', 'Unknown')
+
+            firstname = passenger['doc_ssr_obj'].get('docs_first_givenname', '').strip()
+            surname = passenger['doc_ssr_obj'].get('docs_surname', '').strip()
+            name = f"{firstname} {surname}"
+            travel_doc_nbr = passenger['doc_ssr_obj'].get('doco_travel_doc_nbr', 'Unknown')
+            place_of_issue = passenger['doc_ssr_obj'].get('doco_placeof_issue', 'Unknown')
+            date_of_birth = passenger['doc_ssr_obj'].get('docs_dateof_birth', 'Unknown')
+            nationality = passenger['doc_ssr_obj'].get('docs_pax_nationality', 'Unknown')
+            sex = passenger['doc_ssr_obj'].get('docs_gender', 'Unknown')
+            city_name = passenger['doc_ssr_obj'].get('doca_city_name')
+            address = passenger['doc_ssr_obj'].get('doca_address')
+
+            all_data.append((
+                origin_code, destination_code, flight_leg_flight_number, originator_airline_code,
+                operating_airline_flight_number, departure_date_time, arrival_date_time, bookID,
+                firstname, surname, name, travel_doc_nbr, place_of_issue, date_of_birth, nationality, sex,
+                city_name, address
+            ))
+
+    columns = ['OriginIATA', 'DestinationIATA', 'FlightLegFlightNumber', 'OriginatorAirlineCode',
+                'OperatingAirlineFlightNumber', 'DepartureDateTime', 'ArrivalDateTime', 'BookingID',
+                'Firstname', 'Surname', 'Name', 'Travel Doc Number', 'Place of Issue', 'DOB', 'Nationality', 'Sex',
+                'CityName', 'Address']    
+    df = pd.DataFrame(all_data, columns=columns)
+    logging.info(f"Parsing completed in {time.time() - start_time:.2f} seconds")
+    return df
+
+def parse_json(file_path):
+    logging.info(f"Parsing JSON file: {file_path}")
+    airport_data_access = LocDataAccess.get_instance()  # Access the singleton instance
+    # json_content = download_from_blob_storage(file_path)  # Download JSON content from Azure Blob Storage
+    json_content = download_from_local_storage(file_path)  # Download JSON content from local storage
+    logging.info(f"ready to parse: {file_path}")
+    data = json.loads(json_content)
+
+    flight_data = data['iata_pnrgov_notif_rq_obj']
+    origin_code = flight_data.get('flight_leg_departure_airp_location_code')
+    destination_code = flight_data.get('flight_leg_arrival_airp_location_code')
+    flight_leg_flight_number = flight_data.get('flight_leg_flight_number', 'Unknown')
+    originator_airline_code = flight_data.get('originator_airline_code', 'Unknown')
+    origin_lon, origin_lat = airport_data_access.get_airport_lon_lat_by_iata(origin_code) if origin_code else (None, None)
+    destination_lon, destination_lat = airport_data_access.get_airport_lon_lat_by_iata(destination_code) if destination_code else (None, None)
+
+    data_list = []
+
+    for pnr in flight_data['pnr_obj']:
+        bookID = pnr.get('booking_refid', 'Unknown')
+        for flight in pnr['flight_obj']:
+            operating_airline_flight_number = flight.get('operating_airline_flight_number', 'Unknown')
+            departure_date_time = flight.get('departure_date_time', 'Unknown')
+            arrival_date_time = flight.get('arrival_date_time', 'Unknown')
+            
+            for passenger in pnr['passenger_obj']:
+                firstname = passenger['doc_ssr_obj'].get('docs_first_givenname', '').strip()
+                surname = passenger['doc_ssr_obj'].get('docs_surname', '').strip()
+                name = f"{firstname} {surname}"
+                travel_doc_nbr = passenger['doc_ssr_obj'].get('doco_travel_doc_nbr', 'Unknown')
+                place_of_issue = passenger['doc_ssr_obj'].get('doco_placeof_issue', 'Unknown')
+                date_of_birth = passenger['doc_ssr_obj'].get('docs_dateof_birth', 'Unknown')
+                nationality = passenger['doc_ssr_obj'].get('docs_pax_nationality', 'Unknown')
+                sex = passenger['doc_ssr_obj'].get('docs_gender', 'Unknown')
+                city_name = passenger['doc_ssr_obj'].get('doca_city_name')
+                address = passenger['doc_ssr_obj'].get('doca_address')
+                
+                city_lat, city_lon = airport_data_access.get_airport_lon_lat_by_city(city_name) if city_name else (None, None)
+                city_org = airport_data_access.get_city_by_airport_iata(origin_code) if origin_code else (None)
+                city_dest = airport_data_access.get_city_by_airport_iata(destination_code) if destination_code else (None)
+                ctry_org = airport_data_access.get_country_by_airport_iata(origin_code) if origin_code else (None)
+                ctry_dest = airport_data_access.get_country_by_airport_iata(destination_code) if destination_code else (None)
+                country_of_address = airport_data_access.get_country_by_city(city_name) if city_name else (None)
+
+                data_list.append((file_path, bookID, firstname, surname, name, travel_doc_nbr, place_of_issue, origin_code, city_org, ctry_org, origin_lat, origin_lon, destination_code, city_dest, ctry_dest, destination_lat, destination_lon, date_of_birth, city_name, city_lat, city_lon, address, country_of_address, nationality, sex, flight_leg_flight_number, originator_airline_code, operating_airline_flight_number, departure_date_time, arrival_date_time))
+
+    columns = ['FilePath', 'BookingID', 'Firstname', 'Surname', 'Name', 'Travel Doc Number', 'Place of Issue', 'OriginIATA', 'OriginCity', 'OriginCountry', 'OriginLat', 'OriginLon', 'DestinationIATA', 'DestinationCity', 'DestinationCountry', 'DestinationLat', 'DestinationLon', 'DOB', 'CityName', 'CityLat', 'CityLon', 'Address', 'Country of Address', 'Nationality', 'Sex', 'FlightLegFlightNumber', 'OriginatorAirlineCode', 'OperatingAirlineFlightNumber', 'DepartureDateTime', 'ArrivalDateTime']
+    df = pd.DataFrame(data_list, columns=columns)
+    return df
+  
 def find_similar_passengers(airport_data_access, firstname, surname, name, dob, iata_o, iata_d, city_name, address, sex, nationality, data_dir, nameThreshold, ageThreshold, locationThreshold):
     # Fetch the combined JSON data from Azure Blob Storage
     blob_path = f"{data_dir}/combined_pnr_data.json"
@@ -258,3 +369,52 @@ def data_filtration(df, nameThreshold, ageThreshold, firstname, surname, dob):
         df = df[df['DOB'] == dob]
 
     return df
+
+        
+
+
+
+
+def parse_xml(file_path):
+    logging.info(f"Parsing XML file: {file_path}")
+    airport_data_access = LocDataAccess.get_instance()  # Access the singleton instance
+    # xml_content = download_from_blob_storage(file_path)  # Download XML content from Azure Blob Storage
+    xml_content = download_from_local_storage(file_path)  # Download XML content from local storage
+    logging.info(f"ready to parse: {file_path}")
+    logging.info(f"xml_content: {xml_content}")
+    root = ET.fromstring(xml_content)
+    logging.info(f"rooting success: {root}")
+    data = []
+
+    origin_code = root.find('.//FlightLeg/DepartureAirport').get('LocationCode') if root.find('.//FlightLeg/DepartureAirport') is not None else None
+    destination_code = root.find('.//FlightLeg/ArrivalAirport').get('LocationCode') if root.find('.//FlightLeg/ArrivalAirport') is not None else None
+    origin_lon, origin_lat = airport_data_access.get_airport_lon_lat_by_iata(origin_code) if origin_code else (None, None)
+    destination_lon, destination_lat = airport_data_access.get_airport_lon_lat_by_iata(destination_code) if destination_code else (None, None)
+
+    for pnr in root.findall('.//PNR'):
+        bookID = pnr.find('.//BookingRefID').get('ID') if pnr.find('.//BookingRefID') is not None else 'Unknown'
+        for passenger in pnr.findall('.//Passenger'):
+            firstname = passenger.find('.//GivenName').text.strip()
+            surname = passenger.find('.//Surname').text.strip()
+            name = f"{firstname} {surname}"
+            travel_doc_nbr = passenger.find('.//DOC_SSR/DOCO').get('TravelDocNbr') if passenger.find('.//DOC_SSR/DOCO') is not None else 'Unknown'
+            place_of_issue = passenger.find('.//DOC_SSR/DOCO').get('PlaceOfIssue') if passenger.find('.//DOC_SSR/DOCO') is not None else 'Unknown'
+            date_of_birth = passenger.find('.//DOC_SSR/DOCS').get('DateOfBirth') if passenger.find('.//DOC_SSR/DOCS') is not None else 'Unknown'
+            nationality = passenger.find('.//DOC_SSR/DOCS').get('PaxNationality') if passenger.find('.//DOC_SSR/DOCS') is not None else 'Unknown'
+            sex = passenger.find('.//DOC_SSR/DOCS').get('Gender') if passenger.find('.//DOC_SSR/DOCS') is not None else 'Unknown'
+            city_name = passenger.find('.//DOC_SSR/DOCA').get('CityName') if passenger.find('.//DOC_SSR/DOCA') is not None else None
+            address = passenger.find('.//DOC_SSR/DOCA').get('Address') if passenger.find('.//DOC_SSR/DOCA') is not None else None
+            
+            city_lat, city_lon = airport_data_access.get_airport_lon_lat_by_city(city_name) if city_name else (None, None)
+            city_org = airport_data_access.get_city_by_airport_iata(origin_code) if origin_code else (None)
+            city_dest = airport_data_access.get_city_by_airport_iata(destination_code) if destination_code else (None)
+            ctry_org = airport_data_access.get_country_by_airport_iata(origin_code) if origin_code else (None)
+            ctry_dest = airport_data_access.get_country_by_airport_iata(destination_code) if destination_code else (None)
+            country_of_address = airport_data_access.get_country_by_city(city_name) if city_name else (None)
+
+            data.append((file_path, bookID, firstname, surname, name, travel_doc_nbr, place_of_issue, origin_code, city_org, ctry_org, origin_lat, origin_lon, destination_code, city_dest, ctry_dest, destination_lat, destination_lon, date_of_birth, city_name, city_lat, city_lon, address,  country_of_address, nationality, sex))
+    
+    columns = ['FilePath', 'BookingID', 'Firstname', 'Surname', 'Name', 'Travel Doc Number', 'Place of Issue', 'OriginIATA', 'OriginCity', 'OriginCountry', 'OriginLat', 'OriginLon', 'DestinationIATA', 'DestinationCity', 'DestinationCountry', 'DestinationLat', 'DestinationLon', 'DOB', 'CityName', 'CityLat', 'CityLon', 'Address', 'Country of Address', 'Nationality', 'Sex']
+    df = pd.DataFrame(data, columns=columns)
+    return df
+
