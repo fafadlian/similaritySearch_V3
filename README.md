@@ -37,7 +37,14 @@ celery -A app.celery_init.celery beat --loglevel=info
 ## Docker run and installation
 1. Docker: Make sure Docker is installed and running on your machine. You can download it from [Docker official website](https://www.docker.com/). 
 2. Docker Compose: Docker Compose should also be installed (it comes with Docker Desktop for Mac and Windows).
-3. Ensure you have an environment.env file in the root directory with the following settings:
+3. Clone the repository to your local machine. 
+4. You will need python 3.11 and postgreSQL to run this project
+5. Navigate to the project directory.
+6. Install the required libraries 
+```bash 
+pip install requirements.txt 
+```
+7. Ensure you have an environment.env file in the root directory with the following settings:
 ```sh 
 # Database settings
 POSTGRES_HOST=postgres
@@ -67,7 +74,7 @@ APP_PORT=8000
 STORAGE_PATH=local_storage
 ```
 
-4. You can use the following docker-compose.yml file to configure your application. This assumes you will fill out the credentials
+8. You can use the following docker-compose.yml file to configure your application. This assumes you will fill out the credentials
 ```sh 
 services:
   web:
@@ -137,17 +144,17 @@ volumes:
 
 ```
 
-4. Build the docker:
+9. Build the docker:
 ```sh 
 docker-compose build
 ```
-5. Run the docker:
+10. Run the docker:
 docker-compose up
 ```sh 
 docker-compose up
 ```
 
-6. You can use the Similarity Search Web App on:
+11. You can use the Similarity Search Web App on:
 https://localhost:443
 
 
