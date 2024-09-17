@@ -39,11 +39,9 @@ def process_task(task_id, arrival_date_from, arrival_date_to, flight_number, fol
             'ft_flight_leg_flight_number': flight_number
         }
 
+        # Use asyncio.run to handle asynchronous calls cleanly
         start_time = time.time()
-        loop = asyncio.get_event_loop()
-        pnr_data, total_pages = loop.run_until_complete(fetch_all_pages(api_url, access_token, params))
-        loop.close()
-
+        pnr_data, total_pages = asyncio.run(fetch_all_pages(api_url, access_token, params))
         if pnr_data:
             print(f"Fetched data from {total_pages} pages")
         else:
@@ -65,18 +63,8 @@ def process_task(task_id, arrival_date_from, arrival_date_to, flight_number, fol
 
             start_time = time.time()
 
-            # Ensure a clean event loop for the second async call
-            try:
-                loop = asyncio.get_event_loop()
-                if loop.is_running():
-                    loop.close()
-            except RuntimeError:
-                pass
-
-            loop = asyncio.new_event_loop()
-            asyncio.set_event_loop(loop)
-            loop.run_until_complete(fetch_all_pnr_data(flight_ids, folder_name, access_token))
-            loop.close()
+            # Use asyncio.run again for the second asynchronous call
+            asyncio.run(fetch_all_pnr_data(flight_ids, folder_name, access_token))
 
             end_time = time.time()
             time_second_approach = end_time - start_time
@@ -97,9 +85,7 @@ def process_task(task_id, arrival_date_from, arrival_date_to, flight_number, fol
         )
 
         blob_name = f"{folder_name}/time_comparison.txt"
-        # upload_to_blob_storage_txt(blob_name, time_comparison_content)
         upload_to_local_storage_txt(blob_name, time_comparison_content)
-        # logging.info(f"Uploaded time comparison results to Azure Blob Storage as {blob_name}")
         logging.info(f"blob_name: {blob_name}")
 
     except Exception as e:
@@ -112,6 +98,7 @@ def process_task(task_id, arrival_date_from, arrival_date_to, flight_number, fol
         logging.error(f"Error processing task {task_id}: {e}")
     finally:
         session.close()
+
 
 # Task to delete old folders
 @celery.task

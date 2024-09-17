@@ -352,6 +352,7 @@ def perform_similarity_search(firstname, surname, name, iata_o, lat_o, lon_o, ci
     # filtered_result_df = result_df[(result_df['FNSimilarity'] >= nameThreshold) &
     #                     (result_df['SNSimilarity'] >= nameThreshold) &
     #                     (result_df['AgeSimilarity'] >= ageThreshold)]
+    filtered_result_df = filtered_result_df.copy()
     filtered_result_df.drop_duplicates(subset=['Name', 'DOB', 'BookingID', 'Travel Doc Number', 'FlightLegFlightNumber', 'OriginatorAirlineCode', 'OperatingAirlineFlightNumber', 'DepartureDateTime', 'ArrivalDateTime'], inplace=True)
     # filtered_result_df.to_csv('test/filtered_resilt_df.csv')
     filtered_result_df.sort_values(by = ['Confidence Level', 'Compound Similarity Score'], ascending = False, inplace = True)
