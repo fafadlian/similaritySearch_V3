@@ -3,36 +3,61 @@
 ## Description
 The Similarity Search WebApp is a Python-Flask-based web application designed to perform advanced similarity searches across PNR data. Utilizing a combination of algorithms for distance and age similarity, it offers users the ability to find a person from a watchlist.
 
-## Terminal run and installation
+## Step 1: PostgreSQL Setup
+### Install PostgreSQL
+- Install PostgreSQL from the [official website](https://www.postgresql.org/download/) or use a package manager like `apt` (Linux) or `brew` (macOS).
+
+### Create a Database and User
+- Access the PostgreSQL command line tool (`psql`) or use a graphical tool like pgAdmin.
+- Execute the following commands:
+  ```sql
+  CREATE DATABASE similaritysearch;
+  CREATE USER similarity_user WITH PASSWORD 'your_password';
+  GRANT ALL PRIVILEGES ON DATABASE similaritysearch TO similarity_user;
+  ```
+  - Replace `your_password` with a strong, secure password.
+
+### Configure Environment Variables
+- In the `environment.env` file, include the connection details:
+  ```sh
+  DATABASE_URL=postgresql+psycopg2://similarity_user:your_password@localhost:5432/similaritysearch
+  ```
+
+## Step 2: Terminal Run and Installation
 To run this application, ensure you have Docker installed on your machine.
 
 1. Clone the repository to your local machine. 
-2. You will need python 3.11 and postgreSQL to run this project
+2. You will need Python 3.11 to run this project.
 3. Navigate to the project directory.
-4. Install the required libraries 
+4. Install the required libraries: 
 ```bash 
-pip install requirements.txt 
+pip install -r requirements.txt 
 ```
-5. Set up environment variables: create a environment.enf file in the project root and provide the necessary configurations: 
+
+5. Set up environment variables: create an `environment.env` file in the project root and provide the necessary configurations: 
 ```sh
 STORAGE_PATH=local_storage
 CELERY_BROKER_URL=redis://localhost:6379/0
 CELERY_RESULT_BACKEND=redis://localhost:6379/0
 DATABASE_URL=postgresql+psycopg2://<db_username>:<db_password>@localhost:5432/similaritysearch
 ACCESS_TOKEN=<your_access_token>
-REFRESH_TOKEN=<your_refresh_token> 
+REFRESH_TOKEN=<your_refresh_token>
 ```
-5. Start redis from terminal: 
+   - Replace `<your_access_token>` and `<your_refresh_token>` with values obtained from your API provider or previous deployment records. Ensure these are securely stored and managed.
+
+6. Start Redis from the terminal: 
 ```sh 
 redis-server 
 ```
-6. Open two terminal tabs and run these to run celery workers: 
+7. Open two terminal tabs and run these to start Celery workers: 
 ```sh 
 celery -A app.celery_init.celery worker --loglevel=info
 celery -A app.celery_init.celery beat --loglevel=info 
 ```
-
-5. Run the the following command: ````uvicorn run:app --host 0.0.0.0 --port 443 --log-level info````
+8. Run the following command to start the application:
+```sh
+uvicorn run:app --host 0.0.0.0 --port 443 --log-level info
+```
 
 ## Docker run and installation
 1. Docker: Make sure Docker is installed and running on your machine. You can download it from [Docker official website](https://www.docker.com/). 
