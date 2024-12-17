@@ -59,6 +59,8 @@ celery -A app.celery_init.celery beat --loglevel=info
 uvicorn run:app --host 0.0.0.0 --port 443 --log-level info
 ```
 
+9. The documentation for the endpoints can be seen in here: [Documentation](API_Documentation.md)
+
 ## Docker run and installation
 1. Docker: Make sure Docker is installed and running on your machine. You can download it from [Docker official website](https://www.docker.com/). 
 2. Docker Compose: Docker Compose should also be installed (it comes with Docker Desktop for Mac and Windows).
