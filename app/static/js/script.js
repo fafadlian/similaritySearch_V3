@@ -1,343 +1,339 @@
-// Add this at the top or where other event listeners are added
-window.addEventListener('beforeunload', function (e) {
-    var task_id = localStorage.getItem('task_id');
-    if (task_id) {
-        var data = JSON.stringify({ task_id: task_id });
-        var url = '/delete_task';
-        
-        // Use sendBeacon to ensure the request completes even if the page is being unloaded
-        if (navigator.sendBeacon) {
-            navigator.sendBeacon(url, data);
-        } else {
-            // Fallback to synchronous request if sendBeacon is not available
-            var xhr = new XMLHttpRequest();
-            xhr.open('POST', url, false);  // false makes it synchronous
-            xhr.setRequestHeader('Content-Type', 'application/json');
-            xhr.send(data);
-        }
-        
-        // Remove the task_id from localStorage
-        localStorage.removeItem('task_id');
-    }
-});
+// Refactored JavaScript for Improved Cleanliness and Modularity
 
+const App = (() => {
+    // Constants and Configurations
+    const API_ROUTES = {
+        DELETE_TASK: '/delete_task',
+        SIMILARITY_SEARCH: '/perform_similarity_search',
+        GET_RESULT: '/result',
+        FLIGHT_IDS: '/flight_ids',
+    };
 
-document.addEventListener('DOMContentLoaded', function () {
+    const SELECTORS = {
+        PARAM_FORM: '#paramForm',
+        SEARCH_FORM: '#searchForm',
+        DOWNLOAD_JSON: '#downloadJson',
+        DELETE_TASK: '#deleteTask',
+        LOADING_INDICATOR: '#loadingIndicator',
+        SEARCH_RESULTS: '#searchResults',
+        UNIQUE_FLIGHT_IDS: '#uniqueFlightIds',
+        NATIONALITY: '#nationality',
+        IATA_ORIGIN: '#iata_o',
+        IATA_DESTINATION: '#iata_d',
+    };
 
-    //Navigation
-    setupNavigation();
-
-    //Populating dropdowns
-    populateNationalityDropdown();
-    populateAirportDropdowns();
-
-    const displayedColumns = ['Confidence Level', 'Compound Similarity Score', 'Name', 'DOB', 'Sex', 'Nationality','Travel Doc Number', 'BookingID']; // Directly displayed columns
+    let globalResponseData = []; // Initialize as an empty array
     const hoverColumns = ['FNSimilarity','SNSimilarity','AgeSimilarity', 'DOBSimilarity', 'strAddressSimilarity', 'natMatch', 'sexMatch', 'originSimilarity', 'destinationSimilarity']; // Columns to display on hover
-    var globalResponseData = [];  // Global variable to store the response data
+    const displayedColumns = ['Confidence Level', 'Compound Similarity Score', 'Name', 'DOB', 'Sex', 'Nationality','Travel Doc Number', 'BookingID']; // Directly displayed columns
 
 
-    //Highlighting Section
-     // Identify the current section here. This is a placeholder example.
-     var currentSection = "similaritySearchSection"; // Change this based on actual logic or URL
 
-     // Remove 'active' class from all nav links first
-     document.querySelectorAll('.nav-link').forEach(function(link) {
-         link.classList.remove('active');
-     });
- 
-     // Add 'active' class to the current section's nav link
-     if (currentSection === "similaritySearchSection") {
-         document.querySelector('a[href="#similaritySearchSection"]').classList.add('active');
-     } else if (currentSection === "anomalyDetectionSection") {
-         document.querySelector('a[href="#anomalyDetectionSection"]').classList.add('active');
-     }
-     // Extend with more else-if blocks for additional sections as needed
-
-    var lastParam = {};
-
-    // Handle Date Range Form Submission
-        // Handle Date Range Form Submission
-        document.getElementById('paramForm').addEventListener('submit', function (event) {
-            event.preventDefault();
-            showLoadingIndicator();
-        
-            var task_id = localStorage.getItem('task_id');
-            if (task_id) {
-                sendRequest('/delete_task', { task_id: task_id }, function(response) {
-                    if (response.status === "success" || (response.status === "error" && response.message === "Task not found")) {
-                        console.log("Previous task deleted successfully or not found.");
-                        localStorage.removeItem('task_id');
-                        initiateNewSearch();
+    // Utility Functions
+    const sendRequest = (url, data = {}, method = 'POST') => {
+        return new Promise((resolve, reject) => {
+            const xhr = new XMLHttpRequest();
+            xhr.open(method, url, true);
+            xhr.setRequestHeader('Content-Type', 'application/json');
+    
+            xhr.onload = () => {
+                try {
+                    const response = JSON.parse(xhr.responseText);
+                    if (xhr.status === 200) {
+                        resolve(response);
                     } else {
-                        console.error("Error deleting previous task:", response.message);
-                        initiateNewSearch();
+                        reject({ status: xhr.status, message: response.message || xhr.responseText });
                     }
-                });
-            } else {
-                initiateNewSearch();
-            }
-        });
-
-    var lastSearchQuery = {};
-
-    // Handle Similarity Search Form Submission
-    document.getElementById('searchForm').addEventListener('submit', function(e) {
-        e.preventDefault();
-        showLoadingIndicator();  // Show loading indicator
-    
-        var firstname = document.getElementById('firstname').value || '';
-        var surname = document.getElementById('surname').value || '';
-        var dob = document.getElementById('dob').value || '';
-        var iata_o = document.getElementById('iata_o').value || '';
-        var iata_d = document.getElementById('iata_d').value || '';
-        var city_name = document.getElementById('city_name').value || '';
-        var address = document.getElementById('address').value || '';
-        var sex = document.getElementById('sex').value || 'None';
-        var nationality = document.getElementById('nationality').value || 'None';
-        var nameThreshold = parseFloat(document.getElementById('nameThreshold').value);
-        var ageThreshold = parseFloat(document.getElementById('ageThreshold').value);
-        var locationThreshold = parseFloat(document.getElementById('locationThreshold').value);
-    
-        // Validate threshold values
-        if (isNaN(nameThreshold) || nameThreshold < 0 || nameThreshold > 100) {
-            alert('Name Threshold must be a number between 0 and 100.');
-            hideLoadingIndicator();
-            return;
-        }
-        if (isNaN(ageThreshold) || ageThreshold < 0 || ageThreshold > 100) {
-            alert('Age Threshold must be a number between 0 and 100.');
-            hideLoadingIndicator();
-            return;
-        }
-        if (isNaN(locationThreshold) || locationThreshold < 0 || locationThreshold > 100) {
-            alert('Location Threshold must be a number between 0 and 100.');
-            hideLoadingIndicator();
-            return;
-        }
-    
-        var task_id = localStorage.getItem('task_id');  // Retrieve task_id from local storage
-        var requestData = {
-            task_id: task_id,
-            firstname: firstname,
-            surname: surname,
-            dob: dob,
-            iata_o: iata_o,
-            iata_d: iata_d,
-            city_name: city_name,
-            address: address,
-            sex: sex,
-            nationality: nationality,
-            nameThreshold: nameThreshold,
-            ageThreshold: ageThreshold,
-            locationThreshold: locationThreshold
-        };
-    
-        lastSearchQuery = requestData;
-    
-        sendRequest('/perform_similarity_search', requestData, function(response) {
-            document.getElementById('loadingIndicator').style.display = 'none'; // Hide loading indicator
-            if (response && response.data) {
-                console.log("Search successful:", response.message);
-                displayResults(response);
-            } else {
-                console.error('Error in search:', response ? response.message : "No response from server");
-                alert('An error occurred during search: ' + (response ? response.message : "No response from server"));
-            }
-        });
-    });
-
-    
-    
-    var downloadJsonButton = document.getElementById('downloadJson');
-    if (downloadJsonButton) {
-        downloadJsonButton.addEventListener('click', function() {
-            console.log("Download JSON button clicked");
-            var dateTimeString = new Date().toISOString().replace(/[^0-9]/g, '');
-            var searchQuery = lastSearchQuery;
-            var data = globalResponseData;
-            console.log("Print globalResponseData", globalResponseData);
-            console.log("Print data", data);
-            var jsonData = {
-                "PNR_Timeframe": {
-                    "arrivalDateFrom": searchQuery.arrivalDateFrom,
-                    "arrivalDateTo": searchQuery.arrivalDateTo,
-                },
-                "searchedIndividual": {
-                    "FirstName": searchQuery.firstname,
-                    "Surname": searchQuery.surname,
-                    "DOB": searchQuery.dob,
-                    "originIATA": searchQuery.iata_o,
-                    "destinationIATA": searchQuery.iata_d,
-                    "cityAddress": searchQuery.city_name,
-                    "Address": searchQuery.address,
-                    "Nationality": searchQuery.nationality,
-                    "Sex": searchQuery.sex
-                },
-                "thresholds": {
-                    "nameSimilarityThreshold": searchQuery.nameThreshold,
-                    "ageSimilarityThreshold": searchQuery.ageThreshold,
-                    "locationSimilarityThreshold": searchQuery.locationThreshold,
-                },
-                "results": data
+                } catch (error) {
+                    reject({ status: xhr.status, message: "Invalid JSON response" });
+                }
             };
     
-            var jsonString = JSON.stringify(jsonData, null, 2);
-            var fileName = `similar_passengers_${dateTimeString}.json`;
-            var blob = new Blob([jsonString], { type: "application/json" });
-            var url = URL.createObjectURL(blob);
-            var link = document.createElement("a");
-            link.setAttribute("href", url);
-            link.setAttribute("download", fileName);
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-        });
-        console.log("Download JSON button event listener attached");
-    } else {
-        console.log("Download JSON button not found");
-    }
-
-    document.getElementById('deleteTask').addEventListener('click', function() {
-        var task_id = localStorage.getItem('task_id');
-        if (task_id) {
-            if (confirm("Are you sure you want to delete this task?")) {
-                sendRequest('/delete_task', { task_id: task_id }, function(response) {
-                    if (response.status === "success") {
-                        alert("Task deleted successfully.");
-                        localStorage.removeItem('task_id');
-                        // Optionally, refresh the UI or redirect the user
-                    } else if (response.status === "error" && response.message === "Task not found") {
-                        alert("Task not found or already deleted.");
-                        localStorage.removeItem('task_id');
-                        // Optionally, refresh the UI or redirect the user
-                    } else {
-                        alert("Error deleting task: " + response.message);
-                    }
-                });
+            xhr.onerror = () => reject({ status: 'error', message: 'Network error' });
+    
+            if (method === 'GET') {
+                xhr.send(); // No body for GET requests
+            } else {
+                xhr.send(JSON.stringify(data));
             }
-        } else {
-            alert("No task ID found in local storage.");
+        });
+    };
+    
+
+    const showLoadingIndicator = () => {
+        document.querySelector(SELECTORS.LOADING_INDICATOR).style.display = 'flex';
+    };
+
+    const hideLoadingIndicator = () => {
+        document.querySelector(SELECTORS.LOADING_INDICATOR).style.display = 'none';
+    };
+
+    const showNotification = (message, type = 'danger') => {
+        const notification = document.createElement('div');
+        notification.className = `alert alert-${type}`;
+        notification.textContent = message;
+        document.body.prepend(notification);
+
+        setTimeout(() => {
+            notification.remove();
+        }, 5000);
+    };
+
+    // Handle Cleanup on Page Unload
+    window.addEventListener('beforeunload', () => {
+        const taskId = localStorage.getItem('task_id');
+        if (taskId) {
+            const data = JSON.stringify({ task_id: taskId });
+            const url = API_ROUTES.DELETE_TASK;
+
+            if (navigator.sendBeacon) {
+                navigator.sendBeacon(url, data);
+            } else {
+                const xhr = new XMLHttpRequest();
+                xhr.open('POST', url, false); // false makes it synchronous
+                xhr.setRequestHeader('Content-Type', 'application/json');
+                xhr.send(data);
+            }
+            localStorage.removeItem('task_id');
         }
     });
+
+    // Dropdown Population
+    const populateDropdown = (selector, csvPath, mapData) => {
+        const selectElement = document.querySelector(selector);
+        Papa.parse(csvPath, {
+            download: true,
+            header: true,
+            complete: (results) => {
+                const data = results.data;
+                data.forEach((item) => {
+                    const option = document.createElement('option');
+                    const { value, label } = mapData(item);
+                    option.value = value;
+                    option.textContent = label;
+                    selectElement.appendChild(option);
+                });
+
+                $(selectElement).select2({
+                    placeholder: "Select an option",
+                    allowClear: true,
+                    width: '100%',
+                    dropdownAutoWidth: true,
+                });
+            },
+        });
+    };
+
+    const populateNationalityDropdown = () => {
+        populateDropdown(SELECTORS.NATIONALITY, '/static/data/geoCrosswalk/GeoCrossWalkMed.csv', (item) => {
+            return { value: item.HH_ISO.trim(), label: item.countryName.trim() };
+        });
+    };
+
+    const populateAirportDropdowns = () => {
+        populateDropdown(SELECTORS.IATA_ORIGIN, '/static/data/geoCrosswalk/GeoCrossWalkMed.csv', (item) => {
+            return { value: item.IATA.trim(), label: `${item.IATA.trim()} - ${item.airportName.trim()}` };
+        });
+        populateDropdown(SELECTORS.IATA_DESTINATION, '/static/data/geoCrosswalk/GeoCrossWalkMed.csv', (item) => {
+            return { value: item.IATA.trim(), label: `${item.IATA.trim()} - ${item.airportName.trim()}` };
+        });
+    };
+
+    // Form Handlers
+    const handleParamFormSubmit = (event) => {
+        event.preventDefault();
+        showLoadingIndicator(); // Show loading indicator
+    
+        const data = {
+            arrival_date_from: document.querySelector('#arrivalDateFrom').value,
+            arrival_date_to: document.querySelector('#arrivalDateTo').value,
+            flight_nbr: document.querySelector('#flightNbr').value,
+        };
+    
+        const previousTaskId = localStorage.getItem('task_id');
+        const deleteTaskPromise = previousTaskId
+            ? sendRequest(API_ROUTES.DELETE_TASK, { task_id: previousTaskId })
+            : Promise.resolve();
+    
+        deleteTaskPromise
+            .catch(() => console.log('No previous task to delete'))
+            .finally(() => {
+                sendRequest('/submit_param', data)
+                    .then((response) => {
+                        if (response.task_id) {
+                            localStorage.setItem('task_id', response.task_id);
+                            checkTaskStatusSSE(response.task_id); // Use SSE for real-time updates
+                            showNotification('Task created successfully.', 'success');
+                        } else {
+                            showNotification('Task creation failed: No task ID returned.', 'danger');
+                            hideLoadingIndicator();
+                        }
+                    })
+                    .catch((err) => {
+                        console.error('Error creating new task:', err);
+                        showNotification('Failed to create a new task.', 'danger');
+                        hideLoadingIndicator();
+                    });
+            });
+    };
     
     
     
     
 
-    // Function to send AJAX request to the server
+    const handleSearchFormSubmit = (event) => {
+        event.preventDefault();
+        showLoadingIndicator(); // Show loading indicator
 
-    function sendRequest(url, data, callback, method = 'POST') {
-        var xhr = new XMLHttpRequest();
-        xhr.open(method, url, true);
-        xhr.setRequestHeader('Content-Type', 'application/json');
+        const task_id = localStorage.getItem('task_id');
+        if (!task_id) {
+            showNotification('Task ID not found. Please start a task first.', 'warning');
+            hideLoadingIndicator();
+            return;
+        }
+    
+        const data = {
+            task_id: task_id,
+            firstname: document.querySelector('#firstname').value || '',
+            surname: document.querySelector('#surname').value || '',
+            dob: document.querySelector('#dob').value || '',
+            iata_o: document.querySelector('#iata_o').value || '',
+            iata_d: document.querySelector('#iata_d').value || '',
+            city_name: document.querySelector('#city_name').value || '',
+            address: document.querySelector('#address').value || '',
+            sex: document.querySelector('#sex').value || 'None',
+            nationality: document.querySelector('#nationality').value || 'None',
+            nameThreshold: parseFloat(document.querySelector('#nameThreshold').value),
+            ageThreshold: parseFloat(document.querySelector('#ageThreshold').value),
+            locationThreshold: parseFloat(document.querySelector('#locationThreshold').value),
+        };
+    
+        // Validate threshold values
+        if (
+            isNaN(data.nameThreshold) || data.nameThreshold < 0 || data.nameThreshold > 100 ||
+            isNaN(data.ageThreshold) || data.ageThreshold < 0 || data.ageThreshold > 100 ||
+            isNaN(data.locationThreshold) || data.locationThreshold < 0 || data.locationThreshold > 100
+        ) {
+            showNotification('Thresholds must be numbers between 0 and 100.', 'warning');
+            hideLoadingIndicator();
+            return;
+        }
 
-        xhr.onload = function () {
-            console.log("XHR Load Event Triggered");
-            console.log("XHR onload triggered", xhr.status);
-            console.log("Raw response text:", xhr.responseText);
-            if (xhr.status === 200) {
-                var response = JSON.parse(xhr.responseText);
-                callback(response);
-            } else {
-                console.error("Request failed with status:", xhr.status);
-                callback({ status: "error", message: xhr.responseText });
-                alert("An error occurred. Please check the console for details then refresh the page.");
+        console.log('Payload being sent:', data);
+
+    
+        sendRequest(API_ROUTES.SIMILARITY_SEARCH, data)
+            .then((response) => {
+                if (response && response.data) {
+                    displayResults(response);
+                } else {
+                    showNotification('No similar passengers found.', 'info');
+                }
+            })
+            .catch((err) => {
+                console.error('Error during similarity search:', err);
+                showNotification('Similarity search failed.', 'danger');
+            })
+            .finally(hideLoadingIndicator);
+    };
+    
+
+    const checkTaskStatusSSE = (taskId) => {
+        const eventSource = new EventSource(`/sse/${taskId}`);
+    
+        eventSource.onmessage = (event) => {
+            try {
+                const response = JSON.parse(event.data);
+                console.log('Task Status:', response.status);
+                console.log('Task Message:', response.message);
+    
+                if (response.status === 'completed') {
+                    console.log('Task completed successfully.');
+                    displayFlightIds(taskId); // Display the results
+                    hideLoadingIndicator(); // Hide the loading indicator
+                    eventSource.close(); // Close the SSE connection
+                } else if (response.status === 'failed') {
+                    console.error('Task failed.');
+                    showNotification('Task processing failed.', 'danger');
+                    hideLoadingIndicator(); // Hide the loading indicator
+                    eventSource.close(); // Close the SSE connection
+                } else {
+                    console.log('Task is still in progress.');
+                }
+            } catch (err) {
+                console.error('Error processing SSE message:', err);
+                showNotification('Error processing SSE message.', 'danger');
             }
         };
-
-        xhr.onerror = function () {
-            console.error("Request failed due to a network error");
-            callback({ status: "error", message: "Network error" });
-            hideLoadingIndicator(); // Ensure the loading indicator is hidden on error
+    
+        eventSource.onerror = (err) => {
+            console.error('SSE connection error:', err);
+            showNotification('Error checking task status via SSE.', 'danger');
+            hideLoadingIndicator(); // Hide the loading indicator
+            eventSource.close(); // Close the SSE connection on error
         };
-
-        if (method === 'GET') {
-            xhr.send();
-        } else {
-            xhr.send(JSON.stringify(data));
-        }
-    }
+    };    
     
 
+    // Display Flight IDs
+    const displayFlightIds = (taskId) => {
+        sendRequest(`/flight_ids/${taskId}`, {}, 'GET')
+            .then((response) => {
+                const flightIds = response.flight_ids;
+                const count = response.unique_flight_id_count;
+                const task_id = response.task_id;
+                const displayDiv = document.querySelector('#uniqueFlightIds');
+                displayDiv.innerHTML = `Unique Flight IDs: ${count}<br>`;
+                console.log('task_id:', task_id);   
+            })
+            .catch((err) => {
+                console.error('Error fetching flight IDs:', err);
+                showNotification('Failed to fetch flight IDs.', 'danger');
+            });
+    };
 
-
-    
-    
-    
-    // Function to handle displaying the count
-    function checkTaskStatus(taskId) {
-        var intervalId = setInterval(function() {
-            sendRequest(`/result/${taskId}`, {}, function(response) {
-                console.log("Task Status:", response.status || response.message);
-                if (response.status === 'completed' || response.message === 'Processing completed') {
-                    clearInterval(intervalId);
-                    // Handle the completed task here
-                    console.log("Task completed with folder:", response.folder);
-                    displayFlightIds(taskId);
-                    document.getElementById('loadingIndicator').style.display = 'none'; // Hide loading indicator
-                }
-                else if (response.status === 'failed' || response.message === 'Processing failed') {
-                    clearInterval(intervalId);
-                    console.log("Task failed with error:", response.error);
-                    console.error("Task failed with error:", response.error);
-                    document.getElementById('loadingIndicator').style.display = 'none'; // Hide loading indicator
-                }
-            }, 'GET');
-        }, 1000);  // Check every second
-    }
-
-    function displayFlightIds(taskId) {
-        sendRequest(`/flight_ids/${taskId}`, {}, function(response) {
-            var flightIds = response.flight_ids;
-            var count = response.unique_flight_id_count;
-            var displayDiv = document.getElementById('uniqueFlightIds');
-            displayDiv.innerHTML = `Unique Flight IDs: ${count}<br>` ;
-        }, 'GET');
-    }
-
-    function displayResults(response) {
+    const displayResults = (response) => {
         console.log("Response data:", response.data);
-        globalResponseData = response.data;
-        var resultsDiv = document.getElementById('searchResults');
+        globalResponseData = response.data; // Assign response data to global variable
+        const resultsDiv = document.getElementById('searchResults');
         resultsDiv.innerHTML = ''; // Clear previous results
     
         if (response.data && response.data.length > 0) {
-            var table = document.createElement('table');
+            const table = document.createElement('table');
             table.className = 'table table-striped';
     
             // Header for displayed columns
-            var thead = document.createElement('thead');
-            var headerRow = document.createElement('tr');
-            displayedColumns.forEach(columnName => {
-                var th = document.createElement('th');
+            const thead = document.createElement('thead');
+            const headerRow = document.createElement('tr');
+            displayedColumns.forEach((columnName) => {
+                const th = document.createElement('th');
                 th.textContent = columnName;
                 headerRow.appendChild(th);
             });
     
             // Header cell for "Actions"
-            var actionTh = document.createElement('th');
+            const actionTh = document.createElement('th');
             actionTh.textContent = "Actions";
             headerRow.appendChild(actionTh);
             thead.appendChild(headerRow);
             table.appendChild(thead);
     
             // Body with clickable details
-            var tbody = document.createElement('tbody');
+            const tbody = document.createElement('tbody');
             response.data.forEach((item, index) => {
-                var row = document.createElement('tr');
-                displayedColumns.forEach(columnName => {
-                    var td = document.createElement('td');
+                const row = document.createElement('tr');
+                displayedColumns.forEach((columnName) => {
+                    const td = document.createElement('td');
                     td.textContent = item[columnName];
                     row.appendChild(td);
                 });
     
                 // Cell with a "View More" button to toggle additional details
-                var toggleDetailsTd = document.createElement('td');
-                var toggleDetailsBtn = document.createElement('button');
+                const toggleDetailsTd = document.createElement('td');
+                const toggleDetailsBtn = document.createElement('button');
                 toggleDetailsBtn.textContent = "View More";
                 toggleDetailsBtn.className = 'btn btn-info btn-sm';
-                toggleDetailsBtn.onclick = function() {
-                    var detailsRow = document.getElementById(`details-${index}`);
+                toggleDetailsBtn.onclick = () => {
+                    const detailsRow = document.getElementById(`details-${index}`);
                     detailsRow.style.display = detailsRow.style.display === 'none' ? '' : 'none';
                 };
                 toggleDetailsTd.appendChild(toggleDetailsBtn);
@@ -346,31 +342,31 @@ document.addEventListener('DOMContentLoaded', function () {
                 tbody.appendChild(row);
     
                 // Create a hidden row for additional details
-                var detailsRow = document.createElement('tr');
+                const detailsRow = document.createElement('tr');
                 detailsRow.style.display = 'none'; // Initially hidden
                 detailsRow.id = `details-${index}`;
     
-                var detailsCell = document.createElement('td');
+                const detailsCell = document.createElement('td');
                 detailsCell.colSpan = displayedColumns.length + 1;
     
-                var miniTable = document.createElement('table');
+                const miniTable = document.createElement('table');
                 miniTable.className = 'table table-hover'; // Bootstrap styles
     
-                var miniThead = document.createElement('thead');
-                var miniHeaderRow = document.createElement('tr');
-                hoverColumns.forEach(columnName => {
-                    var miniTh = document.createElement('th');
+                const miniThead = document.createElement('thead');
+                const miniHeaderRow = document.createElement('tr');
+                hoverColumns.forEach((columnName) => {
+                    const miniTh = document.createElement('th');
                     miniTh.textContent = columnName;
                     miniHeaderRow.appendChild(miniTh);
                 });
                 miniThead.appendChild(miniHeaderRow);
                 miniTable.appendChild(miniThead);
     
-                var miniTbody = document.createElement('tbody');
-                var miniBodyRow = document.createElement('tr');
-                hoverColumns.forEach(columnName => {
-                    var miniTd = document.createElement('td');
-                    miniTd.textContent = item[columnName];
+                const miniTbody = document.createElement('tbody');
+                const miniBodyRow = document.createElement('tr');
+                hoverColumns.forEach((columnName) => {
+                    const miniTd = document.createElement('td');
+                    miniTd.textContent = item[columnName] || '-'; // Use '-' if data is missing
                     miniBodyRow.appendChild(miniTd);
                 });
                 miniTbody.appendChild(miniBodyRow);
@@ -387,224 +383,75 @@ document.addEventListener('DOMContentLoaded', function () {
             resultsDiv.textContent = 'No similar passengers found.';
         }
     
-        // Function to hide the loading indicator (if applicable)
-        hideLoadingIndicator(); // Ensure this function is defined elsewhere or remove this line if not needed
-    }
-    
-    
-    
+        // Hide the loading indicator if applicable
+        hideLoadingIndicator(); 
+    };
     
 
-    function safeJSONParse(text) {
-        return JSON.parse(text, (key, value) => {
-            if (typeof value === 'string' && value === 'NaN') return NaN;
-            return value;
-        });
-    }
 
-    function preprocessAndParseJSON(responseText) {
-        // Replace occurrences of NaN with null in the response text
-        // Ensure the replacement is safe and won't affect actual string values that might coincidentally contain "NaN"
-        const safeResponseText = responseText.replace(/:\s*NaN\b/g, ": null");
-        
-        // Now parse the modified response text as JSON
-        return JSON.parse(safeResponseText);
-    }
+    
 
-
-    function setupNavigation() {
-        const navLinks = document.querySelectorAll('.nav-link-container .nav-link');
-        navLinks.forEach(link => {
-        link.addEventListener('click', function(e) {
-            e.preventDefault(); // Prevent the default anchor behavior
-            
-            // Remove 'active' class from all nav links
-            navLinks.forEach(link => {
-                link.classList.remove('active');
-            });
-            
-            // Add 'active' class to the clicked link
-            this.classList.add('active');
-            
-            // Hide all sections initially
-            const sections = document.querySelectorAll('main > section');
-            sections.forEach(section => {
-                section.style.display = 'none'; // Hide all sections
-            });
-            
-            // Extract the target section ID from the href and show the targeted section only
-            const targetSectionId = this.getAttribute('href').substring(1); // Remove the '#' from the href value
-            const targetSection = document.getElementById(targetSectionId);
-            if (targetSection) {
-                targetSection.style.display = 'block'; // Make the target section visible
-            }
-        });
-    });
-    }
-
-    function populateNationalityDropdown() {
-        const nationalitySelect = document.getElementById('nationality');
-        const csvPath = '/static/data/geoCrosswalk/GeoCrossWalkMed.csv'; // Adjust based on your setup
-    
-        Papa.parse(csvPath, {
-            download: true,
-            header: true,
-            complete: function(results) {
-                let nationalities = results.data;
-                
-                // Sort nationalities by countryName alphabetically
-                nationalities = nationalities.sort((a, b) => a.countryName.localeCompare(b.countryName));
-    
-                const addedNationalities = new Set(); // To track already added nationalities
-    
-                // Add "Unknown" option
-                const unknownOption = document.createElement('option');
-                unknownOption.value = '';
-                unknownOption.textContent = 'Unknown';
-                nationalitySelect.appendChild(unknownOption);
-    
-                nationalities.forEach(nationality => {
-                    const countryName = nationality.countryName.trim();
-                    const hhIso = nationality.HH_ISO.trim();
-    
-                    if (countryName && hhIso && !addedNationalities.has(hhIso)) {
-                        const option = document.createElement('option');
-                        option.value = hhIso;
-                        option.textContent = countryName;
-                        nationalitySelect.appendChild(option);
-    
-                        addedNationalities.add(hhIso);
-                    }
-                });
-    
-                // Initialize Select2 with search and limited scroll
-                $(nationalitySelect).select2({
-                    placeholder: "Select Nationality",
-                    allowClear: true,
-                    width: '100%', // Adjust width to fit your layout
-                    dropdownAutoWidth: true
-                });
-            }
-        });
-    }
-    
-    function populateAirportDropdowns() {
-        const originSelect = document.getElementById('iata_o');
-        const destinationSelect = document.getElementById('iata_d');
-        const csvPath = '/static/data/geoCrosswalk/GeoCrossWalkMed.csv'; // Adjust based on your setup
-    
-        Papa.parse(csvPath, {
-            download: true,
-            header: true,
-            complete: function(results) {
-                let airports = results.data;
-                
-                // Sort airports by IATA code alphabetically
-                airports = airports.sort((a, b) => a['IATA'].localeCompare(b['IATA']));
-    
-                const addedAirports = new Set(); // To track already added IATA codes
-    
-                // Add "Unknown" option
-                const unknownOption = document.createElement('option');
-                unknownOption.value = '';
-                unknownOption.textContent = 'Unknown';
-                originSelect.appendChild(unknownOption);
-                destinationSelect.appendChild(unknownOption.cloneNode(true));
-    
-                airports.forEach(airport => {
-                    const iataCode = airport['IATA'].trim();
-                    const airportName = airport['airportName'].trim();
-                    const city = airport['City'].trim();
-                    const country = airport['countryName'].trim();
-    
-                    if (iataCode && airportName && !addedAirports.has(iataCode)) {
-                        const option = document.createElement('option');
-                        option.value = iataCode;
-                        option.innerHTML = `${iataCode} - ${airportName}, ${city}, ${country}`;
-                        originSelect.appendChild(option);
-                        destinationSelect.appendChild(option.cloneNode(true));
-    
-                        addedAirports.add(iataCode);
-                    }
-                });
-    
-                // Initialize Select2 with search and limited scroll
-                $(originSelect).select2({
-                    placeholder: "Origin Airport (IATA)",
-                    allowClear: true,
-                    width: '100%', // Adjust width to fit your layout
-                    dropdownAutoWidth: true
-                });
-    
-                $(destinationSelect).select2({
-                    placeholder: "Destination Airport (IATA)",
-                    allowClear: true,
-                    width: '100%', // Adjust width to fit your layout
-                    dropdownAutoWidth: true
-                });
-            }
-        });
-    }
-    function showLoadingIndicator() {
-        document.getElementById('loadingIndicator').style.display = 'flex';
-    }
-
-    function hideLoadingIndicator() {
-        document.getElementById('loadingIndicator').style.display = 'none';
-    }
-
-    function initiateNewSearch() {
-        var arrivalDateFrom = document.getElementById('arrivalDateFrom').value;
-        var arrivalDateTo = document.getElementById('arrivalDateTo').value;
-        var flightNbr = document.getElementById('flightNbr').value;
-    
-        var dateFrom = new Date(arrivalDateFrom);
-        var dateTo = new Date(arrivalDateTo);
-        var minDate = new Date('2019-01-01');
-        var maxDate = new Date('2019-12-31');
-        var errorMessages = document.getElementById('errorMessages');
-        errorMessages.textContent = '';
-
-        document.getElementById('loadingIndicator').style.display = 'none';
-
-        if (dateFrom > dateTo) {
-            errorMessages.textContent = 'Arrival Date From must be before Arrival Date To.';
-            return;
+    const handleDeleteTask = () => {
+        const taskId = localStorage.getItem('task_id');
+        if (taskId) {
+            sendRequest(API_ROUTES.DELETE_TASK, { task_id: taskId })
+                .then(() => {
+                    localStorage.removeItem('task_id');
+                    showNotification('Task deleted successfully.', 'success');
+                })
+                .catch((err) => showNotification(`Failed to delete task: ${err.message}`, 'danger'));
+        } else {
+            showNotification('No task found to delete.', 'warning');
         }
+    };
 
-    
-        if (dateFrom < minDate || dateFrom > maxDate || dateTo < minDate || dateTo > maxDate) {
-            errorMessages.textContent = 'Dates must be within the year 2019.';
+    const handleDownloadJson = () => {
+        const taskId = localStorage.getItem('task_id');
+        if (!taskId) {
+            showNotification('No task found. Perform a search first.', 'warning');
             return;
         }
     
-        // Check if the range is within 2 weeks
-        var twoWeeks = 14 * 24 * 60 * 60 * 1000; // 14 days in milliseconds
-        if ((dateTo - dateFrom) > twoWeeks) {
-            errorMessages.textContent = 'The date range must be within 2 weeks.';
+        // Assuming `globalResponseData` contains the data to download
+        if (!globalResponseData || globalResponseData.length === 0) {
+            showNotification('No data available to download.', 'warning');
             return;
         }
     
-        var data = {
-            arrival_date_from: arrivalDateFrom,
-            arrival_date_to: arrivalDateTo,
-            flight_nbr: flightNbr
+        const jsonData = {
+            task_id: taskId,
+            data: globalResponseData,
         };
     
-        document.getElementById('loadingIndicator').style.display = 'block';
+        const blob = new Blob([JSON.stringify(jsonData, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `similarity_search_${taskId}.json`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        showNotification('JSON file downloaded successfully.', 'success');
+    };
     
-        sendRequest('/submit_param', data, function(response) {
-            console.log(response.message);
-            if (response.task_id) {
-                localStorage.setItem('task_id', response.task_id);
-                checkTaskStatus(response.task_id);
-            } else {
-                console.error('Error:', response.message || 'No task ID returned');
-                document.getElementById('loadingIndicator').style.display = 'none';
-            }
-        });
-    
-        lastParam = data;
-    }
+    // Event Listeners Initialization
+    const initEventListeners = () => {
+        document.querySelector(SELECTORS.PARAM_FORM).addEventListener('submit', handleParamFormSubmit);
+        document.querySelector(SELECTORS.SEARCH_FORM).addEventListener('submit', handleSearchFormSubmit);
+        document.querySelector(SELECTORS.DELETE_TASK).addEventListener('click', handleDeleteTask);
+        document.querySelector(SELECTORS.DOWNLOAD_JSON)?.addEventListener('click', handleDownloadJson);
+        populateNationalityDropdown();
+        populateAirportDropdowns();
+    };
 
-});
+    // Public API
+    return {
+        init: () => {
+            console.log('App initialized');
+            initEventListeners();
+        },
+    };
+})();
+
+// Initialize the App
+window.addEventListener('DOMContentLoaded', App.init);
