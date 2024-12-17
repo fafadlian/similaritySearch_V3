@@ -80,21 +80,16 @@ def process_task(task_id, arrival_date_from, arrival_date_to, flight_number, fol
         task.flight_ids = ",".join(flight_ids)
         task.flight_count = len(set(flight_ids))
 
-            start_time = time.time()
+        start_time = time.time()
 
-            # Use asyncio.run again for the second asynchronous call
-            asyncio.run(fetch_all_pnr_data(flight_ids, folder_name, access_token))
+        # Use asyncio.run again for the second asynchronous call
+        run_async(fetch_all_pnr_data, flight_ids, folder_name, access_token)
+        end_time = time.time()
+        time_second_approach = end_time - start_time
+        logging.info(f"Time for fetching PNR data concurrently: {time_second_approach:.2f} seconds")
 
-            end_time = time.time()
-            time_second_approach = end_time - start_time
-            logging.info(f"Time for fetching PNR data concurrently: {time_second_approach:.2f} seconds")
-
-            task.status = 'completed'
-            logging.info(f"Task {task_id} completed")
-        else:
-            task.status = 'failed'
-            logging.info(f"Task {task_id} failed")
-            time_second_approach = None
+        task.status = 'completed'
+        logging.info(f"Task {task_id} completed")
 
         session.commit()
 
