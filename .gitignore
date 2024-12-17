@@ -1,15 +1,31 @@
+# Environment variables
 environment.env
 .env*
-*.pyc
-**/.DS_Store
-.npy*
-.model*
 
-
-# Ignore specific files
+# macOS system files
 .DS_Store
+**/.DS_Store
+
+# Windows system files
 Thumbs.db
-commands.txt
+
+# Python compiled files and cache
 *.pyc
+__pycache__/
+
+# Debug and temporary files
 debugSectionScript.js
+commands.txt
+dump.rdb
+
+# Data and models
+*.npy
+.model*
 combined_pnr_data.json
+
+# Application-specific cache
+app/__pycache__/
+app/static/.DS_Store
+
+# Exclude database dumps or runtime-generated files
+*.rdb
