@@ -60,15 +60,17 @@ def process_task(task_id, arrival_date_from, arrival_date_to, flight_number, fol
             'ft_flight_leg_flight_number': flight_number
         }
 
-        # Fetch PNR data
-        pnr_data, total_pages = run_async(fetch_all_pages, api_url, access_token, params)
-        if not pnr_data:
-            logging.warning(f"[Task {task_id}] No PNR data retrieved.")
-            raise ValueError("No PNR data retrieved")
+        # Use asyncio.run to handle asynchronous calls cleanly
+        start_time = time.time()
+        pnr_data, total_pages = asyncio.run(fetch_all_pages(api_url, access_token, params))
+        if pnr_data:
+            print(f"Fetched data from {total_pages} pages")
+        else:
+            print("Failed to fetch data")
+        end_time = time.time()
+        time_first_approach = end_time - start_time
+        logging.info(f"Time for fetching PNR data (first approach): {time_first_approach:.2f} seconds")
 
-        logging.info(f"[Task {task_id}] Fetched data from {total_pages} pages.")
-
-        # Update task with flight IDs
         task = session.query(Task).get(task_id)
         if not task:
             logging.error(f"[Task {task_id}] Task not found in database.")
@@ -78,12 +80,33 @@ def process_task(task_id, arrival_date_from, arrival_date_to, flight_number, fol
         task.flight_ids = ",".join(flight_ids)
         task.flight_count = len(set(flight_ids))
 
-        # Fetch detailed PNR data
-        run_async(fetch_all_pnr_data, flight_ids, folder_name, access_token)
-        task.status = "completed"
-        logging.info(f"[Task {task_id}] Task completed successfully.")
+            start_time = time.time()
+
+            # Use asyncio.run again for the second asynchronous call
+            asyncio.run(fetch_all_pnr_data(flight_ids, folder_name, access_token))
+
+            end_time = time.time()
+            time_second_approach = end_time - start_time
+            logging.info(f"Time for fetching PNR data concurrently: {time_second_approach:.2f} seconds")
+
+            task.status = 'completed'
+            logging.info(f"Task {task_id} completed")
+        else:
+            task.status = 'failed'
+            logging.info(f"Task {task_id} failed")
+            time_second_approach = None
 
         session.commit()
+
+        time_comparison_content = (
+            f"Time for fetching PNR data (first approach): {time_first_approach:.2f} seconds\n"
+            f"Time for fetching PNR data concurrently: {time_second_approach:.2f} seconds\n"
+        )
+
+        blob_name = f"{folder_name}/time_comparison.txt"
+        upload_to_local_storage_txt(blob_name, time_comparison_content)
+        logging.info(f"blob_name: {blob_name}")
+
     except Exception as e:
         logging.error(f"[Task {task_id}] Error processing task: {e}", exc_info=True)
         if task:
@@ -93,6 +116,8 @@ def process_task(task_id, arrival_date_from, arrival_date_to, flight_number, fol
         session.close()
         logging.info("Database session closed.")
 
+
+# Task to delete old folders
 @celery.task
 def delete_old_tasks():
     """Delete tasks older than a certain time threshold."""
