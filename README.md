@@ -91,6 +91,9 @@ ACCESS_TOKEN=<your_RMT_access_token>
 REFRESH_TOKEN=<your_RMT_refresh_token>
 USERNAME=<your_RMT_username>
 PASSWORD=<your_RMT_password>
+FLIGHT_URL=<RMT API dataset flight>
+FLIGHTS_URL=<RMT API datalist flights>
+TOKEN_URL=<RMT Token Authorisation API>
 
 # Application settings
 APP_ENV=development
