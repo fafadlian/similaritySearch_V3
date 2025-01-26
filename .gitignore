@@ -29,3 +29,16 @@ app/static/.DS_Store
 
 # Exclude database dumps or runtime-generated files
 *.rdb
+app/__pycache__/__init__.cpython-311.pyc
+app/__pycache__/age_similarity.cpython-311.pyc
+app/__pycache__/base_similarity.cpython-311.pyc
+app/__pycache__/celery_init.cpython-311.pyc
+app/__pycache__/celeryconfig.cpython-311.pyc
+app/__pycache__/data_fetcher.cpython-311.pyc
+app/__pycache__/loc_access.cpython-311.pyc
+app/__pycache__/location_similarity.cpython-311.pyc
+app/__pycache__/main.cpython-311.pyc
+app/__pycache__/schemas.cpython-311.pyc
+app/__pycache__/similarity_search.cpython-311.pyc
+app/__pycache__/tasks.cpython-311.pyc
+*time_comparison.txt
