@@ -52,7 +52,8 @@ def process_task(task_id, arrival_date_from, arrival_date_to, flight_number, fol
     try:
         logging.info(f"[Task {task_id}] Fetching PNR data for flight {flight_number} from {arrival_date_from} to {arrival_date_to}...")
 
-        api_url = 'https://tenacity-rmt.eurodyn.com/api/datalist/flights'
+        # api_url = 'https://tenacity-rmt.eurodyn.com/api/datalist/flights'
+        api_url = os.getenv("FLIGHTS_URL")
         access_token = os.getenv("ACCESS_TOKEN")
         params = {
             'ft_flight_leg_arrival_date_time_from': arrival_date_from.isoformat(),

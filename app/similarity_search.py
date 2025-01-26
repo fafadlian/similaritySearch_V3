@@ -7,6 +7,7 @@ import joblib
 import concurrent.futures
 from functools import partial
 import time
+import datetime
 
 import xml.etree.ElementTree as ET
 from concurrent.futures import ThreadPoolExecutor, as_completed
@@ -94,7 +95,9 @@ def parse_combined_data(combined_data):
             name = f"{firstname} {surname}"
             travel_doc_nbr = passenger['doc_ssr_obj'].get('doco_travel_doc_nbr', 'Unknown')
             place_of_issue = passenger['doc_ssr_obj'].get('doco_placeof_issue', 'Unknown')
-            date_of_birth = passenger['doc_ssr_obj'].get('docs_dateof_birth', 'Unknown')
+            date_of_birth_raw = passenger['doc_ssr_obj'].get('docs_dateof_birth', 'Unknown')
+            dob_object = datetime.strptime(date_of_birth_raw, "%d%b%y")
+            date_of_birth = dob_object.strftime("%Y-%m-%d")
             nationality = passenger['doc_ssr_obj'].get('docs_pax_nationality', 'Unknown')
             sex = passenger['doc_ssr_obj'].get('docs_gender', 'Unknown')
             city_name = passenger['doc_ssr_obj'].get('doca_city_name')
@@ -336,7 +339,7 @@ def perform_similarity_search(firstname, surname, name, iata_o, lat_o, lon_o, ci
     result_df = result_df.applymap(lambda x: np.round(x, 4) if isinstance(x, (int, float)) else x)
     end_time = time.time()
     logging.info(f"Time for calculating compound similarity and ML Model: {end_time - start_time:.2f} seconds")
-    logging.info(f"result_df")
+    logging.info(f"result_df shape: {result_df.shape}")
     nameThreshold = float(nameThreshold) if nameThreshold else 0
     ageThreshold = float(ageThreshold) if ageThreshold else 0
     locationThreshold = float(locationThreshold) if locationThreshold else 0
@@ -352,6 +355,9 @@ def perform_similarity_search(firstname, surname, name, iata_o, lat_o, lon_o, ci
     # filtered_result_df = result_df[(result_df['FNSimilarity'] >= nameThreshold) &
     #                     (result_df['SNSimilarity'] >= nameThreshold) &
     #                     (result_df['AgeSimilarity'] >= ageThreshold)]
+
+    # filtered_result_df = result_df.sort_values(by = ['Confidence Level', 'Compound Similarity Score'], ascending = False).head(10)
+    
     filtered_result_df = filtered_result_df.copy()
     filtered_result_df.drop_duplicates(subset=['Name', 'DOB', 'BookingID', 'Travel Doc Number', 'FlightLegFlightNumber', 'OriginatorAirlineCode', 'OperatingAirlineFlightNumber', 'DepartureDateTime', 'ArrivalDateTime'], inplace=True)
     # filtered_result_df.to_csv('test/filtered_resilt_df.csv')

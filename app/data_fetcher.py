@@ -6,6 +6,8 @@ from datetime import datetime
 import asyncio
 import aiohttp
 from concurrent.futures import ThreadPoolExecutor, as_completed
+from urllib.parse import urljoin
+
 
 # from app.azure_blob_storage import upload_to_blob_storage, delete_from_blob_storage, download_from_blob_storage, delete_all_files_in_directory
 from app.local_storage import upload_to_local_storage, delete_from_local_storage, delete_all_files_in_directory
@@ -128,7 +130,7 @@ async def fetch_all_pages(api_url, access_token, params):
 
 
 def save_json_data_for_flight_id(flight_id, directory):
-    api_url = f'https://tenacity-rmt.eurodyn.com/api/dataset/flight/{flight_id}'
+    api_url = urljoin(os.getenv("FLIGHT_URL"), str(flight_id))
     access_token = os.getenv("ACCESS_TOKEN")
     headers = {'Authorization': f'Bearer {access_token}'}
     
@@ -172,7 +174,8 @@ async def fetch_all_pnr_data(flight_ids, directory, access_token):
         logging.info(f"Uploaded combined JSON data to Azure Blob Storage as {blob_name}")
 
 async def fetch_pnr_data_to_azure(session, flight_id, combined_data):
-    api_url = f'https://tenacity-rmt.eurodyn.com/api/dataset/flight/{flight_id}'
+    # api_url = f'https://tenacity-rmt.eurodyn.com/api/dataset/flight/{flight_id}'
+    api_url = urljoin(os.getenv("FLIGHT_URL").rstrip('/') + '/', str(flight_id))
     token_manager = TokenManager()
     headers = {'Authorization': f'Bearer {token_manager.get_token()}'}
     

@@ -26,7 +26,8 @@ class TokenManager:
         return cls._instance
 
     def __init__(self):
-        self.api_url = 'https://tenacity-rmt.eurodyn.com/api/user/auth/token'
+        # self.api_url = 'https://tenacity-rmt.eurodyn.com/api/user/auth/token'
+        self.api_url = os.getenv("TOKEN_URL")
         self.username = os.getenv("USERNAME")
         self.password = os.getenv("PASSWORD")
 

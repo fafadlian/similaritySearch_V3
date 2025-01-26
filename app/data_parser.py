@@ -3,7 +3,7 @@ import xml.etree.ElementTree as ET
 import pandas as pd
 import logging
 import time
-
+from datetime import datetime
 from app.loc_access import LocDataAccess
 
 def parse_combined_xml(xml_content):
@@ -91,6 +91,9 @@ def parse_combined_json(combined_data):
             travel_doc_nbr = passenger['doc_ssr_obj'].get('doco_travel_doc_nbr', 'Unknown')
             place_of_issue = passenger['doc_ssr_obj'].get('doco_placeof_issue', 'Unknown')
             date_of_birth = passenger['doc_ssr_obj'].get('docs_dateof_birth', 'Unknown')
+            date_of_birth_raw = passenger['doc_ssr_obj'].get('docs_dateof_birth', 'Unknown')
+            dob_object = datetime.strptime(date_of_birth_raw, "%d%b%y")
+            date_of_birth = dob_object.strftime("%Y-%m-%d")
             nationality = passenger['doc_ssr_obj'].get('docs_pax_nationality', 'Unknown')
             sex = passenger['doc_ssr_obj'].get('docs_gender', 'Unknown')
             city_name = passenger['doc_ssr_obj'].get('doca_city_name')
