@@ -69,7 +69,7 @@ POST
 
 ### Combined Operation
 **Endpoint:**  
-`http://0.0.0.0:443/combined_operation_new`
+`http://0.0.0.0:443/combined_operation`
 
 **Request Method:**  
 POST
@@ -225,7 +225,7 @@ curl -X POST http://0.0.0.0:443/perform_similarity_search \
 
 ### Combined Operation:
 ```shell
-curl -X POST http://0.0.0.0:443/combined_operation_new \
+curl -X POST http://0.0.0.0:443/combined_operation \
 -H "Content-Type: application/json" \
 -d '{
     "arrival_date_from": "2019-05-01",

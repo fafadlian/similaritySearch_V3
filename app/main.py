@@ -112,7 +112,7 @@ async def submit_param_sync(
     # Timeout
     raise HTTPException(status_code=408, detail="Task timed out. Please check the status later.")
 
-@router.post("/combined_operation")
+@router.post("/combined_operation_old")
 async def combined_operation(
     request: CombinedRequest, db: Session = Depends(get_db)
 ):
@@ -220,7 +220,7 @@ async def combined_operation(
         "data": result["data"]
     }
 
-@router.post("/combined_operation_new")
+@router.post("/combined_operation")
 async def combined_operation_new(request: CombinedRequest, db: Session = Depends(get_db)):
     # Step 1: Extract data from the request
     data = request.dict()

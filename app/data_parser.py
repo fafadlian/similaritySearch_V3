@@ -138,21 +138,24 @@ def fetch_and_parse_combined_data(task_id, data_dir):
         logging.info(f"checking if file exists: {os.path.exists(file_path)}")
         logging.info(f"checking current working directory: {os.getcwd()}")
 
-        # ✅ Wait for the file to be fully written (max 5 seconds)
-        max_wait_time = 5  # Maximum time to wait for the file (seconds)
+        max_wait_time = 10  # Max wait time in seconds
         wait_interval = 0.5  # Check every 0.5 seconds
+        previous_size = -1  # Track file size changes
 
         for _ in range(int(max_wait_time / wait_interval)):
             if os.path.exists(file_path):
-                break
-            logging.warning(f"🚨 File {file_path} is not ready yet. Waiting...")
+                current_size = os.path.getsize(file_path)
+                if current_size > 0 and current_size == previous_size:
+                    break  # File is stable, ready to read
+                previous_size = current_size
+            logging.warning(f"File {file_path} might still be writing. Waiting...")
             time.sleep(wait_interval)
 
-        # ✅ If the file still does not exist, raise an error
+        # If the file still does not exist, raise an error
         if not os.path.exists(file_path):
-            raise FileNotFoundError(f"🚨 The file {file_path} does not exist in local storage after waiting.")
+            raise FileNotFoundError(f"The file {file_path} does not exist in local storage after waiting.")
 
-        logging.info(f"📂 Fetching combined data from {file_path}")
+        logging.info(f"Fetching combined data from {file_path}")
 
         # Check if the file exists
         if os.path.exists(file_path):
