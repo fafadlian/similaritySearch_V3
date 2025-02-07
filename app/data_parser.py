@@ -187,6 +187,7 @@ def fetch_and_parse_combined_data(task_id, data_dir):
         departure_date_time = data.get('departure_date_time', 'Unknown')
         arrival_date_time = data.get('arrival_date_time', 'Unknown')
         booking_refid = data.get('booking_refid', 'Unknown')
+        iata_pnrgov_notif_rq_id = data.get('iata_pnrgov_notif_rq_id', 'Unknown')
 
         # Extract passenger details
         passenger_id = data.get('passenger_id', 'Unknown')
@@ -212,7 +213,7 @@ def fetch_and_parse_combined_data(task_id, data_dir):
 
         # Append extracted data to list
         all_data.append((
-            passenger_id, pnr_id, origin_code, destination_code, flight_leg_flight_number, 
+            passenger_id, pnr_id, iata_pnrgov_notif_rq_id, origin_code, destination_code, flight_leg_flight_number, 
             originator_airline_code, flight_number, departure_date_time, arrival_date_time, 
             booking_refid, given_name, surname, full_name, travel_doc_nbr, place_of_issue, 
             date_of_birth, nationality, gender, city_name, address
@@ -220,7 +221,7 @@ def fetch_and_parse_combined_data(task_id, data_dir):
 
     # Define DataFrame columns
     columns = [
-        'PassengerID', 'PNRID', 'OriginIATA', 'DestinationIATA', 'FlightLegFlightNumber',
+        'PassengerID', 'PNRID', 'iata_pnrgov_notif_rq_id', 'OriginIATA', 'DestinationIATA', 'FlightLegFlightNumber',
         'OriginatorAirlineCode', 'FlightNumber', 'DepartureDateTime', 'ArrivalDateTime', 'BookingID',
         'Firstname', 'Surname', 'FullName', 'TravelDocNumber', 'PlaceOfIssue', 
         'DOB', 'Nationality', 'Sex', 'CityName', 'Address'

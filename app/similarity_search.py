@@ -357,7 +357,7 @@ def perform_similarity_search(firstname, surname, name, iata_o, lat_o, lon_o, ci
     # filtered_result_df = result_df.sort_values(by = ['Confidence Level', 'Compound Similarity Score'], ascending = False).head(10)
     
     filtered_result_df = filtered_result_df.copy()
-    filtered_result_df.drop_duplicates(subset=['PassengerID', 'DOB', 'PNRID', 'TravelDocNumber', 'FlightNumber', 'OriginatorAirlineCode', 
+    filtered_result_df.drop_duplicates(subset=['PassengerID', 'DOB', 'PNRID', 'iata_pnrgov_notif_rq_id', 'TravelDocNumber', 'FlightNumber', 'OriginatorAirlineCode', 
                                                'DepartureDateTime', 'ArrivalDateTime', 'FlightLegFlightNumber'], inplace=True)
     # filtered_result_df.to_csv('test/filtered_resilt_df.csv')
     filtered_result_df.sort_values(by = ['Confidence Level', 'Compound Similarity Score'], ascending = False, inplace = True)
