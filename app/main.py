@@ -4,7 +4,7 @@ from fastapi.responses import StreamingResponse
 
 from sqlalchemy.orm import Session
 from sqlalchemy.sql import text
-from app.tasks import process_task, perform_similarity_search_task
+from app.tasks import process_task, perform_similarity_search_task, retrieveng_from_new_API
 from app.models import Task
 from app.database import get_db, SessionLocal
 from app.schemas import FlightSearchRequest, SimilaritySearchRequest, CombinedRequest
@@ -219,6 +219,81 @@ async def combined_operation(
         "task_id": task_id,
         "data": result["data"]
     }
+
+@router.post("/combined_operation_new")
+async def combined_operation_new(request: CombinedRequest, db: Session = Depends(get_db)):
+    # Step 1: Extract data from the request
+    data = request.dict()
+    arrival_date_from = data["arrival_date_from"]
+    arrival_date_to = data["arrival_date_to"]
+    flight_nbr = data["flight_nbr"]
+
+    firstname = data.get("firstname", "")
+    surname = data.get("surname", "")
+    dob = data.get("dob", "")
+    iata_o = data.get("iata_o", "")
+    iata_d = data.get("iata_d", "")
+    city_name = data.get("city_name", "")
+    address = data.get("address", "")
+    sex = data.get("sex", "")
+    nationality = data.get("nationality", "")
+    nameThreshold = data.get("nameThreshold", 0.0)
+    ageThreshold = data.get("ageThreshold", 0.0)
+    locationThreshold = data.get("locationThreshold", 0.0)
+
+    # Step 2: Create and start the task
+    task_id = str(uuid.uuid4())
+    folder_name = f"task_{task_id}"
+    # create_task_folder(folder_name)
+    # logging.info(f"Task {task_id} created with folder {folder_name}")
+
+    task = Task(id=task_id, folder_path=folder_name, status="pending")
+    db.add(task)
+    db.commit()
+
+    logging.info(f"Task {task_id} created with folder {folder_name}")
+    retrieveng_from_new_API.delay(arrival_date_from, arrival_date_to, task_id)
+    logging.info(f"Starting similarity search for task {task_id}, folder {folder_name}, with parameters: {firstname}, {surname}, {dob}, {iata_o}, {iata_d}, {city_name}, {address}, {nameThreshold}, {ageThreshold}, {locationThreshold}")
+    celery_task = perform_similarity_search_task.delay(
+        task_id, firstname, surname, dob, iata_o, iata_d, city_name, address,
+        sex, nationality, folder_name, nameThreshold, ageThreshold, locationThreshold
+    )
+    logging.info(f"task {task_id} done for similarity search. result: {celery_task}")
+    # Step 6: Wait for similarity search to complete
+    try:
+        result = celery_task.get(timeout=300)
+    except Exception as e:
+        logging.error(f"Error during similarity search: {e}")
+        return {
+            "status": "error",
+            "message": "Error during similarity search."
+        }
+
+    if result["status"] != "success":
+        return {
+            "status": "error",
+            "message": "Similarity search failed."
+        }
+
+    # Step 7: Check if any similar passengers were found
+    if not result["data"]:
+        return {
+            "status": "success",
+            "message": "No similar passengers found.",
+            "task_id": task_id,
+            "data": []
+        }
+
+    # Step 8: Return the final results
+    return {
+        "status": "success",
+        "message": "Operation completed successfully.",
+        "task_id": task_id,
+        "data": result["data"]
+    }
+
+
+
 
 
 

@@ -12,7 +12,7 @@ import datetime
 import xml.etree.ElementTree as ET
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from app.loc_access import LocDataAccess
-from app.data_parser import parse_combined_json, parse_combined_xml
+from app.data_parser import parse_combined_json, parse_combined_xml, fetch_and_parse_combined_data
 from app.location_similarity import haversine, location_similarity_score, location_matching, address_str_similarity_score
 from app.age_similarity import age_similarity_score
 from app.base_similarity import count_likelihood2, string_similarity
@@ -168,13 +168,11 @@ def parse_json(file_path):
     df = pd.DataFrame(data_list, columns=columns)
     return df
   
-def find_similar_passengers(airport_data_access, firstname, surname, name, dob, iata_o, iata_d, city_name, address, sex, nationality, data_dir, nameThreshold, ageThreshold, locationThreshold):
+def find_similar_passengers(task_id, airport_data_access, firstname, surname, name, dob, iata_o, iata_d, city_name, address, sex, nationality, folder_name, nameThreshold, ageThreshold, locationThreshold):
     # Fetch the combined JSON data from Azure Blob Storage
-    blob_path = f"{data_dir}/combined_pnr_data.json"
-    combined_data = fetch_combined_data(blob_path)
+    all_data = fetch_and_parse_combined_data(task_id, folder_name)
     
     # Parse the combined data
-    all_data = parse_combined_json(combined_data)    
     logging.info(f"all_data shape before enrichment: {all_data.shape}")
     start_time = time.time()
     all_data = enrich_data(all_data)
@@ -359,7 +357,8 @@ def perform_similarity_search(firstname, surname, name, iata_o, lat_o, lon_o, ci
     # filtered_result_df = result_df.sort_values(by = ['Confidence Level', 'Compound Similarity Score'], ascending = False).head(10)
     
     filtered_result_df = filtered_result_df.copy()
-    filtered_result_df.drop_duplicates(subset=['Name', 'DOB', 'BookingID', 'Travel Doc Number', 'FlightLegFlightNumber', 'OriginatorAirlineCode', 'OperatingAirlineFlightNumber', 'DepartureDateTime', 'ArrivalDateTime'], inplace=True)
+    filtered_result_df.drop_duplicates(subset=['PassengerID', 'DOB', 'PNRID', 'TravelDocNumber', 'FlightNumber', 'OriginatorAirlineCode', 
+                                               'DepartureDateTime', 'ArrivalDateTime', 'FlightLegFlightNumber'], inplace=True)
     # filtered_result_df.to_csv('test/filtered_resilt_df.csv')
     filtered_result_df.sort_values(by = ['Confidence Level', 'Compound Similarity Score'], ascending = False, inplace = True)
     logging.info(f"Filtered result shape: {filtered_result_df.shape}")

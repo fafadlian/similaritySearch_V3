@@ -3,41 +3,47 @@ import pandas as pd
 import numpy as np
 
 def calculate_age(dob):
-    """Calculate age from DOB."""
+    """Calculate age from DOB, handling invalid inputs."""
     if not dob:
         return np.nan
 
     try:
         dob = datetime.strptime(dob, "%Y-%m-%d")
     except ValueError:
-        return np.nan 
+        return np.nan  # Invalid date format
 
     today = datetime.today()
     age = today.year - dob.year - ((today.month, today.day) < (dob.month, dob.day))
-    return age
+
+    return age if age >= 0 else np.nan  # Ensure non-negative age
 
 def age_similarity_score(query_dob, dob):
-    """Calculate a normalized similarity score for age."""
+    """Calculate a normalized similarity score for age, safely handling division by zero."""
     if not query_dob or not dob:
         return np.nan
     
     query_age = calculate_age(query_dob)
     actual_age = calculate_age(dob)
 
-    if np.isnan(query_age) or np.isnan(actual_age):
-        return 0
-    
+    if np.isnan(query_age) or np.isnan(actual_age) or query_age == 0 or actual_age == 0:
+        return 0  # Invalid ages result in 0 similarity
+
     age_difference = abs(query_age - actual_age)
 
-    # Use logarithmic scale for age similarity
+    # ✅ If the ages are identical, return max similarity
     if age_difference == 0:
         return 100
 
     max_age = max(actual_age, query_age)
     min_age = min(actual_age, query_age)
+
+    # ✅ Prevent division by zero (if min_age is zero, return lowest similarity)
+    if min_age == 0:
+        return 0  
+
     log_age_diff = np.log(max_age / min_age)
 
-    # Scale log_age_diff to a 0-100 score
+    # ✅ Scale log_age_diff to a 0-100 score
     score = max(0, 100 - (log_age_diff * 100))
 
     return score

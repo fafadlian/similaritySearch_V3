@@ -7,8 +7,12 @@ STORAGE_PATH = os.getenv('STORAGE_PATH', 'local_storage')
 
 def upload_to_local_storage(file_name, data, is_json=True):
     try:
-        file_path = os.path.join(STORAGE_PATH, file_name)
-        os.makedirs(os.path.dirname(file_path), exist_ok=True)  # Create directories if they don't exist
+        # Create a folder with the name of the file (without extension)
+        folder_name = os.path.join(STORAGE_PATH, file_name)
+        os.makedirs(folder_name, exist_ok=True)  # Create folder if it doesn't exist
+        
+        # Define the full path for the file (add .json extension if is_json)
+        file_path = os.path.join(folder_name, f"{file_name}.json" if is_json else file_name)
         
         # Save data as JSON or plain text
         with open(file_path, 'w' if is_json else 'wb') as file:
@@ -16,18 +20,23 @@ def upload_to_local_storage(file_name, data, is_json=True):
                 json.dump(data, file)
             else:
                 file.write(data)
-        logging.info(f"Uploaded {file_name} to local storage.")
+        
+        logging.info(f"Uploaded {file_name} to local storage in folder {folder_name}.")
     except Exception as e:
         logging.error(f"Error uploading {file_name} to local storage: {str(e)}")
 
 def upload_to_local_storage_txt(file_name, data):
     upload_to_local_storage(file_name, data, is_json=False)
 
-def fetch_combined_data(file_path):
+def fetch_combined_data(task_id):
     try:
-        full_path = os.path.join(STORAGE_PATH, file_path)
-        if os.path.exists(full_path):
-            with open(full_path, 'r') as file:
+        # Construct the full path to the task's JSON file
+        folder_path = os.path.join(STORAGE_PATH, f"task_{task_id}")
+        file_path = os.path.join(folder_path, f"{task_id}.json")
+        
+        # Check if the file exists
+        if os.path.exists(file_path):
+            with open(file_path, 'r') as file:
                 raw_data = json.load(file)
                 # If raw_data is a stringified JSON, parse it again
                 if isinstance(raw_data, str):

@@ -12,13 +12,14 @@ import numpy as np
 import os
 import time
 import asyncio
+import requests
 from datetime import datetime, timedelta
 import shutil
+import urllib
 import logging
 from dotenv import load_dotenv
 
 load_dotenv('environment.env')
-logging.basicConfig(level=logging.INFO)
 
 
 # AZURE_STORAGE_CONNECTION_STRING = os.getenv('AZURE_STORAGE_CONNECTION_STRING')
@@ -112,6 +113,46 @@ def process_task(task_id, arrival_date_from, arrival_date_to, flight_number, fol
         session.close()
         logging.info("Database session closed.")
 
+@celery.task
+def retrieveng_from_new_API(start_date, end_date, task_id): 
+    session = SessionLocal()
+    api_url = os.getenv("NEW_COMBINED_API")
+    access_token = os.getenv("ACCESS_TOKEN")
+
+    start_date = start_date.date()
+    end_date = end_date.date()
+
+    startArDate = f"{start_date}T00:00:00Z"
+    endArDate = f"{end_date}T23:59:59Z"
+
+    params = {
+            'startArDate': startArDate,
+            'endArDate': endArDate
+        }
+    start_time = time.time()
+    logging.info(f"[Task {task_id}] Fetching data from new API for {start_date} to {end_date}...")
+    logging.info(f"Request URL: {api_url}?{urllib.parse.urlencode(params)}")
+
+    response = requests.get(api_url, params=params)
+
+    # Log the status code
+    logging.info(f"[Task {task_id}] Request sent to {api_url} with params: {params}")
+    logging.info(f"Response status: {response.status_code}")
+
+    if response.status_code == 200:
+        data = response.json()
+        logging.info(f"[Task {task_id}] Successfully fetched {len(data)} records.")
+    else:
+        # Log the full response if 400 error occurs
+        logging.error(f"[Task {task_id}] Failed to fetch data. Status Code: {response.status_code}, Response: {response.text}")
+        return
+    # Upload full response data to local storage
+    folder_name = f"task_{task_id}"
+    upload_to_local_storage(folder_name, data)
+    logging.info(f"[Task {task_id}] Uploaded data to local storage.")
+
+    
+
 
 # Task to delete old folders
 @celery.task
@@ -151,7 +192,7 @@ def perform_similarity_search_task(task_id, firstname, surname, dob, iata_o, iat
     try:
         airport_data_access = LocDataAccess.get_instance()
         similar_passengers = find_similar_passengers(
-            airport_data_access, firstname, surname, f"{firstname} {surname}", dob, iata_o, iata_d,
+            task_id, airport_data_access, firstname, surname, f"{firstname} {surname}", dob, iata_o, iata_d,
             city_name, address, sex, nationality, folder_path, nameThreshold, ageThreshold, locationThreshold
         )
 
