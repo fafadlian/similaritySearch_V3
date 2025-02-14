@@ -203,11 +203,18 @@ def fetch_and_parse_combined_data(task_id, data_dir):
         date_of_birth_raw = data.get('docs_dateof_birth', 'Unknown')
         
         # Convert DOB to YYYY-MM-DD format
+        date_of_birth = 'Unknown'  # Initialize date_of_birth with a default value
         try:
             dob_object = datetime.strptime(date_of_birth_raw, "%d%b%y")
+            year = dob_object.year
+            if year < 1920:
+                dob_object = dob_object.replace(year=year + 100)
+            elif year > 2019:
+                dob_object = dob_object.replace(year=year - 100)
             date_of_birth = dob_object.strftime("%Y-%m-%d")
         except ValueError:
-            date_of_birth = 'Unknown'
+            pass  # Keep date_of_birth as 'Unknown' if parsing fails
+
 
         nationality = data.get('docs_pax_nationality', 'Unknown')
         gender = data.get('docs_gender', 'Unknown')

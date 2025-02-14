@@ -97,6 +97,13 @@ def parse_combined_data(combined_data):
             place_of_issue = passenger['doc_ssr_obj'].get('doco_placeof_issue', 'Unknown')
             date_of_birth_raw = passenger['doc_ssr_obj'].get('docs_dateof_birth', 'Unknown')
             dob_object = datetime.strptime(date_of_birth_raw, "%d%b%y")
+            year = dob_object.year
+            # If the year is outside 1920–2018, adjust it
+            if year > 2019:
+                dob_object = dob_object.replace(year=year - 100)
+            elif year < 1920:
+                dob_object = dob_object.replace(year=year + 100)
+            logging.info(f"DOB: {date_of_birth_raw}, DOB object: {dob_object}")
             date_of_birth = dob_object.strftime("%Y-%m-%d")
             nationality = passenger['doc_ssr_obj'].get('docs_pax_nationality', 'Unknown')
             sex = passenger['doc_ssr_obj'].get('docs_gender', 'Unknown')
@@ -116,56 +123,6 @@ def parse_combined_data(combined_data):
                 'CityName', 'Address']    
     df = pd.DataFrame(all_data, columns=columns)
     logging.info(f"Parsing completed in {time.time() - start_time:.2f} seconds")
-    return df
-
-def parse_json(file_path):
-    logging.info(f"Parsing JSON file: {file_path}")
-    airport_data_access = LocDataAccess.get_instance()  # Access the singleton instance
-    # json_content = download_from_blob_storage(file_path)  # Download JSON content from Azure Blob Storage
-    json_content = download_from_local_storage(file_path)  # Download JSON content from local storage
-    logging.info(f"ready to parse: {file_path}")
-    data = json.loads(json_content)
-
-    flight_data = data['iata_pnrgov_notif_rq_obj']
-    origin_code = flight_data.get('flight_leg_departure_airp_location_code')
-    destination_code = flight_data.get('flight_leg_arrival_airp_location_code')
-    flight_leg_flight_number = flight_data.get('flight_leg_flight_number', 'Unknown')
-    originator_airline_code = flight_data.get('originator_airline_code', 'Unknown')
-    origin_lon, origin_lat = airport_data_access.get_airport_lon_lat_by_iata(origin_code) if origin_code else (None, None)
-    destination_lon, destination_lat = airport_data_access.get_airport_lon_lat_by_iata(destination_code) if destination_code else (None, None)
-
-    data_list = []
-
-    for pnr in flight_data['pnr_obj']:
-        bookID = pnr.get('booking_refid', 'Unknown')
-        for flight in pnr['flight_obj']:
-            operating_airline_flight_number = flight.get('operating_airline_flight_number', 'Unknown')
-            departure_date_time = flight.get('departure_date_time', 'Unknown')
-            arrival_date_time = flight.get('arrival_date_time', 'Unknown')
-            
-            for passenger in pnr['passenger_obj']:
-                firstname = passenger['doc_ssr_obj'].get('docs_first_givenname', '').strip()
-                surname = passenger['doc_ssr_obj'].get('docs_surname', '').strip()
-                name = f"{firstname} {surname}"
-                travel_doc_nbr = passenger['doc_ssr_obj'].get('doco_travel_doc_nbr', 'Unknown')
-                place_of_issue = passenger['doc_ssr_obj'].get('doco_placeof_issue', 'Unknown')
-                date_of_birth = passenger['doc_ssr_obj'].get('docs_dateof_birth', 'Unknown')
-                nationality = passenger['doc_ssr_obj'].get('docs_pax_nationality', 'Unknown')
-                sex = passenger['doc_ssr_obj'].get('docs_gender', 'Unknown')
-                city_name = passenger['doc_ssr_obj'].get('doca_city_name')
-                address = passenger['doc_ssr_obj'].get('doca_address')
-                
-                city_lat, city_lon = airport_data_access.get_airport_lon_lat_by_city(city_name) if city_name else (None, None)
-                city_org = airport_data_access.get_city_by_airport_iata(origin_code) if origin_code else (None)
-                city_dest = airport_data_access.get_city_by_airport_iata(destination_code) if destination_code else (None)
-                ctry_org = airport_data_access.get_country_by_airport_iata(origin_code) if origin_code else (None)
-                ctry_dest = airport_data_access.get_country_by_airport_iata(destination_code) if destination_code else (None)
-                country_of_address = airport_data_access.get_country_by_city(city_name) if city_name else (None)
-
-                data_list.append((file_path, bookID, firstname, surname, name, travel_doc_nbr, place_of_issue, origin_code, city_org, ctry_org, origin_lat, origin_lon, destination_code, city_dest, ctry_dest, destination_lat, destination_lon, date_of_birth, city_name, city_lat, city_lon, address, country_of_address, nationality, sex, flight_leg_flight_number, originator_airline_code, operating_airline_flight_number, departure_date_time, arrival_date_time))
-
-    columns = ['FilePath', 'BookingID', 'Firstname', 'Surname', 'Name', 'Travel Doc Number', 'Place of Issue', 'OriginIATA', 'OriginCity', 'OriginCountry', 'OriginLat', 'OriginLon', 'DestinationIATA', 'DestinationCity', 'DestinationCountry', 'DestinationLat', 'DestinationLon', 'DOB', 'CityName', 'CityLat', 'CityLon', 'Address', 'Country of Address', 'Nationality', 'Sex', 'FlightLegFlightNumber', 'OriginatorAirlineCode', 'OperatingAirlineFlightNumber', 'DepartureDateTime', 'ArrivalDateTime']
-    df = pd.DataFrame(data_list, columns=columns)
     return df
   
 def find_similar_passengers(task_id, airport_data_access, firstname, surname, name, dob, iata_o, iata_d, city_name, address, sex, nationality, folder_name, nameThreshold, ageThreshold, locationThreshold):
@@ -343,6 +300,14 @@ def perform_similarity_search(firstname, surname, name, iata_o, lat_o, lon_o, ci
     locationThreshold = float(locationThreshold) if locationThreshold else 0
 
 
+    # filtered_result_df = result_df[(result_df['FNSimilarity'] >= nameThreshold) &
+    #                     (result_df['SNSimilarity'] >= nameThreshold) &
+    #                     (result_df['DOBSimilarity'] >= ageThreshold) & 
+    #                     (result_df['Compound Similarity Score'] >= 10) &
+    #                     (result_df['Confidence Level'] >= 1)
+    #                     ]
+    logging.info(f"Result df examples: {result_df[result_df['Firstname'] == 'colin'][['DOB','AgeSimilarity', 'DOBSimilarity']].head(10)}")
+    
     filtered_result_df = result_df[(result_df['FNSimilarity'] >= nameThreshold) &
                         (result_df['SNSimilarity'] >= nameThreshold) &
                         (result_df['AgeSimilarity'] >= ageThreshold) & 
