@@ -16,6 +16,7 @@ from app.data_parser import parse_combined_json, parse_combined_xml, fetch_and_p
 from app.location_similarity import haversine, location_similarity_score, location_matching, address_str_similarity_score
 from app.age_similarity import age_similarity_score
 from app.base_similarity import count_likelihood2, string_similarity
+from app.siamese_network import siamese_network
 
 # from app.azure_blob_storage import upload_to_blob_storage, download_from_blob_storage, delete_all_files_in_directory, fetch_combined_data
 from app.local_storage import upload_to_local_storage, download_from_local_storage, delete_all_files_in_directory, fetch_combined_data
@@ -149,7 +150,8 @@ def find_similar_passengers(task_id, airport_data_access, firstname, surname, na
     end_time = time.time()
     logging.info(f"Time for fetching location data: {end_time - start_time:.2f} seconds")
     start_time = time.time()
-    similar_passengers = perform_similarity_search(firstname, surname, name, iata_o, lat_o, lon_o, city_org, ctry_org, iata_d, lat_d, lon_d, city_dest, ctry_dest, dob, city_name, lat_c, lon_c, country, nationality, sex, address, all_data, nameThreshold, ageThreshold, locationThreshold)
+    # similar_passengers = perform_similarity_search(firstname, surname, name, iata_o, lat_o, lon_o, city_org, ctry_org, iata_d, lat_d, lon_d, city_dest, ctry_dest, dob, city_name, lat_c, lon_c, country, nationality, sex, address, all_data, nameThreshold, ageThreshold, locationThreshold)
+    similar_passengers = siamese_network(firstname, surname, name, iata_o, lat_o, lon_o, city_org, ctry_org, iata_d, lat_d, lon_d, city_dest, ctry_dest, dob, city_name, lat_c, lon_c, country, nationality, sex, address, all_data, nameThreshold, ageThreshold, locationThreshold)
     end_time = time.time()
     logging.info(f"Time for similarity search: {end_time - start_time:.2f} seconds")
     logging.info(f"similar_passengers shape: {similar_passengers.shape}")
