@@ -65,7 +65,7 @@ uvicorn run:app --host 0.0.0.0 --port 443 --log-level info
 1. Docker: Make sure Docker is installed and running on your machine. You can download it from [Docker official website](https://www.docker.com/). 
 2. Docker Compose: Docker Compose should also be installed (it comes with Docker Desktop for Mac and Windows).
 3. Clone the repository to your local machine. 
-4. You will need python 3.11 and postgreSQL to run this project
+4. You will need python 3.10 and postgreSQL to run this project
 5. Navigate to the project directory.
 6. Install the required libraries 
 ```bash 
