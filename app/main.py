@@ -228,23 +228,26 @@ async def combined_operation_new(request: CombinedRequest, db: Session = Depends
     arrival_date_to = data["arrival_date_to"]
     flight_nbr = data["flight_nbr"]
 
-    firstname = data.get("firstname", "")
-    surname = data.get("surname", "")
+    firstname = data.get("firstname", "MISSING")
+    surname = data.get("surname", "MISSING")
     dob = data.get("dob", "")
     iata_o = data.get("iata_o", "")
     iata_d = data.get("iata_d", "")
     city_name = data.get("city_name", "")
-    address = data.get("address", "")
-    sex = data.get("sex", "")
-    nationality = data.get("nationality", "")
+    address = data.get("address", "MISSING")
+    sex = data.get("sex", "Unknown")
+    nationality = data.get("nationality", "Unknown")
     nameThreshold = data.get("nameThreshold", 0.0)
     ageThreshold = data.get("ageThreshold", 0.0)
     locationThreshold = data.get("locationThreshold", 0.0)
 
+
     # Step 2: Create and start the task
     task_id = str(uuid.uuid4())
+    task_id = str(task_id)
+    # task_id = "manto"
     folder_name = f"task_{task_id}"
-    # create_task_folder(folder_name)
+    create_task_folder(folder_name)
     # logging.info(f"Task {task_id} created with folder {folder_name}")
 
     task = Task(id=task_id, folder_path=folder_name, status="pending")
@@ -252,12 +255,12 @@ async def combined_operation_new(request: CombinedRequest, db: Session = Depends
     db.commit()
 
     logging.info(f"Task {task_id} created with folder {folder_name}")
+    logging.info(f"start date: {arrival_date_from}, end date: {arrival_date_to}, task_id: {task_id}")
     retrieveng_from_new_API.delay(arrival_date_from, arrival_date_to, task_id)
+    # retrieveng_from_new_API("2019-01-06", "2019-01-09", "manto")
     logging.info(f"Starting similarity search for task {task_id}, folder {folder_name}, with parameters: {firstname}, {surname}, {dob}, {iata_o}, {iata_d}, {city_name}, {address}, {nameThreshold}, {ageThreshold}, {locationThreshold}")
-    celery_task = perform_similarity_search_task.delay(
-        task_id, firstname, surname, dob, iata_o, iata_d, city_name, address,
-        sex, nationality, folder_name, nameThreshold, ageThreshold, locationThreshold
-    )
+    celery_task = perform_similarity_search_task.delay(task_id, firstname, surname, dob, iata_o, iata_d, city_name, address,sex, nationality, folder_name, nameThreshold, ageThreshold, locationThreshold)
+    # celery_task = perform_similarity_search_task.delay("manto", "collins", "brown", "1968-10-15", "DXB", "BUD", "","","","","task_manto", 80.0, 80.0, 80.0)
     logging.info(f"task {task_id} done for similarity search. result: {celery_task}")
     # Step 6: Wait for similarity search to complete
     try:

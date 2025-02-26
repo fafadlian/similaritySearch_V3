@@ -115,9 +115,16 @@ def process_task(task_id, arrival_date_from, arrival_date_to, flight_number, fol
 
 @celery.task
 def retrieveng_from_new_API(start_date, end_date, task_id): 
+    logging.info(f"[Task {task_id}] Fetching data from new API for {start_date} to {end_date}...")
     session = SessionLocal()
     api_url = os.getenv("NEW_COMBINED_API")
     access_token = os.getenv("ACCESS_TOKEN")
+
+     # Ensure start_date and end_date are converted to datetime before extracting date
+    if isinstance(start_date, str):
+        start_date = datetime.strptime(start_date.split()[0], "%Y-%m-%d")  # Remove time before conversion
+    if isinstance(end_date, str):
+        end_date = datetime.strptime(end_date.split()[0], "%Y-%m-%d")  # Convert to datetime
 
     start_date = start_date.date()
     end_date = end_date.date()

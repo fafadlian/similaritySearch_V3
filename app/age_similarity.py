@@ -23,7 +23,7 @@ def age_similarity_score(query_dob, dob):
     """Calculate a normalized similarity score for age, safely handling division by zero."""
     if not query_dob or not dob:
         logging.info("Missing DOB for age similarity calculation")
-        return np.nan
+        return 0
     
     query_age = calculate_age(query_dob)
     actual_age = calculate_age(dob)

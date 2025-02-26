@@ -3,21 +3,89 @@ import numpy as np
 import pandas as pd
 import tensorflow as tf
 from tensorflow.keras.models import load_model
-from app.similarity_search import data_filtration
+
 from app.location_similarity import haversine, location_similarity_score, location_matching, address_str_similarity_score
 from app.age_similarity import age_similarity_score
 from app.base_similarity import count_likelihood2, string_similarity
 import logging
 import time
+from datetime import datetime
+from sklearn.preprocessing import LabelEncoder
 
-siamese_encoder = load_model("model/siamese_encoder.h5")  # Load Siamese Encoder
-xgb_classifier = joblib.load("model/xgboost_model.joblib")  # Load XGBoost Model
+
+siamese_encoder = load_model("model/siamese_encoder.h5", compile = False)  # Load Siamese Encoder
+xgb_classifier = joblib.load("model/xgb_similarity_model.pkl")  # Load XGBoost Model
+list_nationality = pd.read_csv("data\geoCrosswalk\GeoCrossWalkMed.csv")['HH_ISO'].unique().tolist()
+list_nationality = ['Unknown' if (pd.isna(x) or x == '') else x for x in list_nationality]
+if 'Unknown' not in list_nationality:
+    list_nationality.append('Unknown')
+
 
 def text_to_numeric(text, max_length=40):
     text = text.lower()[:max_length]
     return np.array([ord(char) % 256 for char in text] + [0] * (max_length - len(text)))
 
+def normalize_dob(dob):
+    reference_date = datetime(1900, 1, 1)
+
+    if pd.isna(dob) or dob == '':
+        dob = datetime(1900, 1, 1)  # Default for missing dates
+
+    if isinstance(dob, float) or isinstance(dob, int):
+        dob = str(int(dob))  # Convert float (e.g., 19680115) to string
+
+    if isinstance(dob, datetime):
+        return (dob - reference_date).days / 365.25  # Convert date to age in years
+
+    try:
+        return (datetime.strptime(dob.strip(), '%Y-%m-%d') - reference_date).days / 365.25
+    except ValueError:
+        return 0  # Default for invalid dates
+
+def siamese_cleaning(df):
+
+
+    df['Firstname'] = df['Firstname'].astype(str).str.lower()
+    df['Surname'] = df['Surname'].astype(str).str.lower()
+    df['Address'] = df['Address'].astype(str).str.lower()
+
+    text_cols = ['Firstname', 'Surname', 'Address']
+    for col in text_cols:
+        df.loc[:, col] = df[col].replace('', 'MISSING').fillna("MISSING")
+
+ # Convert to numeric first
+        # Fix Categorical Column Missing Values
+    df.loc[:, 'Sex'] = df['Sex'].replace('', 'Unknown').fillna("Unknown")
+    df.loc[:, 'Nationality'] = df['Nationality'].replace('', 'Unknown').fillna("Unknown")
+
+    return df
+
+
 def get_siamese_embedding(df):
+    le_nationality = LabelEncoder()
+    le_nationality.fit(list_nationality)
+    df['Nationality_embd'] = le_nationality.transform(df['Nationality'])
+    le_sex = LabelEncoder()
+    le_sex.fit(['Unknown', 'F', 'M'])
+    df['Sex_embd'] = le_sex.transform(df['Sex'])
+    df['DOB_embd'] = df['DOB'].apply(normalize_dob)
+
+
+
+
+    num_cols = ['OriginLat', 'OriginLon','DestinationLat', 'DestinationLon']
+    for col in num_cols:
+        df[col] = df[col].astype(str).str.strip()  # Remove spaces
+        df[col] = df[col].replace('', np.nan)  # Convert empty strings to NaN
+        df[col] = df[col].apply(lambda x: pd.to_numeric(x, errors='coerce'))  # Convert to numeric
+        df[col] = df[col].fillna(0).astype(float) 
+
+    df['OriginLat'] /= 90.0
+    df['OriginLon'] /= 180.0
+    df['DestinationLat'] /= 90.0
+    df['DestinationLon'] /= 180.0
+
+
     """Extract embeddings for each record using the Siamese model."""
     X_text = np.array([
         np.concatenate([
@@ -28,12 +96,29 @@ def get_siamese_embedding(df):
         for i in range(len(df))
     ], dtype=np.float32)
 
-    X_cat = df[['Nationality', 'Sex']].values  # Categorical features
-    X_num = df[['DOB', 'OriginLat', 'OriginLon', 'DestinationLat', 'DestinationLon']].values  # Numerical features
+    X_cat = df[['Nationality_embd', 'Sex_embd']].values  # Categorical features
+    logging.info(f"dtype of numerical features: {df[['DOB_embd', 'OriginLat', 'OriginLon', 'DestinationLat', 'DestinationLon']].dtypes}")
+    X_num = df[['DOB_embd', 'OriginLat', 'OriginLon', 'DestinationLat', 'DestinationLon']].values  # Numerical features
+    logging.info(f"d type: {X_text.dtype}, {X_cat.dtype}, {X_num.dtype}")
 
     # Get embeddings
     embeddings = siamese_encoder.predict([X_text, X_cat, X_num], verbose=0)
     return embeddings
+
+def data_filtration(df, nameThreshold, ageThreshold, firstname, surname, dob):
+    if nameThreshold == 100:
+        df = df[(df['Firstname'].str.lower() == firstname.lower()) & 
+                (df['Surname'].str.lower() == surname.lower())]
+    elif nameThreshold < 100:
+        df = df[(df['Firstname'].str.startswith(firstname[0].lower()) | 
+                 df['Firstname'].str.startswith(surname[0].lower())) &
+                (df['Surname'].str.startswith(firstname[0].lower()) | 
+                 df['Surname'].str.startswith(surname[0].lower()))]
+
+    if ageThreshold == 100:
+        df = df[df['DOB'] == dob]
+
+    return df
 
 def siamese_network(firstname, surname, name, iata_o, lat_o, lon_o, city_org, ctry_org, iata_d, lat_d, lon_d, city_dest, ctry_dest, dob, city_name, lat_c, lon_c, country,  nationality, sex, address, df, nameThreshold, ageThreshold, locationThreshold):
     """
@@ -80,6 +165,9 @@ def siamese_network(firstname, surname, name, iata_o, lat_o, lon_o, city_org, ct
         "DestinationLon": lon_d
     }])
 
+    query_df = siamese_cleaning(query_df)
+    df = siamese_cleaning(df)
+
     df.reset_index(inplace=True)
     df.rename(columns={'index': 'unique_id'}, inplace=True)
 
@@ -87,9 +175,13 @@ def siamese_network(firstname, surname, name, iata_o, lat_o, lon_o, city_org, ct
         df = data_filtration(df, nameThreshold, ageThreshold, firstname, surname, dob)
 
     # Step 2: Extract Embeddings for Query & Database
+    start_time = time.time()
     query_embedding = get_siamese_embedding(query_df)
     db_embeddings = get_siamese_embedding(df)
+    end_time = time.time()
+    logging.info(f"Time for computing embeddings: {end_time - start_time:.2f} seconds")
 
+    start_time = time.time()
     # Step 3: Compute Feature Representation for XGBoost
     X_test = np.hstack([
         np.abs(db_embeddings - query_embedding),  # Distance-Based Features
@@ -98,6 +190,8 @@ def siamese_network(firstname, surname, name, iata_o, lat_o, lon_o, city_org, ct
 
     # Step 4: Predict Similarity Using XGBoost
     similarity_scores = xgb_classifier.predict_proba(X_test)[:, 1] * 100  # Convert to percentage
+    end_time = time.time()
+    logging.info(f"Time for computing XGBoost predictions: {end_time - start_time:.2f} seconds")
 
     # Step 5: Store Results in DataFrame (Maintain Original Columns)
     df['Confidence Level'] = similarity_scores
@@ -153,7 +247,8 @@ def compute_similarity_features(df, firstname, surname, dob, address, city_name,
     """
     Computes all similarity features and ensures expected columns exist.
     """
-
+    start_time = time.time()
+    num_records = df.shape[0]
     gender_counts = df['Sex'].str.lower().value_counts(normalize=True)
     origin_airport_counts = df['OriginIATA'].str.lower().value_counts(normalize=True)
     origin_city_counts = df['OriginCity'].str.lower().value_counts(normalize=True)
@@ -236,5 +331,8 @@ def compute_similarity_features(df, firstname, surname, dob, address, city_name,
     for col in expected_columns:
         if col not in similarity_df.columns:
             similarity_df[col] = 0
+
+    end_time = time.time()
+    logging.info(f"Time for calculating similarities: {end_time - start_time:.2f} seconds")
 
     return similarity_df

@@ -27,11 +27,11 @@ The Similarity Search WebApp is a Python-Flask-based web application designed to
 To run this application, ensure you have Docker installed on your machine.
 
 1. Clone the repository to your local machine. 
-2. You will need Python 3.11 to run this project.
+2. You will need Python 3.10 to run this project.
 3. Navigate to the project directory.
 4. Install the required libraries: 
 ```bash 
-pip install -r requirements.txt 
+pip install -r requirements_new.txt 
 ```
 
 5. Set up environment variables: create an `environment.env` file in the project root and provide the necessary configurations: 
@@ -51,8 +51,8 @@ redis-server
 ```
 7. Open two terminal tabs and run these to start Celery workers: 
 ```sh 
-celery -A app.celery_init.celery worker --loglevel=info
-celery -A app.celery_init.celery beat --loglevel=info 
+celery -A app.celery_init.celery worker --loglevel=info --pool=solo
+celery -A app.celery_init.celery beat --loglevel=info --pool=solo
 ```
 8. Run the following command to start the application:
 ```sh
