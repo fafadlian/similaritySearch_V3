@@ -42,6 +42,7 @@ CELERY_RESULT_BACKEND=redis://localhost:6379/0
 DATABASE_URL=postgresql+psycopg2://<db_username>:<db_password>@localhost:5432/similaritysearch
 ACCESS_TOKEN=<your_access_token>
 REFRESH_TOKEN=<your_refresh_token>
+SIAMESE_THERESHOLD=<your threshold>
 ```
    - Replace `<your_access_token>` and `<your_refresh_token>` with values obtained from your API provider or previous deployment records. Ensure these are securely stored and managed.
 
@@ -128,7 +129,7 @@ services:
       context: .
       dockerfile: Dockerfile.windows
     container_name: celery_worker
-    command: celery -A app.celery_init.celery worker --loglevel=info --concurrency=4
+    command: celery -A app.celery_init.celery worker --loglevel=info --concurrency=1
     depends_on:
       - redis
       - postgres
@@ -142,7 +143,7 @@ services:
       context: .
       dockerfile: Dockerfile.windows
     container_name: celery_beat
-    command: celery -A app.celery_init.celery beat --loglevel=info
+    command: celery -A app.celery_init.celery beat --loglevel=info --pool=solo
     depends_on:
       - redis
       - postgres
