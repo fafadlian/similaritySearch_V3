@@ -36,7 +36,7 @@ def age_similarity_score(query_dob, dob):
 
     # ✅ If the ages are identical, return max similarity
     if age_difference == 0:
-        logging.info("Identical ages for age similarity calculation")
+        # logging.info("Identical ages for age similarity calculation")
         return 100
 
     max_age = max(actual_age, query_age)
@@ -52,7 +52,7 @@ def age_similarity_score(query_dob, dob):
     # ✅ Scale log_age_diff to a 0-100 score
     score = max(0, 100 - (log_age_diff * 100))
 
-    logging.info(f"Age similarity score: {score:.2f}")
+    # logging.info(f"Age similarity score: {score:.2f}")
     return score
 
 # Example Usage

@@ -3,6 +3,7 @@ import numpy as np
 import pandas as pd
 import tensorflow as tf
 from tensorflow.keras.models import load_model
+import os
 
 from app.location_similarity import haversine, location_similarity_score, location_matching, address_str_similarity_score
 from app.age_similarity import age_similarity_score
@@ -11,6 +12,11 @@ import logging
 import time
 from datetime import datetime
 from sklearn.preprocessing import LabelEncoder
+from dotenv import load_dotenv
+load_dotenv("environment.env")
+SIAMESE_THRESHOLD = int(os.getenv("SIAMESE_THRESHOLD"))
+
+
 
 
 siamese_encoder = load_model("model/siamese_encoder.h5", compile = False)  # Load Siamese Encoder
@@ -197,10 +203,11 @@ def siamese_network(firstname, surname, name, iata_o, lat_o, lon_o, city_org, ct
     df['Confidence Level'] = similarity_scores
 
     # Step 6: Rank Results by Similarity
-    df_filtered = df[df['Confidence Level'] >= 40]
+    df_filtered = df[df['Confidence Level'] >= SIAMESE_THRESHOLD]
+    logging.info(f"Number of records with similarity >= {SIAMESE_THRESHOLD}: {df_filtered.shape[0]}")
     similarity_df = compute_similarity_features(df_filtered, firstname, surname, dob, address, city_name, country, sex, nationality, iata_o, city_org, ctry_org, iata_d, city_dest, ctry_dest, lat_o, lon_o, lat_d, lon_d, max_distance=12000)
     
-    similarity_df['Siamese Similarity'] = df['Confidence Level'] / 100  # Normalize to [0,1]
+    similarity_df['Siamese Similarity'] = df['Confidence Level']  # Normalize to [0,1]
 
     # ✅ Define Weights for Feature Contribution
     siamese_weight = 0.7

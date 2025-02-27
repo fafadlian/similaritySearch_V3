@@ -1,0 +1,17 @@
+{
+    "arrival_date_from": "2019-02-06",
+    "arrival_date_to": "2019-02-09",
+    "flight_nbr": "",
+    "firstname": "tiles",
+    "surname": "roosenbaumm",
+    "dob": "1991-12-12",
+    "iata_o": "WMI",
+    "iata_d": "ATH",
+    "city_name": "Breda",
+    "address": "",
+    "sex": "M",
+    "nationality": "NLD",
+    "nameThreshold": 50,
+    "ageThreshold": 50,
+    "locationThreshold": 50
+}
