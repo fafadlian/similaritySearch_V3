@@ -2410,26 +2410,26 @@ airportID,airportName,City,countryName,IATA,ICAO,Latitude,Longitude,Altitude,Tim
 3236,Thandwe Airport,Thandwe,Myanmar,SNW,VYTD,18.46069908,94.30010223388672,20,6.5,U,Asia/Rangoon,airport,OurAirports,MM,,MMR,Asia,South-eastern Asia,#N/A,#N/A,#N/A
 3237,Tachileik Airport,Tachilek,Myanmar,THL,VYTL,20.483800888061523,99.93540192,1280,6.5,U,Asia/Rangoon,airport,OurAirports,MM,,MMR,Asia,South-eastern Asia,#N/A,#N/A,#N/A
 3239,Yangon International Airport,Yangon,Myanmar,RGN,VYYY,16.907300949099998,96.1332016,109,6.5,U,Asia/Rangoon,airport,OurAirports,MM,,MMR,Asia,South-eastern Asia,#N/A,#N/A,#N/A
-3240,Hasanuddin International Airport,Ujung Pandang,Indonesia,UPG,WAAA,-5.061629772,119.55400085449219,47,8,N,Asia/Makassar,airport,OurAirports,ID,,IDN,Asia,South-eastern Asia,id_ID,#N/A,IDN
-3241,Frans Kaisiepo Airport,Biak,Indonesia,BIK,WABB,-1.190019965,136.10800170898438,46,9,N,Asia/Jayapura,airport,OurAirports,ID,,IDN,Asia,South-eastern Asia,id_ID,#N/A,IDN
-3242,Nabire Airport,Nabire,Indonesia,NBX,WABI,-3.36818,135.496002,20,9,N,Asia/Jayapura,airport,OurAirports,ID,,IDN,Asia,South-eastern Asia,id_ID,#N/A,IDN
-3243,Moses Kilangin Airport,Timika,Indonesia,TIM,WABP,-4.528279781,136.88699340820312,103,9,N,Asia/Jayapura,airport,OurAirports,ID,,IDN,Asia,South-eastern Asia,id_ID,#N/A,IDN
-3244,Sentani International Airport,Jayapura,Indonesia,DJJ,WAJJ,-2.576950073,140.5160065,289,9,N,Asia/Jayapura,airport,OurAirports,ID,,IDN,Asia,South-eastern Asia,id_ID,#N/A,IDN
-3245,Wamena Airport,Wamena,Indonesia,WMX,WAJW,-4.10251,138.957001,5085,9,N,Asia/Jayapura,airport,OurAirports,ID,,IDN,Asia,South-eastern Asia,id_ID,#N/A,IDN
-3246,Mopah Airport,Merauke,Indonesia,MKQ,WAKK,-8.520290375,140.41799926757812,10,9,N,Asia/Jayapura,airport,OurAirports,ID,,IDN,Asia,South-eastern Asia,id_ID,#N/A,IDN
-3247,Jalaluddin Airport,Gorontalo,Indonesia,GTO,WAMG,0.637118995,122.8499985,105,8,N,Asia/Makassar,airport,OurAirports,ID,,IDN,Asia,South-eastern Asia,id_ID,#N/A,IDN
-3249,Mutiara Airport,Palu,Indonesia,PLW,WAML,-0.918542027,119.91000366210938,284,8,N,Asia/Makassar,airport,OurAirports,ID,,IDN,Asia,South-eastern Asia,id_ID,#N/A,IDN
-3250,Sam Ratulangi Airport,Manado,Indonesia,MDC,WAMM,1.5492600202560425,124.9260025024414,264,8,N,Asia/Makassar,airport,OurAirports,ID,,IDN,Asia,South-eastern Asia,id_ID,#N/A,IDN
-3251,Kasiguncu Airport,Poso,Indonesia,PSJ,WAMP,-1.416749954,120.6579971,174,8,N,Asia/Makassar,airport,OurAirports,ID,,IDN,Asia,South-eastern Asia,id_ID,#N/A,IDN
-3252,Pitu Airport,Morotai Island,Indonesia,OTI,WAMR,2.0459899902300003,128.3249969,49,9,N,Asia/Jayapura,airport,OurAirports,ID,,IDN,Asia,South-eastern Asia,id_ID,#N/A,IDN
-3253,Sultan Khairun Babullah Airport,Ternate,Indonesia,TTE,WAMT,0.831413984,127.38099670410156,49,9,N,Asia/Jayapura,airport,OurAirports,ID,,IDN,Asia,South-eastern Asia,id_ID,#N/A,IDN
-3254,Syukuran Aminuddin Amir Airport,Luwuk,Indonesia,LUW,WAMW,-1.03892,122.772003,56,8,N,Asia/Makassar,airport,OurAirports,ID,,IDN,Asia,South-eastern Asia,id_ID,#N/A,IDN
-3256,"Pattimura Airport, Ambon",Ambon,Indonesia,AMQ,WAPP,-3.710259914,128.0890045,33,9,N,Asia/Jayapura,airport,OurAirports,ID,,IDN,Asia,South-eastern Asia,id_ID,#N/A,IDN
-3257,Fakfak Airport,Fak Fak,Indonesia,FKQ,WASF,-2.920190096,132.26699829101562,462,9,N,Asia/Jayapura,airport,OurAirports,ID,,IDN,Asia,South-eastern Asia,id_ID,#N/A,IDN
-3258,Kaimana Airport,Kaimana,Indonesia,KNG,WASK,-3.644520044,133.6959991455078,19,9,N,Asia/Jayapura,airport,OurAirports,ID,,IDN,Asia,South-eastern Asia,id_ID,#N/A,IDN
-3259,Babo Airport,Babo,Indonesia,BXB,WASO,-2.532239914,133.43899536132812,10,9,N,Asia/Jayapura,airport,OurAirports,ID,,IDN,Asia,South-eastern Asia,id_ID,#N/A,IDN
-3260,Rendani Airport,Manokwari,Indonesia,MKW,WASR,-0.891833007,134.0489959716797,23,9,N,Asia/Jayapura,airport,OurAirports,ID,,IDN,Asia,South-eastern Asia,id_ID,#N/A,IDN
-3261,Dominique Edward Osok Airport,Sorong,Indonesia,SOQ,WAXX,-0.894,131.287,10,9,N,Asia/Jayapura,airport,OurAirports,ID,,IDN,Asia,South-eastern Asia,id_ID,#N/A,IDN
+3240,Hasanuddin International Airport,Ujung Pandang,Indonesia,UPG,WAAA,-5.061629772,119.55400085449219,47,8,N,Asia/Makassar,airport,OurAirports,ID,,INA,Asia,South-eastern Asia,id_ID,#N/A,IDN
+3241,Frans Kaisiepo Airport,Biak,Indonesia,BIK,WABB,-1.190019965,136.10800170898438,46,9,N,Asia/Jayapura,airport,OurAirports,ID,,INA,Asia,South-eastern Asia,id_ID,#N/A,IDN
+3242,Nabire Airport,Nabire,Indonesia,NBX,WABI,-3.36818,135.496002,20,9,N,Asia/Jayapura,airport,OurAirports,ID,,INA,Asia,South-eastern Asia,id_ID,#N/A,IDN
+3243,Moses Kilangin Airport,Timika,Indonesia,TIM,WABP,-4.528279781,136.88699340820312,103,9,N,Asia/Jayapura,airport,OurAirports,ID,,INA,Asia,South-eastern Asia,id_ID,#N/A,IDN
+3244,Sentani International Airport,Jayapura,Indonesia,DJJ,WAJJ,-2.576950073,140.5160065,289,9,N,Asia/Jayapura,airport,OurAirports,ID,,INA,Asia,South-eastern Asia,id_ID,#N/A,IDN
+3245,Wamena Airport,Wamena,Indonesia,WMX,WAJW,-4.10251,138.957001,5085,9,N,Asia/Jayapura,airport,OurAirports,ID,,INA,Asia,South-eastern Asia,id_ID,#N/A,IDN
+3246,Mopah Airport,Merauke,Indonesia,MKQ,WAKK,-8.520290375,140.41799926757812,10,9,N,Asia/Jayapura,airport,OurAirports,ID,,INA,Asia,South-eastern Asia,id_ID,#N/A,IDN
+3247,Jalaluddin Airport,Gorontalo,Indonesia,GTO,WAMG,0.637118995,122.8499985,105,8,N,Asia/Makassar,airport,OurAirports,ID,,INA,Asia,South-eastern Asia,id_ID,#N/A,IDN
+3249,Mutiara Airport,Palu,Indonesia,PLW,WAML,-0.918542027,119.91000366210938,284,8,N,Asia/Makassar,airport,OurAirports,ID,,INA,Asia,South-eastern Asia,id_ID,#N/A,IDN
+3250,Sam Ratulangi Airport,Manado,Indonesia,MDC,WAMM,1.5492600202560425,124.9260025024414,264,8,N,Asia/Makassar,airport,OurAirports,ID,,INA,Asia,South-eastern Asia,id_ID,#N/A,IDN
+3251,Kasiguncu Airport,Poso,Indonesia,PSJ,WAMP,-1.416749954,120.6579971,174,8,N,Asia/Makassar,airport,OurAirports,ID,,INA,Asia,South-eastern Asia,id_ID,#N/A,IDN
+3252,Pitu Airport,Morotai Island,Indonesia,OTI,WAMR,2.0459899902300003,128.3249969,49,9,N,Asia/Jayapura,airport,OurAirports,ID,,INA,Asia,South-eastern Asia,id_ID,#N/A,IDN
+3253,Sultan Khairun Babullah Airport,Ternate,Indonesia,TTE,WAMT,0.831413984,127.38099670410156,49,9,N,Asia/Jayapura,airport,OurAirports,ID,,INA,Asia,South-eastern Asia,id_ID,#N/A,IDN
+3254,Syukuran Aminuddin Amir Airport,Luwuk,Indonesia,LUW,WAMW,-1.03892,122.772003,56,8,N,Asia/Makassar,airport,OurAirports,ID,,INA,Asia,South-eastern Asia,id_ID,#N/A,IDN
+3256,"Pattimura Airport, Ambon",Ambon,Indonesia,AMQ,WAPP,-3.710259914,128.0890045,33,9,N,Asia/Jayapura,airport,OurAirports,ID,,INA,Asia,South-eastern Asia,id_ID,#N/A,IDN
+3257,Fakfak Airport,Fak Fak,Indonesia,FKQ,WASF,-2.920190096,132.26699829101562,462,9,N,Asia/Jayapura,airport,OurAirports,ID,,INA,Asia,South-eastern Asia,id_ID,#N/A,IDN
+3258,Kaimana Airport,Kaimana,Indonesia,KNG,WASK,-3.644520044,133.6959991455078,19,9,N,Asia/Jayapura,airport,OurAirports,ID,,INA,Asia,South-eastern Asia,id_ID,#N/A,IDN
+3259,Babo Airport,Babo,Indonesia,BXB,WASO,-2.532239914,133.43899536132812,10,9,N,Asia/Jayapura,airport,OurAirports,ID,,INA,Asia,South-eastern Asia,id_ID,#N/A,IDN
+3260,Rendani Airport,Manokwari,Indonesia,MKW,WASR,-0.891833007,134.0489959716797,23,9,N,Asia/Jayapura,airport,OurAirports,ID,,INA,Asia,South-eastern Asia,id_ID,#N/A,IDN
+3261,Dominique Edward Osok Airport,Sorong,Indonesia,SOQ,WAXX,-0.894,131.287,10,9,N,Asia/Jayapura,airport,OurAirports,ID,,INA,Asia,South-eastern Asia,id_ID,#N/A,IDN
 3262,Bintulu Airport,Bintulu,Malaysia,BTU,WBGB,3.123850107,113.0199966,74,8,N,Asia/Kuala_Lumpur,airport,OurAirports,MY,,MYS,Asia,South-eastern Asia,#N/A,#N/A,MYS
 3263,Kuching International Airport,Kuching,Malaysia,KCH,WBGG,1.4846999645233154,110.34700012207031,89,8,N,Asia/Kuala_Lumpur,airport,OurAirports,MY,,MYS,Asia,South-eastern Asia,#N/A,#N/A,MYS
 3264,Limbang Airport,Limbang,Malaysia,LMN,WBGJ,4.808300018310547,115.01000213623047,14,8,N,Asia/Kuala_Lumpur,airport,OurAirports,MY,,MYS,Asia,South-eastern Asia,#N/A,#N/A,MYS
@@ -2441,23 +2441,23 @@ airportID,airportName,City,countryName,IATA,ICAO,Latitude,Longitude,Altitude,Tim
 3270,Labuan Airport,Labuan,Malaysia,LBU,WBKL,5.300680160522461,115.25,101,8,N,Asia/Kuala_Lumpur,airport,OurAirports,MY,,MYS,Asia,South-eastern Asia,#N/A,#N/A,MYS
 3271,Tawau Airport,Tawau,Malaysia,TWU,WBKW,4.320159912109375,118.12799835205078,57,8,N,Asia/Kuala_Lumpur,airport,OurAirports,MY,,MYS,Asia,South-eastern Asia,#N/A,#N/A,MYS
 3272,Brunei International Airport,Bandar Seri Begawan,Brunei,BWN,WBSB,4.944200038909912,114.9280014038086,73,8,U,Asia/Brunei,airport,OurAirports,BN,,BRN,Asia,South-eastern Asia,#N/A,#N/A,BRN
-3273,Sultan Syarif Kasim Ii (Simpang Tiga) Airport,Pekanbaru,Indonesia,PKU,WIBB,0.46078601479530334,101.44499969482422,102,7,N,Asia/Jakarta,airport,OurAirports,ID,,IDN,Asia,South-eastern Asia,id_ID,#N/A,IDN
-3274,Pinang Kampai Airport,Dumai,Indonesia,DUM,WIBD,1.60919,101.433998,55,7,N,Asia/Jakarta,airport,OurAirports,ID,,IDN,Asia,South-eastern Asia,id_ID,#N/A,IDN
-3275,Soekarno-Hatta International Airport,Jakarta,Indonesia,CGK,WIII,-6.12556982,106.6559982,34,7,N,Asia/Jakarta,airport,OurAirports,ID,,IDN,Asia,South-eastern Asia,id_ID,#N/A,IDN
-3276,Binaka Airport,Gunung Sitoli,Indonesia,GNS,WIMB,1.16638,97.704697,20,7,N,Asia/Jakarta,airport,OurAirports,ID,,IDN,Asia,South-eastern Asia,id_ID,#N/A,IDN
-3277,Aek Godang Airport,Padang Sidempuan,Indonesia,AEG,WIME,1.4001,99.430496,922,7,N,Asia/Jakarta,airport,OurAirports,ID,,IDN,Asia,South-eastern Asia,id_ID,#N/A,IDN
-3278,Minangkabau International Airport,Padang,Indonesia,PDG,WIPT,-0.786917,100.280998,18,7,N,Asia/Jakarta,airport,OurAirports,ID,,IDN,Asia,South-eastern Asia,id_ID,#N/A,IDN
-3279,Soewondo Air Force Base,Medan,Indonesia,MES,WIMK,3.559167,98.671111,114,7,N,Asia/Jakarta,airport,OurAirports,ID,,IDN,Asia,South-eastern Asia,id_ID,#N/A,IDN
-3280,Dr Ferdinand Lumban Tobing Airport,Sibolga,Indonesia,FLZ,WIMS,1.55594,98.888901,33,7,N,Asia/Jakarta,airport,OurAirports,ID,,IDN,Asia,South-eastern Asia,id_ID,#N/A,IDN
-3281,Nanga Pinoh Airport,Nangapinoh,Indonesia,NPO,WIOG,-0.348868996,111.7480011,123,7,N,Asia/Jakarta,airport,OurAirports,ID,,IDN,Asia,South-eastern Asia,id_ID,#N/A,IDN
-3282,Ketapang(Rahadi Usman) Airport,Ketapang,Indonesia,KTG,WIOK,-1.816640019,109.96299743652344,46,7,N,Asia/Jakarta,airport,OurAirports,ID,,IDN,Asia,South-eastern Asia,id_ID,#N/A,IDN
-3284,Supadio Airport,Pontianak,Indonesia,PNK,WIOO,-0.150711,109.40399932861328,10,7,N,Asia/Jakarta,airport,OurAirports,ID,,IDN,Asia,South-eastern Asia,id_ID,#N/A,IDN
-3287,Sultan Thaha Airport,Jambi,Indonesia,DJB,WIPA,-1.638020039,103.64399719238281,82,7,N,Asia/Jakarta,airport,OurAirports,ID,,IDN,Asia,South-eastern Asia,id_ID,#N/A,IDN
-3288,Fatmawati Soekarno Airport,Bengkulu,Indonesia,BKS,WIPL,-3.8637,102.338997,50,7,N,Asia/Jakarta,airport,OurAirports,ID,,IDN,Asia,South-eastern Asia,id_ID,#N/A,IDN
-3289,Sultan Mahmud Badaruddin II Airport,Palembang,Indonesia,PLM,WIPP,-2.898250103,104.6999969,49,7,N,Asia/Jakarta,airport,OurAirports,ID,,IDN,Asia,South-eastern Asia,id_ID,#N/A,IDN
-3291,Japura Airport,Rengat,Indonesia,RGT,WIPR,-0.352807999,102.33499908447266,62,7,N,Asia/Jakarta,airport,OurAirports,ID,,IDN,Asia,South-eastern Asia,id_ID,#N/A,IDN
-3292,Lhok Sukon Airport,Lhok Sukon,Indonesia,LSX,WITL,5.069509983062744,97.25920104980469,28,7,N,Asia/Jakarta,airport,OurAirports,ID,,IDN,Asia,South-eastern Asia,id_ID,#N/A,IDN
-3294,Sultan Iskandar Muda International Airport,Banda Aceh,Indonesia,BTJ,WITT,5.522872024010001,95.42063713070002,65,7,N,Asia/Jakarta,airport,OurAirports,ID,,IDN,Asia,South-eastern Asia,id_ID,#N/A,IDN
+3273,Sultan Syarif Kasim Ii (Simpang Tiga) Airport,Pekanbaru,Indonesia,PKU,WIBB,0.46078601479530334,101.44499969482422,102,7,N,Asia/Jakarta,airport,OurAirports,ID,,INA,Asia,South-eastern Asia,id_ID,#N/A,IDN
+3274,Pinang Kampai Airport,Dumai,Indonesia,DUM,WIBD,1.60919,101.433998,55,7,N,Asia/Jakarta,airport,OurAirports,ID,,INA,Asia,South-eastern Asia,id_ID,#N/A,IDN
+3275,Soekarno-Hatta International Airport,Jakarta,Indonesia,CGK,WIII,-6.12556982,106.6559982,34,7,N,Asia/Jakarta,airport,OurAirports,ID,,INA,Asia,South-eastern Asia,id_ID,#N/A,IDN
+3276,Binaka Airport,Gunung Sitoli,Indonesia,GNS,WIMB,1.16638,97.704697,20,7,N,Asia/Jakarta,airport,OurAirports,ID,,INA,Asia,South-eastern Asia,id_ID,#N/A,IDN
+3277,Aek Godang Airport,Padang Sidempuan,Indonesia,AEG,WIME,1.4001,99.430496,922,7,N,Asia/Jakarta,airport,OurAirports,ID,,INA,Asia,South-eastern Asia,id_ID,#N/A,IDN
+3278,Minangkabau International Airport,Padang,Indonesia,PDG,WIPT,-0.786917,100.280998,18,7,N,Asia/Jakarta,airport,OurAirports,ID,,INA,Asia,South-eastern Asia,id_ID,#N/A,IDN
+3279,Soewondo Air Force Base,Medan,Indonesia,MES,WIMK,3.559167,98.671111,114,7,N,Asia/Jakarta,airport,OurAirports,ID,,INA,Asia,South-eastern Asia,id_ID,#N/A,IDN
+3280,Dr Ferdinand Lumban Tobing Airport,Sibolga,Indonesia,FLZ,WIMS,1.55594,98.888901,33,7,N,Asia/Jakarta,airport,OurAirports,ID,,INA,Asia,South-eastern Asia,id_ID,#N/A,IDN
+3281,Nanga Pinoh Airport,Nangapinoh,Indonesia,NPO,WIOG,-0.348868996,111.7480011,123,7,N,Asia/Jakarta,airport,OurAirports,ID,,INA,Asia,South-eastern Asia,id_ID,#N/A,IDN
+3282,Ketapang(Rahadi Usman) Airport,Ketapang,Indonesia,KTG,WIOK,-1.816640019,109.96299743652344,46,7,N,Asia/Jakarta,airport,OurAirports,ID,,INA,Asia,South-eastern Asia,id_ID,#N/A,IDN
+3284,Supadio Airport,Pontianak,Indonesia,PNK,WIOO,-0.150711,109.40399932861328,10,7,N,Asia/Jakarta,airport,OurAirports,ID,,INA,Asia,South-eastern Asia,id_ID,#N/A,IDN
+3287,Sultan Thaha Airport,Jambi,Indonesia,DJB,WIPA,-1.638020039,103.64399719238281,82,7,N,Asia/Jakarta,airport,OurAirports,ID,,INA,Asia,South-eastern Asia,id_ID,#N/A,IDN
+3288,Fatmawati Soekarno Airport,Bengkulu,Indonesia,BKS,WIPL,-3.8637,102.338997,50,7,N,Asia/Jakarta,airport,OurAirports,ID,,INA,Asia,South-eastern Asia,id_ID,#N/A,IDN
+3289,Sultan Mahmud Badaruddin II Airport,Palembang,Indonesia,PLM,WIPP,-2.898250103,104.6999969,49,7,N,Asia/Jakarta,airport,OurAirports,ID,,INA,Asia,South-eastern Asia,id_ID,#N/A,IDN
+3291,Japura Airport,Rengat,Indonesia,RGT,WIPR,-0.352807999,102.33499908447266,62,7,N,Asia/Jakarta,airport,OurAirports,ID,,INA,Asia,South-eastern Asia,id_ID,#N/A,IDN
+3292,Lhok Sukon Airport,Lhok Sukon,Indonesia,LSX,WITL,5.069509983062744,97.25920104980469,28,7,N,Asia/Jakarta,airport,OurAirports,ID,,INA,Asia,South-eastern Asia,id_ID,#N/A,IDN
+3294,Sultan Iskandar Muda International Airport,Banda Aceh,Indonesia,BTJ,WITT,5.522872024010001,95.42063713070002,65,7,N,Asia/Jakarta,airport,OurAirports,ID,,INA,Asia,South-eastern Asia,id_ID,#N/A,IDN
 3296,Sultan Abdul Halim Airport,Alor Setar,Malaysia,AOR,WMKA,6.189670085906982,100.39800262451172,15,8,N,Asia/Kuala_Lumpur,airport,OurAirports,MY,,MYS,Asia,South-eastern Asia,#N/A,#N/A,MYS
 3297,Butterworth Airport,Butterworth,Malaysia,BWH,WMKB,5.4659199714660645,100.39099884033203,11,8,N,Asia/Kuala_Lumpur,airport,OurAirports,MY,,MYS,Asia,South-eastern Asia,#N/A,#N/A,MYS
 3298,Sultan Ismail Petra Airport,Kota Bahru,Malaysia,KBR,WMKC,6.1668500900268555,102.29299926757812,16,8,N,Asia/Kuala_Lumpur,airport,OurAirports,MY,,MYS,Asia,South-eastern Asia,#N/A,#N/A,MYS
@@ -2986,43 +2986,43 @@ airportID,airportName,City,countryName,IATA,ICAO,Latitude,Longitude,Altitude,Tim
 3881,Youngstown Warren Regional Airport,Youngstown,United States of America,YNG,KYNG,41.26070023,-80.67910004,1192,-5,A,America/New_York,airport,OurAirports,US,,USA,Americas,Northern America,en_US,USD,USA
 3882,Ladd AAF Airfield,Fort Wainwright,United States of America,FBK,PAFB,64.83750153,-147.6139984,454,-9,A,America/Anchorage,airport,OurAirports,US,,USA,Americas,Northern America,en_US,USD,USA
 3884,Robins Air Force Base,Macon,United States of America,WRB,KWRB,32.64009857,-83.59190369,294,-5,A,America/New_York,airport,OurAirports,US,,USA,Americas,Northern America,en_US,USD,USA
-3886,Naha Airport,Naha,Indonesia,NAH,WAMH,3.6832098960876465,125.52799987792969,16,8,N,Asia/Makassar,airport,OurAirports,ID,,IDN,Asia,South-eastern Asia,id_ID,#N/A,IDN
-3887,Andi Jemma Airport,Masamba,Indonesia,MXB,WAWM,-2.55803,120.323997,164,8,N,Asia/Makassar,airport,OurAirports,ID,,IDN,Asia,South-eastern Asia,id_ID,#N/A,IDN
-3888,Soroako Airport,Soroako,Indonesia,SQR,WAWS,-2.531199932,121.35800170898438,1388,8,N,Asia/Makassar,airport,OurAirports,ID,,IDN,Asia,South-eastern Asia,id_ID,#N/A,IDN
-3889,Pongtiku Airport,Makale,Indonesia,TTR,WAWT,-3.044739962,119.8219986,2884,8,N,Asia/Makassar,airport,OurAirports,ID,,IDN,Asia,South-eastern Asia,id_ID,#N/A,IDN
-3890,Wolter Monginsidi Airport,Kendari,Indonesia,KDI,WAWW,-4.081610203,122.41799926757812,538,8,N,Asia/Makassar,airport,OurAirports,ID,,IDN,Asia,South-eastern Asia,id_ID,#N/A,IDN
-3891,Maimun Saleh Airport,Sabang,Indonesia,SBG,WITB,5.874129772,95.33969879150001,393,7,N,Asia/Jakarta,airport,OurAirports,ID,,IDN,Asia,South-eastern Asia,id_ID,#N/A,IDN
-3892,Cibeureum Airport,Tasikmalaya,Indonesia,TSY,WICM,-7.346600056,108.2460022,1148,7,N,Asia/Jakarta,airport,OurAirports,ID,,IDN,Asia,South-eastern Asia,id_ID,#N/A,IDN
-3894,Abdul Rachman Saleh Airport,Malang,Indonesia,MLG,WARA,-7.926559925,112.7149963,1726,7,N,Asia/Jakarta,airport,OurAirports,ID,,IDN,Asia,South-eastern Asia,id_ID,#N/A,IDN
-3896,Husein Sastranegara International Airport,Bandung,Indonesia,BDO,WICC,-6.900629997,107.57599639892578,2436,7,N,Asia/Jakarta,airport,OurAirports,ID,,IDN,Asia,South-eastern Asia,id_ID,#N/A,IDN
-3897,Penggung Airport,Cirebon,Indonesia,CBN,WICD,-6.756140232,108.5400009,89,7,N,Asia/Jakarta,airport,OurAirports,ID,,IDN,Asia,South-eastern Asia,id_ID,#N/A,IDN
-3898,Adi Sutjipto International Airport,Yogyakarta,Indonesia,JOG,WARJ,-7.788179874,110.43199920654297,350,7,N,Asia/Jakarta,airport,OurAirports,ID,,IDN,Asia,South-eastern Asia,id_ID,#N/A,IDN
-3899,Tunggul Wulung Airport,Cilacap,Indonesia,CXP,WIHL,-7.645060062,109.0339966,69,7,N,Asia/Jakarta,airport,OurAirports,ID,,IDN,Asia,South-eastern Asia,id_ID,#N/A,IDN
-3900,Pondok Cabe Air Base,Jakarta,Indonesia,PCB,WIHP,-6.336959839,106.76499938964844,200,7,N,Asia/Jakarta,airport,OurAirports,ID,,IDN,Asia,South-eastern Asia,id_ID,#N/A,IDN
-3901,Achmad Yani Airport,Semarang,Indonesia,SRG,WARS,-6.97273,110.375,10,7,N,Asia/Jakarta,airport,OurAirports,ID,,IDN,Asia,South-eastern Asia,id_ID,#N/A,IDN
-3903,Hang Nadim International Airport,Batam,Indonesia,BTH,WIDD,1.121029973,104.1190033,126,7,N,Asia/Jakarta,airport,OurAirports,ID,,IDN,Asia,South-eastern Asia,id_ID,#N/A,IDN
-3904,Buluh Tumbang (H A S Hanandjoeddin) Airport,Tanjung Pandan,Indonesia,TJQ,WIOD,-2.74571991,107.7549973,164,7,N,Asia/Jakarta,airport,OurAirports,ID,,IDN,Asia,South-eastern Asia,id_ID,#N/A,IDN
-3905,Pangkal Pinang (Depati Amir) Airport,Pangkal Pinang,Indonesia,PGK,WIPK,-2.162199974,106.1389999,109,7,N,Asia/Jakarta,airport,OurAirports,ID,,IDN,Asia,South-eastern Asia,id_ID,#N/A,IDN
-3906,Raja Haji Fisabilillah International Airport,Tanjung Pinang,Indonesia,TNJ,WIDN,0.922683001,104.5319977,52,7,N,Asia/Jakarta,airport,OurAirports,ID,,IDN,Asia,South-eastern Asia,id_ID,#N/A,IDN
-3907,Dabo Airport,Singkep,Indonesia,SIQ,WIDS,-0.479189008,104.5790023803711,95,7,N,Asia/Jakarta,airport,OurAirports,ID,,IDN,Asia,South-eastern Asia,id_ID,#N/A,IDN
-3908,Syamsudin Noor Airport,Banjarmasin,Indonesia,BDJ,WAOO,-3.442359924,114.76300048828125,66,8,N,Asia/Makassar,airport,OurAirports,ID,,IDN,Asia,South-eastern Asia,id_ID,#N/A,IDN
-3909,Batu Licin Airport,Batu Licin,Indonesia,BTW,WAOC,-3.412410021,115.9950027,3,8,N,Asia/Makassar,airport,OurAirports,ID,,IDN,Asia,South-eastern Asia,id_ID,#N/A,IDN
-3910,Iskandar Airport,Pangkalan Bun,Indonesia,PKN,WAOI,-2.705199957,111.6729965,75,7,N,Asia/Jakarta,airport,OurAirports,ID,,IDN,Asia,South-eastern Asia,id_ID,#N/A,IDN
-3911,Tjilik Riwut Airport,Palangkaraya,Indonesia,PKY,WAOP,-2.225130081,113.9430008,82,7,N,Asia/Jakarta,airport,OurAirports,ID,,IDN,Asia,South-eastern Asia,id_ID,#N/A,IDN
-3913,Maumere(Wai Oti) Airport,Maumere,Indonesia,MOF,WATC,-8.640649796,122.2369995,115,8,N,Asia/Makassar,airport,OurAirports,ID,,IDN,Asia,South-eastern Asia,id_ID,#N/A,IDN
-3914,Ende (H Hasan Aroeboesman) Airport,Ende,Indonesia,ENE,WATE,-8.849289894,121.6610031,49,8,N,Asia/Makassar,airport,OurAirports,ID,,IDN,Asia,South-eastern Asia,id_ID,#N/A,IDN
-3915,Frans Sales Lega Airport,Ruteng,Indonesia,RTG,WATG,-8.597009659,120.4769974,3510,8,N,Asia/Makassar,airport,OurAirports,ID,,IDN,Asia,South-eastern Asia,id_ID,#N/A,IDN
-3916,El Tari Airport,Kupang,Indonesia,KOE,WATT,-10.17160034,123.6709976196289,335,8,N,Asia/Makassar,airport,OurAirports,ID,,IDN,Asia,South-eastern Asia,id_ID,#N/A,IDN
-3917,Komodo Airport,Labuhan Bajo,Indonesia,LBJ,WATO,-8.48666,119.889,66,8,N,Asia/Makassar,airport,OurAirports,ID,,IDN,Asia,South-eastern Asia,id_ID,#N/A,IDN
-3919,Sultan Aji Muhamad Sulaiman Airport,Balikpapan,Indonesia,BPN,WALL,-1.268270016,116.8939972,12,8,N,Asia/Makassar,airport,OurAirports,ID,,IDN,Asia,South-eastern Asia,id_ID,#N/A,IDN
-3920,Juwata Airport,Taraken,Indonesia,TRK,WALR,3.326667,117.569444,23,8,N,Asia/Makassar,airport,OurAirports,ID,,IDN,Asia,South-eastern Asia,id_ID,#N/A,IDN
-3921,Temindung Airport,Samarinda,Indonesia,SRI,WALS,-0.484530985,117.1569977,33,8,N,Asia/Makassar,airport,OurAirports,ID,,IDN,Asia,South-eastern Asia,id_ID,#N/A,IDN
-3922,Tanjung Santan Airport,Tanjung Santan,Indonesia,TSX,WALT,-0.092973001,117.4530029,121,8,N,Asia/Makassar,airport,OurAirports,ID,,IDN,Asia,South-eastern Asia,id_ID,#N/A,IDN
-3923,Selaparang Airport,Mataram,Indonesia,AMI,WADA,-8.560709953,116.0950012,52,8,N,Asia/Makassar,airport,OurAirports,ID,,IDN,Asia,South-eastern Asia,id_ID,#N/A,IDN
-3924,Muhammad Salahuddin Airport,Bima,Indonesia,BMU,WADB,-8.539649963,118.6869965,3,8,N,Asia/Makassar,airport,OurAirports,ID,,IDN,Asia,South-eastern Asia,id_ID,#N/A,IDN
-3927,Umbu Mehang Kunda Airport,Waingapu,Indonesia,WGP,WADW,-9.66922,120.302002,33,8,N,Asia/Makassar,airport,OurAirports,ID,,IDN,Asia,South-eastern Asia,id_ID,#N/A,IDN
-3928,Juanda International Airport,Surabaya,Indonesia,SUB,WARR,-7.379829884,112.78700256347656,9,7,N,Asia/Jakarta,airport,OurAirports,ID,,IDN,Asia,South-eastern Asia,id_ID,#N/A,IDN
-3929,Adi Sumarmo Wiryokusumo Airport,Solo City,Indonesia,SOC,WARQ,-7.516089916,110.75700378417969,421,7,N,Asia/Jakarta,airport,OurAirports,ID,,IDN,Asia,South-eastern Asia,id_ID,#N/A,IDN
+3886,Naha Airport,Naha,Indonesia,NAH,WAMH,3.6832098960876465,125.52799987792969,16,8,N,Asia/Makassar,airport,OurAirports,ID,,INA,Asia,South-eastern Asia,id_ID,#N/A,IDN
+3887,Andi Jemma Airport,Masamba,Indonesia,MXB,WAWM,-2.55803,120.323997,164,8,N,Asia/Makassar,airport,OurAirports,ID,,INA,Asia,South-eastern Asia,id_ID,#N/A,IDN
+3888,Soroako Airport,Soroako,Indonesia,SQR,WAWS,-2.531199932,121.35800170898438,1388,8,N,Asia/Makassar,airport,OurAirports,ID,,INA,Asia,South-eastern Asia,id_ID,#N/A,IDN
+3889,Pongtiku Airport,Makale,Indonesia,TTR,WAWT,-3.044739962,119.8219986,2884,8,N,Asia/Makassar,airport,OurAirports,ID,,INA,Asia,South-eastern Asia,id_ID,#N/A,IDN
+3890,Wolter Monginsidi Airport,Kendari,Indonesia,KDI,WAWW,-4.081610203,122.41799926757812,538,8,N,Asia/Makassar,airport,OurAirports,ID,,INA,Asia,South-eastern Asia,id_ID,#N/A,IDN
+3891,Maimun Saleh Airport,Sabang,Indonesia,SBG,WITB,5.874129772,95.33969879150001,393,7,N,Asia/Jakarta,airport,OurAirports,ID,,INA,Asia,South-eastern Asia,id_ID,#N/A,IDN
+3892,Cibeureum Airport,Tasikmalaya,Indonesia,TSY,WICM,-7.346600056,108.2460022,1148,7,N,Asia/Jakarta,airport,OurAirports,ID,,INA,Asia,South-eastern Asia,id_ID,#N/A,IDN
+3894,Abdul Rachman Saleh Airport,Malang,Indonesia,MLG,WARA,-7.926559925,112.7149963,1726,7,N,Asia/Jakarta,airport,OurAirports,ID,,INA,Asia,South-eastern Asia,id_ID,#N/A,IDN
+3896,Husein Sastranegara International Airport,Bandung,Indonesia,BDO,WICC,-6.900629997,107.57599639892578,2436,7,N,Asia/Jakarta,airport,OurAirports,ID,,INA,Asia,South-eastern Asia,id_ID,#N/A,IDN
+3897,Penggung Airport,Cirebon,Indonesia,CBN,WICD,-6.756140232,108.5400009,89,7,N,Asia/Jakarta,airport,OurAirports,ID,,INA,Asia,South-eastern Asia,id_ID,#N/A,IDN
+3898,Adi Sutjipto International Airport,Yogyakarta,Indonesia,JOG,WARJ,-7.788179874,110.43199920654297,350,7,N,Asia/Jakarta,airport,OurAirports,ID,,INA,Asia,South-eastern Asia,id_ID,#N/A,IDN
+3899,Tunggul Wulung Airport,Cilacap,Indonesia,CXP,WIHL,-7.645060062,109.0339966,69,7,N,Asia/Jakarta,airport,OurAirports,ID,,INA,Asia,South-eastern Asia,id_ID,#N/A,IDN
+3900,Pondok Cabe Air Base,Jakarta,Indonesia,PCB,WIHP,-6.336959839,106.76499938964844,200,7,N,Asia/Jakarta,airport,OurAirports,ID,,INA,Asia,South-eastern Asia,id_ID,#N/A,IDN
+3901,Achmad Yani Airport,Semarang,Indonesia,SRG,WARS,-6.97273,110.375,10,7,N,Asia/Jakarta,airport,OurAirports,ID,,INA,Asia,South-eastern Asia,id_ID,#N/A,IDN
+3903,Hang Nadim International Airport,Batam,Indonesia,BTH,WIDD,1.121029973,104.1190033,126,7,N,Asia/Jakarta,airport,OurAirports,ID,,INA,Asia,South-eastern Asia,id_ID,#N/A,IDN
+3904,Buluh Tumbang (H A S Hanandjoeddin) Airport,Tanjung Pandan,Indonesia,TJQ,WIOD,-2.74571991,107.7549973,164,7,N,Asia/Jakarta,airport,OurAirports,ID,,INA,Asia,South-eastern Asia,id_ID,#N/A,IDN
+3905,Pangkal Pinang (Depati Amir) Airport,Pangkal Pinang,Indonesia,PGK,WIPK,-2.162199974,106.1389999,109,7,N,Asia/Jakarta,airport,OurAirports,ID,,INA,Asia,South-eastern Asia,id_ID,#N/A,IDN
+3906,Raja Haji Fisabilillah International Airport,Tanjung Pinang,Indonesia,TNJ,WIDN,0.922683001,104.5319977,52,7,N,Asia/Jakarta,airport,OurAirports,ID,,INA,Asia,South-eastern Asia,id_ID,#N/A,IDN
+3907,Dabo Airport,Singkep,Indonesia,SIQ,WIDS,-0.479189008,104.5790023803711,95,7,N,Asia/Jakarta,airport,OurAirports,ID,,INA,Asia,South-eastern Asia,id_ID,#N/A,IDN
+3908,Syamsudin Noor Airport,Banjarmasin,Indonesia,BDJ,WAOO,-3.442359924,114.76300048828125,66,8,N,Asia/Makassar,airport,OurAirports,ID,,INA,Asia,South-eastern Asia,id_ID,#N/A,IDN
+3909,Batu Licin Airport,Batu Licin,Indonesia,BTW,WAOC,-3.412410021,115.9950027,3,8,N,Asia/Makassar,airport,OurAirports,ID,,INA,Asia,South-eastern Asia,id_ID,#N/A,IDN
+3910,Iskandar Airport,Pangkalan Bun,Indonesia,PKN,WAOI,-2.705199957,111.6729965,75,7,N,Asia/Jakarta,airport,OurAirports,ID,,INA,Asia,South-eastern Asia,id_ID,#N/A,IDN
+3911,Tjilik Riwut Airport,Palangkaraya,Indonesia,PKY,WAOP,-2.225130081,113.9430008,82,7,N,Asia/Jakarta,airport,OurAirports,ID,,INA,Asia,South-eastern Asia,id_ID,#N/A,IDN
+3913,Maumere(Wai Oti) Airport,Maumere,Indonesia,MOF,WATC,-8.640649796,122.2369995,115,8,N,Asia/Makassar,airport,OurAirports,ID,,INA,Asia,South-eastern Asia,id_ID,#N/A,IDN
+3914,Ende (H Hasan Aroeboesman) Airport,Ende,Indonesia,ENE,WATE,-8.849289894,121.6610031,49,8,N,Asia/Makassar,airport,OurAirports,ID,,INA,Asia,South-eastern Asia,id_ID,#N/A,IDN
+3915,Frans Sales Lega Airport,Ruteng,Indonesia,RTG,WATG,-8.597009659,120.4769974,3510,8,N,Asia/Makassar,airport,OurAirports,ID,,INA,Asia,South-eastern Asia,id_ID,#N/A,IDN
+3916,El Tari Airport,Kupang,Indonesia,KOE,WATT,-10.17160034,123.6709976196289,335,8,N,Asia/Makassar,airport,OurAirports,ID,,INA,Asia,South-eastern Asia,id_ID,#N/A,IDN
+3917,Komodo Airport,Labuhan Bajo,Indonesia,LBJ,WATO,-8.48666,119.889,66,8,N,Asia/Makassar,airport,OurAirports,ID,,INA,Asia,South-eastern Asia,id_ID,#N/A,IDN
+3919,Sultan Aji Muhamad Sulaiman Airport,Balikpapan,Indonesia,BPN,WALL,-1.268270016,116.8939972,12,8,N,Asia/Makassar,airport,OurAirports,ID,,INA,Asia,South-eastern Asia,id_ID,#N/A,IDN
+3920,Juwata Airport,Taraken,Indonesia,TRK,WALR,3.326667,117.569444,23,8,N,Asia/Makassar,airport,OurAirports,ID,,INA,Asia,South-eastern Asia,id_ID,#N/A,IDN
+3921,Temindung Airport,Samarinda,Indonesia,SRI,WALS,-0.484530985,117.1569977,33,8,N,Asia/Makassar,airport,OurAirports,ID,,INA,Asia,South-eastern Asia,id_ID,#N/A,IDN
+3922,Tanjung Santan Airport,Tanjung Santan,Indonesia,TSX,WALT,-0.092973001,117.4530029,121,8,N,Asia/Makassar,airport,OurAirports,ID,,INA,Asia,South-eastern Asia,id_ID,#N/A,IDN
+3923,Selaparang Airport,Mataram,Indonesia,AMI,WADA,-8.560709953,116.0950012,52,8,N,Asia/Makassar,airport,OurAirports,ID,,INA,Asia,South-eastern Asia,id_ID,#N/A,IDN
+3924,Muhammad Salahuddin Airport,Bima,Indonesia,BMU,WADB,-8.539649963,118.6869965,3,8,N,Asia/Makassar,airport,OurAirports,ID,,INA,Asia,South-eastern Asia,id_ID,#N/A,IDN
+3927,Umbu Mehang Kunda Airport,Waingapu,Indonesia,WGP,WADW,-9.66922,120.302002,33,8,N,Asia/Makassar,airport,OurAirports,ID,,INA,Asia,South-eastern Asia,id_ID,#N/A,IDN
+3928,Juanda International Airport,Surabaya,Indonesia,SUB,WARR,-7.379829884,112.78700256347656,9,7,N,Asia/Jakarta,airport,OurAirports,ID,,INA,Asia,South-eastern Asia,id_ID,#N/A,IDN
+3929,Adi Sumarmo Wiryokusumo Airport,Solo City,Indonesia,SOC,WARQ,-7.516089916,110.75700378417969,421,7,N,Asia/Jakarta,airport,OurAirports,ID,,INA,Asia,South-eastern Asia,id_ID,#N/A,IDN
 3931,Chiang Mai International Airport,Chiang Mai,Thailand,CNX,VTCC,18.766799926799997,98.96260071,1036,7,U,Asia/Bangkok,airport,OurAirports,TH,,THA,Asia,South-eastern Asia,en_TH,THB,THA
 3932,Chiang Rai International Airport,Chiang Rai,Thailand,CEI,VTCT,19.95229912,99.88289642330001,1280,7,U,Asia/Bangkok,airport,OurAirports,TH,,THA,Asia,South-eastern Asia,en_TH,THB,THA
 3933,Nakhon Si Thammarat Airport,Nakhon Si Thammarat,Thailand,NST,VTSF,8.539620399475098,99.94470215,13,7,U,Asia/Bangkok,airport,OurAirports,TH,,THA,Asia,South-eastern Asia,en_TH,THB,THA
@@ -3031,7 +3031,7 @@ airportID,airportName,City,countryName,IATA,ICAO,Latitude,Longitude,Altitude,Tim
 3937,Ubon Ratchathani Airport,Ubon Ratchathani,Thailand,UBP,VTUU,15.25129986,104.8700027,406,7,U,Asia/Bangkok,airport,OurAirports,TH,,THA,Asia,South-eastern Asia,en_TH,THB,THA
 3938,Khon Kaen Airport,Khon Kaen,Thailand,KKC,VTUK,16.466600418099997,102.7839966,670,7,U,Asia/Bangkok,airport,OurAirports,TH,,THA,Asia,South-eastern Asia,en_TH,THB,THA
 3939,Sukhothai Airport,Sukhothai,Thailand,THS,VTPO,17.238000869750977,99.81819915771484,179,7,U,Asia/Bangkok,airport,OurAirports,TH,,THA,Asia,South-eastern Asia,en_TH,THB,THA
-3940,Ngurah Rai (Bali) International Airport,Denpasar,Indonesia,DPS,WADD,-8.748169899,115.1669998,14,8,N,Asia/Makassar,airport,OurAirports,ID,,IDN,Asia,South-eastern Asia,id_ID,#N/A,IDN
+3940,Ngurah Rai (Bali) International Airport,Denpasar,Indonesia,DPS,WADD,-8.748169899,115.1669998,14,8,N,Asia/Makassar,airport,OurAirports,ID,,INA,Asia,South-eastern Asia,id_ID,#N/A,IDN
 3942,Chubu Centrair International Airport,Nagoya,Japan,NGO,RJGG,34.85839844,136.80499267578125,15,9,U,Asia/Tokyo,airport,OurAirports,JP,,JPN,Asia,Eastern Asia,ja_JP,JPY,JPN
 3943,Kobe Airport,Kobe,Japan,UKB,RJBE,34.63280106,135.2239990234375,22,9,U,Asia/Tokyo,airport,OurAirports,JP,,JPN,Asia,Eastern Asia,ja_JP,JPY,JPN
 3944,Pullman Moscow Regional Airport,Pullman,United States of America,PUW,KPUW,46.7439,-117.110001,2556,-8,A,America/Los_Angeles,airport,OurAirports,US,,USA,Americas,Northern America,en_US,USD,USA
@@ -3946,17 +3946,17 @@ airportID,airportName,City,countryName,IATA,ICAO,Latitude,Longitude,Altitude,Tim
 6200,Mawlamyine Airport,Mawlamyine,Myanmar,MNU,VYMM,16.444700241088867,97.66069793701172,52,6.5,U,Asia/Rangoon,airport,OurAirports,MM,,MMR,Asia,South-eastern Asia,#N/A,#N/A,#N/A
 6201,Pathein Airport,Pathein,Myanmar,BSX,VYPN,16.815201,94.7799,20,6.5,U,Asia/Rangoon,airport,OurAirports,MM,,MMR,Asia,South-eastern Asia,#N/A,#N/A,#N/A
 6202,Pakhokku Airport,Pakhokku,Myanmar,PKK,VYPU,21.4043,95.11125,151,6.5,U,Asia/Rangoon,airport,OurAirports,MM,,MMR,Asia,South-eastern Asia,#N/A,#N/A,#N/A
-6203,Sumbawa Besar Airport,Sumbawa Island,Indonesia,SWQ,WADS,-8.489040375,117.41200256347656,16,8,N,Asia/Makassar,airport,OurAirports,ID,,IDN,Asia,South-eastern Asia,id_ID,#N/A,IDN
-6204,Tambolaka Airport,Waikabubak-Sumba Island,Indonesia,TMC,WADT,-9.40972,119.244003,161,8,N,Asia/Makassar,airport,OurAirports,ID,,IDN,Asia,South-eastern Asia,id_ID,#N/A,IDN
-6205,Bokondini Airport,Bokondini-Papua Island,Indonesia,BUI,WAJB,-3.6822,138.6755,4550,9,N,Asia/Jayapura,airport,OurAirports,ID,,IDN,Asia,South-eastern Asia,id_ID,#N/A,IDN
-6206,Senggeh Airport,Senggeh-Papua Island,Indonesia,SEH,WAJS,-3.45,140.779,914,9,N,Asia/Jayapura,airport,OurAirports,ID,,IDN,Asia,South-eastern Asia,id_ID,#N/A,IDN
-6207,Tanjung Harapan Airport,Tanjung Selor-Borneo Island,Indonesia,TJS,WALG,2.835833333,117.3736111,10,8,N,Asia/Makassar,airport,OurAirports,ID,,IDN,Asia,South-eastern Asia,id_ID,#N/A,IDN
-6208,Datadawai Airport,Datadawai-Borneo Island,Indonesia,DTD,WALJ,0.8106,114.5306,508,8,N,Asia/Makassar,airport,OurAirports,ID,,IDN,Asia,South-eastern Asia,id_ID,#N/A,IDN
-6209,Kalimarau Airport,Tanjung Redep-Borneo Island,Indonesia,BEJ,WALK,2.1555,117.431999,59,8,N,Asia/Makassar,airport,OurAirports,ID,,IDN,Asia,South-eastern Asia,id_ID,#N/A,IDN
-6210,Warukin Airport,Tanjung-Borneo Island,Indonesia,TJG,WAON,-2.216559887,115.435997,197,8,N,Asia/Makassar,airport,OurAirports,ID,,IDN,Asia,South-eastern Asia,id_ID,#N/A,IDN
-6211,Sampit(Hasan) Airport,Sampit-Borneo Island,Indonesia,SMQ,WAOS,-2.499190092,112.9749985,50,7,N,Asia/Jakarta,airport,OurAirports,ID,,IDN,Asia,South-eastern Asia,id_ID,#N/A,IDN
-6212,Dumatumbun Airport,Langgur-Kei Islands,Indonesia,LUV,WAPL,-5.66162014,132.7310028076172,10,9,N,Asia/Jayapura,airport,OurAirports,ID,,IDN,Asia,South-eastern Asia,id_ID,#N/A,IDN
-6213,Mali Airport,Alor Island,Indonesia,ARD,WATM,-8.132340431,124.59700012207031,10,8,N,Asia/Makassar,airport,OurAirports,ID,,IDN,Asia,South-eastern Asia,id_ID,#N/A,IDN
+6203,Sumbawa Besar Airport,Sumbawa Island,Indonesia,SWQ,WADS,-8.489040375,117.41200256347656,16,8,N,Asia/Makassar,airport,OurAirports,ID,,INA,Asia,South-eastern Asia,id_ID,#N/A,IDN
+6204,Tambolaka Airport,Waikabubak-Sumba Island,Indonesia,TMC,WADT,-9.40972,119.244003,161,8,N,Asia/Makassar,airport,OurAirports,ID,,INA,Asia,South-eastern Asia,id_ID,#N/A,IDN
+6205,Bokondini Airport,Bokondini-Papua Island,Indonesia,BUI,WAJB,-3.6822,138.6755,4550,9,N,Asia/Jayapura,airport,OurAirports,ID,,INA,Asia,South-eastern Asia,id_ID,#N/A,IDN
+6206,Senggeh Airport,Senggeh-Papua Island,Indonesia,SEH,WAJS,-3.45,140.779,914,9,N,Asia/Jayapura,airport,OurAirports,ID,,INA,Asia,South-eastern Asia,id_ID,#N/A,IDN
+6207,Tanjung Harapan Airport,Tanjung Selor-Borneo Island,Indonesia,TJS,WALG,2.835833333,117.3736111,10,8,N,Asia/Makassar,airport,OurAirports,ID,,INA,Asia,South-eastern Asia,id_ID,#N/A,IDN
+6208,Datadawai Airport,Datadawai-Borneo Island,Indonesia,DTD,WALJ,0.8106,114.5306,508,8,N,Asia/Makassar,airport,OurAirports,ID,,INA,Asia,South-eastern Asia,id_ID,#N/A,IDN
+6209,Kalimarau Airport,Tanjung Redep-Borneo Island,Indonesia,BEJ,WALK,2.1555,117.431999,59,8,N,Asia/Makassar,airport,OurAirports,ID,,INA,Asia,South-eastern Asia,id_ID,#N/A,IDN
+6210,Warukin Airport,Tanjung-Borneo Island,Indonesia,TJG,WAON,-2.216559887,115.435997,197,8,N,Asia/Makassar,airport,OurAirports,ID,,INA,Asia,South-eastern Asia,id_ID,#N/A,IDN
+6211,Sampit(Hasan) Airport,Sampit-Borneo Island,Indonesia,SMQ,WAOS,-2.499190092,112.9749985,50,7,N,Asia/Jakarta,airport,OurAirports,ID,,INA,Asia,South-eastern Asia,id_ID,#N/A,IDN
+6212,Dumatumbun Airport,Langgur-Kei Islands,Indonesia,LUV,WAPL,-5.66162014,132.7310028076172,10,9,N,Asia/Jayapura,airport,OurAirports,ID,,INA,Asia,South-eastern Asia,id_ID,#N/A,IDN
+6213,Mali Airport,Alor Island,Indonesia,ARD,WATM,-8.132340431,124.59700012207031,10,8,N,Asia/Makassar,airport,OurAirports,ID,,INA,Asia,South-eastern Asia,id_ID,#N/A,IDN
 6214,Belaga Airport,Belaga,Malaysia,BLG,WBGC,2.650000095,113.7669983,200,8,N,Asia/Kuala_Lumpur,airport,OurAirports,MY,,MYS,Asia,South-eastern Asia,#N/A,#N/A,MYS
 6215,Long Lellang Airport,Long Datih,Malaysia,LGL,WBGF,3.4210000038099997,115.1539993,1400,8,N,Asia/Kuala_Lumpur,airport,OurAirports,MY,,MYS,Asia,South-eastern Asia,#N/A,#N/A,MYS
 6216,Long Seridan Airport,Long Seridan,Malaysia,ODN,WBGI,3.9670000076293945,115.05000305175781,607,8,N,Asia/Kuala_Lumpur,airport,OurAirports,MY,,MYS,Asia,South-eastern Asia,#N/A,#N/A,MYS
@@ -3966,17 +3966,17 @@ airportID,airportName,City,countryName,IATA,ICAO,Latitude,Longitude,Altitude,Tim
 6220,Bario Airport,Bario,Malaysia,BBN,WBGZ,3.7338900566101074,115.47899627685547,3350,8,N,Asia/Kuala_Lumpur,airport,OurAirports,MY,,MYS,Asia,South-eastern Asia,#N/A,#N/A,MYS
 6221,Tomanggong Airport,Tomanggong,Malaysia,TMG,WBKM,5.40257,118.65763,26,8,N,Asia/Kuala_Lumpur,airport,OurAirports,MY,,MYS,Asia,South-eastern Asia,#N/A,#N/A,MYS
 6222,Kudat Airport,Kudat,Malaysia,KUD,WBKT,6.922500133514404,116.83599853515625,10,8,N,Asia/Kuala_Lumpur,airport,OurAirports,MY,,MYS,Asia,South-eastern Asia,#N/A,#N/A,MYS
-6223,Radin Inten II (Branti) Airport,Bandar Lampung-Sumatra Island,Indonesia,TKG,WIAT,-5.240556,105.175556,282,7,N,Asia/Jakarta,airport,OurAirports,ID,,IDN,Asia,South-eastern Asia,id_ID,#N/A,IDN
-6224,Halim Perdanakusuma International Airport,Jakarta,Indonesia,HLP,WIHH,-6.266610146,106.89099884033203,84,7,N,Asia/Jakarta,airport,OurAirports,ID,,IDN,Asia,South-eastern Asia,id_ID,#N/A,IDN
-6225,Ranai Airport,Ranai-Natuna Besar Island,Indonesia,NTX,WION,3.90871,108.388,7,7,N,Asia/Jakarta,airport,OurAirports,ID,,IDN,Asia,South-eastern Asia,id_ID,#N/A,IDN
-6226,Pangsuma Airport,Putussibau-Borneo Island,Indonesia,PSU,WIOP,0.8355780243873596,112.93699645996094,297,7,N,Asia/Jakarta,airport,OurAirports,ID,,IDN,Asia,South-eastern Asia,id_ID,#N/A,IDN
-6227,Sintang(Susilo) Airport,Sintang-Borneo Island,Indonesia,SQG,WIOS,0.063619003,111.4729995727539,98,7,N,Asia/Jakarta,airport,OurAirports,ID,,IDN,Asia,South-eastern Asia,id_ID,#N/A,IDN
-6228,Pendopo Airport,Talang Gudang-Sumatra Island,Indonesia,PDO,WIPQ,-3.286070108,103.87999725341797,184,7,N,Asia/Jakarta,airport,OurAirports,ID,,IDN,Asia,South-eastern Asia,id_ID,#N/A,IDN
-6229,Malikus Saleh Airport,Lhok Seumawe-Sumatra Island,Indonesia,LSW,WITM,5.226679801940918,96.95030212402344,90,7,N,Asia/Jakarta,airport,OurAirports,ID,,IDN,Asia,South-eastern Asia,id_ID,#N/A,IDN
+6223,Radin Inten II (Branti) Airport,Bandar Lampung-Sumatra Island,Indonesia,TKG,WIAT,-5.240556,105.175556,282,7,N,Asia/Jakarta,airport,OurAirports,ID,,INA,Asia,South-eastern Asia,id_ID,#N/A,IDN
+6224,Halim Perdanakusuma International Airport,Jakarta,Indonesia,HLP,WIHH,-6.266610146,106.89099884033203,84,7,N,Asia/Jakarta,airport,OurAirports,ID,,INA,Asia,South-eastern Asia,id_ID,#N/A,IDN
+6225,Ranai Airport,Ranai-Natuna Besar Island,Indonesia,NTX,WION,3.90871,108.388,7,7,N,Asia/Jakarta,airport,OurAirports,ID,,INA,Asia,South-eastern Asia,id_ID,#N/A,IDN
+6226,Pangsuma Airport,Putussibau-Borneo Island,Indonesia,PSU,WIOP,0.8355780243873596,112.93699645996094,297,7,N,Asia/Jakarta,airport,OurAirports,ID,,INA,Asia,South-eastern Asia,id_ID,#N/A,IDN
+6227,Sintang(Susilo) Airport,Sintang-Borneo Island,Indonesia,SQG,WIOS,0.063619003,111.4729995727539,98,7,N,Asia/Jakarta,airport,OurAirports,ID,,INA,Asia,South-eastern Asia,id_ID,#N/A,IDN
+6228,Pendopo Airport,Talang Gudang-Sumatra Island,Indonesia,PDO,WIPQ,-3.286070108,103.87999725341797,184,7,N,Asia/Jakarta,airport,OurAirports,ID,,INA,Asia,South-eastern Asia,id_ID,#N/A,IDN
+6229,Malikus Saleh Airport,Lhok Seumawe-Sumatra Island,Indonesia,LSW,WITM,5.226679801940918,96.95030212402344,90,7,N,Asia/Jakarta,airport,OurAirports,ID,,INA,Asia,South-eastern Asia,id_ID,#N/A,IDN
 6230,Pulau Pangkor Airport,Pangkor Island,Malaysia,PKG,WMPA,4.244719982147217,100.5530014038086,19,8,N,Asia/Kuala_Lumpur,airport,OurAirports,MY,,MYS,Asia,South-eastern Asia,#N/A,#N/A,MYS
-6232,Long Bawan Airport,Long Bawan-Borneo Island,Indonesia,LBW,WRLB,3.9028,115.6921,3165,8,N,Asia/Makassar,airport,OurAirports,ID,,IDN,Asia,South-eastern Asia,id_ID,#N/A,IDN
-6233,Nunukan Airport,Nunukan-Nunukan Island,Indonesia,NNX,WRLF,4.133333333,117.6666667,30,8,N,Asia/Makassar,airport,OurAirports,ID,,IDN,Asia,South-eastern Asia,id_ID,#N/A,IDN
-6234,Long Apung Airport,Long Apung-Borneo Island,Indonesia,LPU,WRLP,1.704486,114.970297,627,8,N,Asia/Makassar,airport,OurAirports,ID,,IDN,Asia,South-eastern Asia,id_ID,#N/A,IDN
+6232,Long Bawan Airport,Long Bawan-Borneo Island,Indonesia,LBW,WRLB,3.9028,115.6921,3165,8,N,Asia/Makassar,airport,OurAirports,ID,,INA,Asia,South-eastern Asia,id_ID,#N/A,IDN
+6233,Nunukan Airport,Nunukan-Nunukan Island,Indonesia,NNX,WRLF,4.133333333,117.6666667,30,8,N,Asia/Makassar,airport,OurAirports,ID,,INA,Asia,South-eastern Asia,id_ID,#N/A,IDN
+6234,Long Apung Airport,Long Apung-Borneo Island,Indonesia,LPU,WRLP,1.704486,114.970297,627,8,N,Asia/Makassar,airport,OurAirports,ID,,INA,Asia,South-eastern Asia,id_ID,#N/A,IDN
 6235,Albany Airport,Albany,Australia,ALH,YABA,-34.94329834,117.80899810791016,233,8,O,Australia/Perth,airport,OurAirports,AU,,AUS,Oceania,Australia and New Zealand,en_AU,#N/A,AUS
 6236,Argyle Airport,Argyle,Australia,GYL,YARG,-16.6369,128.451004,522,8,O,Australia/Perth,airport,OurAirports,AU,,AUS,Oceania,Australia and New Zealand,en_AU,#N/A,AUS
 6237,Aurukun Airport,Aurukun,Australia,AUU,YAUR,-13.354067,141.72065,31,10,O,Australia/Brisbane,airport,OurAirports,AU,,AUS,Oceania,Australia and New Zealand,en_AU,#N/A,AUS
@@ -4645,7 +4645,7 @@ airportID,airportName,City,countryName,IATA,ICAO,Latitude,Longitude,Altitude,Tim
 7523,First Flight Airport,Kill Devil Hills,United States of America,FFA,KFFA,36.01819992,-75.6713028,13,-5,A,America/New_York,airport,OurAirports,US,,USA,Americas,Northern America,en_US,USD,USA
 7527,Lintsang Airfield,Lincang,China,LNJ,ZPLC,23.738100051900002,100.0250015,6230,8,U,Asia/Shanghai,airport,OurAirports,CN,,CHN,Asia,Eastern Asia,#N/A,#N/A,CHN
 7532,Carajás Airport,Parauapebas,Brazil,CKS,SBCJ,-6.115277767,-50.00138855,2064,-3,S,America/Belem,airport,OurAirports,BR,,BRA,Americas,Latin America and the Caribbean,pt_BR,BRL,BRA
-7536,Tarempa Airport,Anambas Islands,Indonesia,MWK,WIOM,3.3481199741363525,106.25800323486328,10,7,N,Asia/Jakarta,airport,OurAirports,ID,,IDN,Asia,South-eastern Asia,id_ID,#N/A,IDN
+7536,Tarempa Airport,Anambas Islands,Indonesia,MWK,WIOM,3.3481199741363525,106.25800323486328,10,7,N,Asia/Jakarta,airport,OurAirports,ID,,INA,Asia,South-eastern Asia,id_ID,#N/A,IDN
 7546,Persian Gulf International Airport,Khalije Fars,Iran,PGU,OIBP,27.379601,52.737701,27,3.5,U,Asia/Tehran,airport,OurAirports,IR,,IRN,Asia,Southern Asia,#N/A,#N/A,IRN
 7547,Yasouj Airport,Yasuj,Iran,YES,OISY,30.70050049,51.54510117,5939,3.5,U,Asia/Tehran,airport,OurAirports,IR,,IRN,Asia,Southern Asia,#N/A,#N/A,IRN
 7548,Mosul International Airport,Mosul,Iraq,OSM,ORBM,36.305801,43.1474,719,3,U,Asia/Baghdad,airport,OurAirports,IQ,,IRQ,Asia,Western Asia,#N/A,#N/A,#N/A
@@ -4930,7 +4930,7 @@ airportID,airportName,City,countryName,IATA,ICAO,Latitude,Longitude,Altitude,Tim
 8380,Mallacoota Airport,Mallacoota,Australia,XMC,YMCO,-37.59830093,149.72000122070312,31,10,U,Australia/Hobart,airport,OurAirports,AU,,AUS,Oceania,Australia and New Zealand,en_AU,#N/A,AUS
 8381,Majeed Bin Abdulaziz Airport,Al-Ula,Saudi Arabia,ULH,OEAO,26.48,38.12888889,2050,3,N,Asia/Riyadh,airport,OurAirports,SA,,SAU,Asia,Western Asia,ar_SA,#N/A,SAU
 8395,Yuendumu Airport,Yuendumu ,Australia,YUE,YYND,-22.25419998,131.78199768066406,2205,9.5,O,Australia/Darwin,airport,OurAirports,AU,,AUS,Oceania,Australia and New Zealand,en_AU,#N/A,AUS
-8401,Lombok International Airport,Praya,Indonesia,LOP,WADL,-8.757322,116.276675,319,8,N,Asia/Makassar,airport,OurAirports,ID,,IDN,Asia,South-eastern Asia,id_ID,#N/A,IDN
+8401,Lombok International Airport,Praya,Indonesia,LOP,WADL,-8.757322,116.276675,319,8,N,Asia/Makassar,airport,OurAirports,ID,,INA,Asia,South-eastern Asia,id_ID,#N/A,IDN
 8404,South Cariboo Region / 108 Mile Airport,108 Mile Ranch,Canada,ZMH,CZML,51.736099243199995,-121.3330002,3126,-8,A,America/Vancouver,airport,OurAirports,CA,,CAN,Americas,Northern America,en_CA,CAD,CAN
 8407,Handan Airport,Handan,China,HDG,ZBHD,36.52583333,114.4255556,229,8,N,Asia/Shanghai,airport,OurAirports,CN,,CHN,Asia,Eastern Asia,#N/A,#N/A,CHN
 8410,London-Corbin Airport/Magee Field,London,United States of America,LOZ,KLOZ,37.0821991,-84.0848999,1212,-5,A,America/New_York,airport,OurAirports,US,,USA,Americas,Northern America,en_US,USD,USA
@@ -5014,7 +5014,7 @@ airportID,airportName,City,countryName,IATA,ICAO,Latitude,Longitude,Altitude,Tim
 8744,Stevens Point Municipal Airport,Stevens Point,United States of America,STE,KSTE,44.54520035,-89.53029633,1110,-6,A,America/Chicago,airport,OurAirports,US,,USA,Americas,Northern America,en_US,USD,USA
 8746,Moma Airport,Honuu,Russia,MQJ,UEMA,66.450861,143.261551,656,11,N,Asia/Srednekolymsk,airport,OurAirports,RU,,RUS,Europe,Eastern Europe,ru_RU,RUB,RUS
 8750,Peenemünde Airport,Peenemunde,Germany,PEF,EDCP,54.15777969,13.774443626399998,7,1,E,Europe/Berlin,airport,OurAirports,DE,,DEU,Europe,Western Europe,de_DE,EUR,DEU
-8752,Nusawiru Airport,Nusawiru,Indonesia,CJN,WI1A,-7.719895,108.488995,16,7,N,Asia/Jakarta,airport,OurAirports,ID,,IDN,Asia,South-eastern Asia,id_ID,#N/A,IDN
+8752,Nusawiru Airport,Nusawiru,Indonesia,CJN,WI1A,-7.719895,108.488995,16,7,N,Asia/Jakarta,airport,OurAirports,ID,,INA,Asia,South-eastern Asia,id_ID,#N/A,IDN
 8759,Galion Municipal Airport,Galion,United States of America,GQQ,KGQQ,40.7533989,-82.72380066,1224,-5,A,America/New_York,airport,OurAirports,US,,USA,Americas,Northern America,en_US,USD,USA
 8761,Tiputini Airport,Tiputini,Ecuador,TPN,SETI,-0.776111007,-75.52639771,997,-5,S,America/Guayaquil,airport,OurAirports,EC,,ECU,Americas,Latin America and the Caribbean,#N/A,#N/A,ECU
 8762,Rio Amazonas Airport,Pastaza,Ecuador,PTZ,SESM,-1.505239964,-78.06269836,3465,-5,S,America/Guayaquil,airport,OurAirports,EC,,ECU,Americas,Latin America and the Caribbean,#N/A,#N/A,ECU
@@ -5119,7 +5119,7 @@ airportID,airportName,City,countryName,IATA,ICAO,Latitude,Longitude,Altitude,Tim
 9095,Inverell Airport,Inverell,Australia,IVR,YIVL,-29.88829994,151.1439972,2667,10,O,Australia/Sydney,airport,OurAirports,AU,,AUS,Oceania,Australia and New Zealand,en_AU,#N/A,AUS
 9096,Glen Innes Airport,Glen Innes,Australia,GLI,YGLI,-29.67499924,151.68899536132812,3433,10,O,Australia/Sydney,airport,OurAirports,AU,,AUS,Oceania,Australia and New Zealand,en_AU,#N/A,AUS
 9102,Immokalee Regional Airport,Immokalee ,United States of America,IMM,KIMM,26.43320084,-81.40100098,37,-5,A,America/New_York,airport,OurAirports,US,,USA,Americas,Northern America,en_US,USD,USA
-9103,Maranggo Airport,Sulawesi Tenggara,Indonesia,TQQ,WA44,-5.764570236,123.9169998,169,8,N,Asia/Makassar,airport,OurAirports,ID,,IDN,Asia,South-eastern Asia,id_ID,#N/A,IDN
+9103,Maranggo Airport,Sulawesi Tenggara,Indonesia,TQQ,WA44,-5.764570236,123.9169998,169,8,N,Asia/Makassar,airport,OurAirports,ID,,INA,Asia,South-eastern Asia,id_ID,#N/A,IDN
 9107,Yichun Mingyueshan Airport,Yichun,China,YIC,ZSYC,27.8025,114.3062,430,8,U,Asia/Shanghai,airport,OurAirports,CN,,CHN,Asia,Eastern Asia,#N/A,#N/A,CHN
 9120,Dinwiddie County Airport,Petersburg,United States of America,PTB,KPTB,37.18379974,-77.50740051,193,-5,A,America/New_York,airport,OurAirports,US,,USA,Americas,Northern America,en_US,USD,USA
 9126,Sheboygan County Memorial Airport,Sheboygan,United States of America,SBM,KSBM,43.76959991,-87.85140228,755,-6,A,America/Chicago,airport,OurAirports,US,,USA,Americas,Northern America,en_US,USD,USA
@@ -5175,7 +5175,7 @@ airportID,airportName,City,countryName,IATA,ICAO,Latitude,Longitude,Altitude,Tim
 9393,Santa Cruz del Quiche Airport,Santa Cruz des Quiche,Guatemala,AQB,MGQC,15.012200355529785,-91.15059662,6631,-6,S,America/Guatemala,airport,OurAirports,GT,,GTM,Americas,Latin America and the Caribbean,#N/A,#N/A,GTM
 9394,Norðfjörður Airport,Nordfjordur,Iceland,NOR,BINF,65.13189697265625,-13.74639988,13,0,E,Atlantic/Reykjavik,airport,OurAirports,IS,,ISL,Europe,Northern Europe,sv_SE,ISK,ISL
 9395,Bursa Airport,Bursa,Turkey,BTZ,LTBE,40.233299255371094,29.009199142456055,331,3,U,Europe/Istanbul,airport,OurAirports,TR,,TUR,Asia,Western Asia,tr_TR,TRY,TUR
-9397,Waris Airport,Waris-Papua Island,Indonesia,WAR,WAJR,-3.235,140.994,1500,9,U,Asia/Jayapura,airport,OurAirports,ID,,IDN,Asia,South-eastern Asia,id_ID,#N/A,IDN
+9397,Waris Airport,Waris-Papua Island,Indonesia,WAR,WAJR,-3.235,140.994,1500,9,U,Asia/Jayapura,airport,OurAirports,ID,,INA,Asia,South-eastern Asia,id_ID,#N/A,IDN
 9399,Newton City-County Airport,Newton,United States of America,EWK,KEWK,38.058200836199994,-97.27449799,1533,-6,A,America/Chicago,airport,OurAirports,US,,USA,Americas,Northern America,en_US,USD,USA
 9402,Bairnsdale Airport,Bairnsdale,Australia,BSJ,YBNS,-37.88750076,147.5679931640625,165,10,O,Australia/Hobart,airport,OurAirports,AU,,AUS,Oceania,Australia and New Zealand,en_AU,#N/A,AUS
 9403,Taszár Air Base,Columbus,United States of America,TZR,LHTA,46.39310073852539,17.917499542236328,531,1,A,Europe/Budapest,airport,OurAirports,US,,USA,Americas,Northern America,en_US,USD,USA
@@ -5238,24 +5238,24 @@ airportID,airportName,City,countryName,IATA,ICAO,Latitude,Longitude,Altitude,Tim
 9853,Toowoomba Wellcamp Airport,Toowoomba,Australia,WTB,YBWW,-27.558332,151.793335,1509,10,N,Australia/Brisbane,airport,OurAirports,AU,,AUS,Oceania,Australia and New Zealand,en_AU,#N/A,AUS
 9854,Tonghua Sanyuanpu Airport,Tonghua,China,TNH,ZYTN,42.25388889,125.7033333,1200,8,N,Asia/Shanghai,airport,OurAirports,CN,,CHN,Asia,Eastern Asia,#N/A,#N/A,CHN
 9857,Suzhou Guangfu Airport,Suzhou,China,SZV,ZSSZ,31.2631,120.401001,0,8,N,Asia/Shanghai,airport,OurAirports,CN,,CHN,Asia,Eastern Asia,#N/A,#N/A,CHN
-9868,Mulia Airport,Mulia,Indonesia,LII,WAJM,-3.7018,137.957,6527,9,N,Asia/Jayapura,airport,OurAirports,ID,,IDN,Asia,South-eastern Asia,id_ID,#N/A,IDN
-9872,Stenkol Airport,Bintuni,Indonesia,NTI,WASB,-2.1033,133.5164,57,9,N,Asia/Jayapura,airport,OurAirports,ID,,IDN,Asia,South-eastern Asia,id_ID,#N/A,IDN
-9873,Wasior Airport,Wasior,Indonesia,WSR,WASW,-2.721,134.5061,49,9,N,Asia/Jayapura,airport,OurAirports,ID,,IDN,Asia,South-eastern Asia,id_ID,#N/A,IDN
-9874,Silangit Airport,Siborong-Borong,Indonesia,DTB,WIMN,2.25973,98.991898,4700,7,N,Asia/Jakarta,airport,OurAirports,ID,,IDN,Asia,South-eastern Asia,id_ID,#N/A,IDN
-9886,Seunagan Airport,Nagan Raya,Indonesia,MEQ,WITC,4.25,96.21700286865234,10,7,N,\N,airport,OurAirports,ID,,IDN,Asia,South-eastern Asia,id_ID,#N/A,IDN
-9887,Betoambari Airport,Bau-Bau,Indonesia,BUW,WAWB,-5.486879826,122.56900024414062,164,8,N,\N,airport,OurAirports,ID,,IDN,Asia,South-eastern Asia,id_ID,#N/A,IDN
-9888,Kao Airport,Kao,Indonesia,KAZ,WAMK,1.1852799654006958,127.89600372314453,27,9,N,\N,airport,OurAirports,ID,,IDN,Asia,South-eastern Asia,id_ID,#N/A,IDN
-9889,Melangguane Airport,Melonguane,Indonesia,MNA,WAMN,4.00694,126.672997,3,8,N,\N,airport,OurAirports,ID,,IDN,Asia,South-eastern Asia,id_ID,#N/A,IDN
-9890,Sanggata/Sangkimah Airport,Sanggata,Indonesia,SGQ,WRLA,0.3847,117.543,60,8,N,\N,airport,OurAirports,ID,,IDN,Asia,South-eastern Asia,id_ID,#N/A,IDN
-9891,Muara Bungo Airport,Muara Bungo,Indonesia,BUU,WIPI,-1.1278,102.135,214,7,N,\N,airport,OurAirports,ID,,IDN,Asia,South-eastern Asia,id_ID,#N/A,IDN
-9897,Illaga Airport,Illaga,Indonesia,ILA,WABL,-3.97648,137.6225,7989,9,N,\N,airport,OurAirports,ID,,IDN,Asia,South-eastern Asia,id_ID,#N/A,IDN
-9898,Oksibil Airport,Oksibil,Indonesia,OKL,WAJO,-4.9071,140.6277,4315,9,N,\N,airport,OurAirports,ID,,IDN,Asia,South-eastern Asia,id_ID,#N/A,IDN
-9899,Kokonau Airport,Kokonau,Indonesia,KOX,WABN,-4.71075,136.43515,59,9,N,\N,airport,OurAirports,ID,,IDN,Asia,South-eastern Asia,id_ID,#N/A,IDN
+9868,Mulia Airport,Mulia,Indonesia,LII,WAJM,-3.7018,137.957,6527,9,N,Asia/Jayapura,airport,OurAirports,ID,,INA,Asia,South-eastern Asia,id_ID,#N/A,IDN
+9872,Stenkol Airport,Bintuni,Indonesia,NTI,WASB,-2.1033,133.5164,57,9,N,Asia/Jayapura,airport,OurAirports,ID,,INA,Asia,South-eastern Asia,id_ID,#N/A,IDN
+9873,Wasior Airport,Wasior,Indonesia,WSR,WASW,-2.721,134.5061,49,9,N,Asia/Jayapura,airport,OurAirports,ID,,INA,Asia,South-eastern Asia,id_ID,#N/A,IDN
+9874,Silangit Airport,Siborong-Borong,Indonesia,DTB,WIMN,2.25973,98.991898,4700,7,N,Asia/Jakarta,airport,OurAirports,ID,,INA,Asia,South-eastern Asia,id_ID,#N/A,IDN
+9886,Seunagan Airport,Nagan Raya,Indonesia,MEQ,WITC,4.25,96.21700286865234,10,7,N,\N,airport,OurAirports,ID,,INA,Asia,South-eastern Asia,id_ID,#N/A,IDN
+9887,Betoambari Airport,Bau-Bau,Indonesia,BUW,WAWB,-5.486879826,122.56900024414062,164,8,N,\N,airport,OurAirports,ID,,INA,Asia,South-eastern Asia,id_ID,#N/A,IDN
+9888,Kao Airport,Kao,Indonesia,KAZ,WAMK,1.1852799654006958,127.89600372314453,27,9,N,\N,airport,OurAirports,ID,,INA,Asia,South-eastern Asia,id_ID,#N/A,IDN
+9889,Melangguane Airport,Melonguane,Indonesia,MNA,WAMN,4.00694,126.672997,3,8,N,\N,airport,OurAirports,ID,,INA,Asia,South-eastern Asia,id_ID,#N/A,IDN
+9890,Sanggata/Sangkimah Airport,Sanggata,Indonesia,SGQ,WRLA,0.3847,117.543,60,8,N,\N,airport,OurAirports,ID,,INA,Asia,South-eastern Asia,id_ID,#N/A,IDN
+9891,Muara Bungo Airport,Muara Bungo,Indonesia,BUU,WIPI,-1.1278,102.135,214,7,N,\N,airport,OurAirports,ID,,INA,Asia,South-eastern Asia,id_ID,#N/A,IDN
+9897,Illaga Airport,Illaga,Indonesia,ILA,WABL,-3.97648,137.6225,7989,9,N,\N,airport,OurAirports,ID,,INA,Asia,South-eastern Asia,id_ID,#N/A,IDN
+9898,Oksibil Airport,Oksibil,Indonesia,OKL,WAJO,-4.9071,140.6277,4315,9,N,\N,airport,OurAirports,ID,,INA,Asia,South-eastern Asia,id_ID,#N/A,IDN
+9899,Kokonau Airport,Kokonau,Indonesia,KOX,WABN,-4.71075,136.43515,59,9,N,\N,airport,OurAirports,ID,,INA,Asia,South-eastern Asia,id_ID,#N/A,IDN
 9901,Clermont Airport,Clermont,Australia,CMQ,YCMT,-22.7730999,147.62100219726562,908,10,N,\N,airport,OurAirports,AU,,AUS,Oceania,Australia and New Zealand,en_AU,#N/A,AUS
 9902,Warrnambool Airport,Warrnambool,Australia,WMB,YWBL,-38.29529953,142.44700622558594,242,10,O,\N,airport,OurAirports,AU,,AUS,Oceania,Australia and New Zealand,en_AU,#N/A,AUS
 9904,Richmond Airport,Richmond,Australia,RCM,YRMD,-20.70190048,143.11500549316406,676,10,N,\N,airport,OurAirports,AU,,AUS,Oceania,Australia and New Zealand,en_AU,#N/A,AUS
 9905,RAAF Base Curtin,Derby,Australia,DCN,YCIN,-17.58139992,123.8280029,300,8,N,\N,airport,OurAirports,AU,,AUS,Oceania,Australia and New Zealand,en_AU,#N/A,AUS
-9935,Kualanamu International Airport,Medan,Indonesia,KNO,WIMM,3.642222,98.885278,23,7,N,Asia/Jakarta,airport,OurAirports,ID,,IDN,Asia,South-eastern Asia,id_ID,#N/A,IDN
+9935,Kualanamu International Airport,Medan,Indonesia,KNO,WIMM,3.642222,98.885278,23,7,N,Asia/Jakarta,airport,OurAirports,ID,,INA,Asia,South-eastern Asia,id_ID,#N/A,IDN
 9937,Gratiot Community Airport,Kamloops,Canada,AMN,KAMN,43.32210159,-84.68800354,754,-7,A,\N,airport,OurAirports,CA,,CAN,Americas,Northern America,en_CA,CAD,CAN
 9939,Seosan Air Base,Seosan,South Korea,HMY,RKTP,36.703999,126.486,39,9,N,\N,airport,OurAirports,KR,,KOR,Asia,Eastern Asia,ko_KR,KRW,KOR
 10017,San Gabriel Valley Airport,El Monte,United States of America,EMT,KEMT,34.086102,-118.035004,296,-8,E,\N,airport,OurAirports,US,,USA,Americas,Northern America,en_US,USD,USA
@@ -5283,7 +5283,7 @@ airportID,airportName,City,countryName,IATA,ICAO,Latitude,Longitude,Altitude,Tim
 10155,Brigadeiro Cabral Airport,Divinopolis,Brazil,DIQ,SNDV,-20.1807003,-44.8708992,2608,-3,S,\N,airport,OurAirports,BR,,BRA,Americas,Latin America and the Caribbean,pt_BR,BRL,BRA
 10156,Yeysk Airport,Eysk,Russia,EIK,URKE,46.68,38.21,60,3,N,Europe/Moscow,airport,OurAirports,RU,,RUS,Europe,Eastern Europe,ru_RU,RUB,RUS
 10157,Berdyansk Airport,Berdyansk,Ukraine,ERD,UKDB,46.814998626708984,36.75809860229492,171,2,E,\N,airport,OurAirports,UA,,UKR,Europe,Eastern Europe,uk_UA,UAH,UKR
-10158,Blimbingsari Airport,Banyuwangi,Indonesia,BWX,WARB,-8.31015,114.3401,112,7,N,\N,airport,OurAirports,ID,,IDN,Asia,South-eastern Asia,id_ID,#N/A,IDN
+10158,Blimbingsari Airport,Banyuwangi,Indonesia,BWX,WARB,-8.31015,114.3401,112,7,N,\N,airport,OurAirports,ID,,INA,Asia,South-eastern Asia,id_ID,#N/A,IDN
 10160,Erenhot Saiwusu International Airport,Erenhot,China,ERL,ZBER,43.4225,112.096667,3301,8,N,\N,airport,OurAirports,CN,,CHN,Asia,Eastern Asia,#N/A,#N/A,CHN
 10162,Chino Airport,Chino,United States of America,CNO,KCNO,33.97470093,-117.637001,650,-8,A,\N,airport,OurAirports,US,,USA,Americas,Northern America,en_US,USD,USA
 10166,Hateruma Airport,Taketomi,Japan,HTR,RORH,24.05890083,123.8059998,43,9,N,\N,airport,OurAirports,JP,,JPN,Asia,Eastern Asia,ja_JP,JPY,JPN
@@ -5364,13 +5364,13 @@ airportID,airportName,City,countryName,IATA,ICAO,Latitude,Longitude,Altitude,Tim
 11243,Montauk Airport,Montauk,United States of America,MTP,KMTP,41.0765,-71.920797,6,-4,A,\N,airport,OurAirports,US,,USA,Americas,Northern America,en_US,USD,USA
 11255,Porter County Municipal Airport,Valparaiso IN,United States of America,VPZ,KVPZ,41.45399857,-87.00710297,770,-5,A,\N,airport,OurAirports,US,,USA,Americas,Northern America,en_US,USD,USA
 11257,Dharavandhoo Airport,DHARAVANDHOO,Maldives,DRV,VRMD,5.1561,73.1302,6,5,N,\N,airport,OurAirports,MV,,MDV,Asia,Southern Asia,#N/A,#N/A,#N/A
-11258,Saumlaki/Olilit Airport,Saumlaki,Indonesia,SXK,WAPI,-7.988609791,131.3059998,218,9,N,\N,airport,OurAirports,ID,,IDN,Asia,South-eastern Asia,id_ID,#N/A,IDN
+11258,Saumlaki/Olilit Airport,Saumlaki,Indonesia,SXK,WAPI,-7.988609791,131.3059998,218,9,N,\N,airport,OurAirports,ID,,INA,Asia,South-eastern Asia,id_ID,#N/A,IDN
 11268,Cerro Largo International Airport,Melo,Uruguay,MLZ,SUMO,-32.33789825,-54.21670151,364,-3,S,\N,airport,OurAirports,UY,,URY,Americas,Latin America and the Caribbean,#N/A,#N/A,URY
 11269,Tydeo Larre Borges Airport,Paysandu,Uruguay,PDU,SUPU,-32.36330032,-58.06190109,138,-3,S,\N,airport,OurAirports,UY,,URY,Americas,Latin America and the Caribbean,#N/A,#N/A,URY
 11270,Artigas International Airport,Artigas ,Uruguay,ATI,SUAG,-30.40069962,-56.50790024,410,-3,S,\N,airport,OurAirports,UY,,URY,Americas,Latin America and the Caribbean,#N/A,#N/A,URY
 11273,Horsham Airport,Horsham,Australia,HSM,YHSM,-36.66970062,142.17300415039062,445,10,O,\N,airport,OurAirports,AU,,AUS,Oceania,Australia and New Zealand,en_AU,#N/A,AUS
 11274,Swan Hill Airport,Swan Hill,Australia,SWH,YSWH,-35.37580109,143.5330047607422,234,10,O,\N,airport,OurAirports,AU,,AUS,Oceania,Australia and New Zealand,en_AU,#N/A,AUS
-11288,Dewadaru - Kemujan Island,Karimunjawa,Indonesia,KWB,WARU,-5.80091,110.47838,35,7,U,\N,airport,OurAirports,ID,,IDN,Asia,South-eastern Asia,id_ID,#N/A,IDN
+11288,Dewadaru - Kemujan Island,Karimunjawa,Indonesia,KWB,WARU,-5.80091,110.47838,35,7,U,\N,airport,OurAirports,ID,,INA,Asia,South-eastern Asia,id_ID,#N/A,IDN
 11290,Kongolo Airport,Kongolo,Democratic Republic of Congo,KOO,FZRQ,-5.39444,26.99,1850,1,U,\N,airport,OurAirports,CD,,COD,Africa,Sub-Saharan Africa,#N/A,#N/A,#N/A
 11295,São Miguel do Oeste Airport,Sao Miguel do Oeste,Brazil,SQX,SSOE,-26.78160095,-53.50350189,2180,-3,S,\N,airport,OurAirports,BR,,BRA,Americas,Latin America and the Caribbean,pt_BR,BRL,BRA
 11299,Mason County Airport,Ludington,United States of America,LDM,KLDM,43.96250153,-86.40789795,646,-5,A,\N,airport,OurAirports,US,,USA,Americas,Northern America,en_US,USD,USA
@@ -5383,7 +5383,7 @@ airportID,airportName,City,countryName,IATA,ICAO,Latitude,Longitude,Altitude,Tim
 11356,Ordu Giresun Airport,Ordu-Giresun,Turkey,OGU,LTCB,40.966047,38.080994,11,2,E,\N,airport,OurAirports,TR,,TUR,Asia,Western Asia,tr_TR,TRY,TUR
 11357,Hakkari Yüksekova Airport,Hakkari,Turkey,YKO,LTCW,37.5497,44.2381,6400,2,E,\N,airport,OurAirports,TR,,TUR,Asia,Western Asia,tr_TR,TRY,TUR
 11389,Bathpalathang Airport,Jakar,Bhutan,BUT,VQBT,27.5622,90.7471,8485,6,N,\N,airport,OurAirports,BT,,BTN,Asia,Southern Asia,#N/A,#N/A,#N/A
-11401,Sultan Bantilan Airport,Toli-Toli,Indonesia,TLI,WAMI,1.123428,120.793658,40,8,U,\N,airport,OurAirports,ID,,IDN,Asia,South-eastern Asia,id_ID,#N/A,IDN
+11401,Sultan Bantilan Airport,Toli-Toli,Indonesia,TLI,WAMI,1.123428,120.793658,40,8,U,\N,airport,OurAirports,ID,,INA,Asia,South-eastern Asia,id_ID,#N/A,IDN
 11436,Tarko-Sale Airport,Tarko-Sale,Russia,TQL,USDS,64.93080139,77.81809997559999,82,5,U,\N,airport,OurAirports,RU,,RUS,Europe,Eastern Europe,ru_RU,RUB,RUS
 11473,Jinchuan Airport,Jinchuan,China,JIC,ZLJC,38.542222222199996,102.3483333,4740,8,U,\N,airport,OurAirports,CN,,CHN,Asia,Eastern Asia,#N/A,#N/A,CHN
 11498,Alashankou Bole (Bortala) airport,Bole,China,BPL,ZWAX,44.895,82.3,1253,8,N,\N,airport,OurAirports,CN,,CHN,Asia,Eastern Asia,#N/A,#N/A,CHN
@@ -5639,7 +5639,7 @@ airportID,airportName,City,countryName,IATA,ICAO,Latitude,Longitude,Altitude,Tim
 13229,Shaoyang Wugang Airport,Shaoyang,China,WGN,ZGSY,26.802,110.642,1444,8,N,\N,airport,OurAirports,CN,,CHN,Asia,Eastern Asia,#N/A,#N/A,CHN
 13230,9 de Maio - Teixeira de Freitas Airport,Teixeira de Freitas,Brazil,TXF,SNTF,-17.52449989,-39.66849899,344,-3,S,\N,airport,OurAirports,BR,,BRA,Americas,Latin America and the Caribbean,pt_BR,BRL,BRA
 13233,Spartanburg Downtown Memorial Airport,Spartangurg,United States of America,SPA,KSPA,34.91569901,-81.95649719,801,-5,A,\N,airport,OurAirports,US,,USA,Americas,Northern America,en_US,USD,USA
-13243,Bajawa Soa Airport,Bajawa,Indonesia,BJW,WATB,-8.70743498,121.0574269,4326,8,U,\N,airport,OurAirports,ID,,IDN,Asia,South-eastern Asia,id_ID,#N/A,IDN
+13243,Bajawa Soa Airport,Bajawa,Indonesia,BJW,WATB,-8.70743498,121.0574269,4326,8,U,\N,airport,OurAirports,ID,,INA,Asia,South-eastern Asia,id_ID,#N/A,IDN
 13260,Oyo Ollombo Airport,Oyo,Congo,OLL,FCOD,-1.226666,15.91,1073,1,N,\N,airport,OurAirports,CG,,COG,Africa,Sub-Saharan Africa,#N/A,#N/A,#N/A
 13265,Tri-City Airport,Parsons,United States of America,PPF,KPPF,37.32989883,-95.5062027,900,-6,A,\N,airport,OurAirports,US,,USA,Americas,Northern America,en_US,USD,USA
 13267,Waycross Ware County Airport,Waycross,United States of America,AYS,KAYS,31.24909973,-82.39550018,142,-5,A,\N,airport,OurAirports,US,,USA,Americas,Northern America,en_US,USD,USA
@@ -5700,19 +5700,19 @@ airportID,airportName,City,countryName,IATA,ICAO,Latitude,Longitude,Altitude,Tim
 13511,Vijayanagar Aerodrome (JSW),Toranagallu,India,VDY,VOJV,15.17496667,76.63494722,1670,5.5,N,\N,airport,OurAirports,IN,,IND,Asia,Southern Asia,en_IN,INR,IND
 13513,Shirdi Airport,Shirdi,India,SAG,VASD,19.688611,74.378889,1926,5.5,N,\N,airport,OurAirports,IN,,IND,Asia,Southern Asia,en_IN,INR,IND
 13514,Jeypore Airport,Jeypore,India,PYB,VEJP,18.87999916,82.55200195,1952,5.5,N,\N,airport,OurAirports,IN,,IND,Asia,Southern Asia,en_IN,INR,IND
-13520,Trunojoyo Airport,Sumenep,Indonesia,SUP,WART,-7.0242,113.89023,10,7,N,\N,airport,OurAirports,ID,,IDN,Asia,South-eastern Asia,id_ID,#N/A,IDN
-13525,Rokot Airport,Sipora,Indonesia,RKO,WIBR,-2.099119902,99.70069885253906,1,7,N,\N,airport,OurAirports,ID,,IDN,Asia,South-eastern Asia,id_ID,#N/A,IDN
-13529,Pasir Pangaraan Airport,Pasir Pangaraian,Indonesia,PPR,WIDE,0.8454310297966003,100.37000274658203,151,7,N,\N,airport,OurAirports,ID,,IDN,Asia,South-eastern Asia,id_ID,#N/A,IDN
-13530,Sei Bati Airport,Tanjung Balai Karimun,Indonesia,TJB,WIBT,1.0527,103.3931,33,7,N,\N,airport,OurAirports,ID,,IDN,Asia,South-eastern Asia,id_ID,#N/A,IDN
-13532,Departi Parbo Airport,Kerinci Regency,Indonesia,KRC,WIPH,-2.093,101.4683,2600,7,N,\N,airport,OurAirports,ID,,IDN,Asia,South-eastern Asia,id_ID,#N/A,IDN
-13535,Namrole Airport,Buru Island,Indonesia,NRE,WAPG,-3.8548,126.7012,31,9,N,\N,airport,OurAirports,ID,,IDN,Asia,South-eastern Asia,id_ID,#N/A,IDN
-13538,Namlea Airport,Namlea,Indonesia,NAM,WAPR,-3.235569954,127.0999984741211,41,9,N,\N,airport,OurAirports,ID,,IDN,Asia,South-eastern Asia,id_ID,#N/A,IDN
-13540,Rar Gwamar Airport,Dobo,Indonesia,DOB,WAPD,-5.772220135,134.2120056,61,9,N,\N,airport,OurAirports,ID,,IDN,Asia,South-eastern Asia,id_ID,#N/A,IDN
-13543,Emalamo Sanana Airport,Sanana,Indonesia,SQN,WAPN,-2.080509901,125.96700286865234,39,9,N,\N,airport,OurAirports,ID,,IDN,Asia,South-eastern Asia,id_ID,#N/A,IDN
-13544,Ayawasi Airport,Ayawasi,Indonesia,AYW,WASA,-1.1593,132.4633,1560,9,N,\N,airport,OurAirports,ID,,IDN,Asia,South-eastern Asia,id_ID,#N/A,IDN
-13545,Bunyu Airport,Bunyu,Indonesia,BYQ,WALV,3.455719948,117.8669968,118,8,N,\N,airport,OurAirports,ID,,IDN,Asia,South-eastern Asia,id_ID,#N/A,IDN
-13546,Buol Airport,Buol,Indonesia,UOL,WAMY,1.1027,121.4141,27,8,N,\N,airport,OurAirports,ID,,IDN,Asia,South-eastern Asia,id_ID,#N/A,IDN
-13548,Sugimanuru Airport,Raha,Indonesia,RAQ,WAWR,-4.760557,122.569371,132,8,N,\N,airport,OurAirports,ID,,IDN,Asia,South-eastern Asia,id_ID,#N/A,IDN
+13520,Trunojoyo Airport,Sumenep,Indonesia,SUP,WART,-7.0242,113.89023,10,7,N,\N,airport,OurAirports,ID,,INA,Asia,South-eastern Asia,id_ID,#N/A,IDN
+13525,Rokot Airport,Sipora,Indonesia,RKO,WIBR,-2.099119902,99.70069885253906,1,7,N,\N,airport,OurAirports,ID,,INA,Asia,South-eastern Asia,id_ID,#N/A,IDN
+13529,Pasir Pangaraan Airport,Pasir Pangaraian,Indonesia,PPR,WIDE,0.8454310297966003,100.37000274658203,151,7,N,\N,airport,OurAirports,ID,,INA,Asia,South-eastern Asia,id_ID,#N/A,IDN
+13530,Sei Bati Airport,Tanjung Balai Karimun,Indonesia,TJB,WIBT,1.0527,103.3931,33,7,N,\N,airport,OurAirports,ID,,INA,Asia,South-eastern Asia,id_ID,#N/A,IDN
+13532,Departi Parbo Airport,Kerinci Regency,Indonesia,KRC,WIPH,-2.093,101.4683,2600,7,N,\N,airport,OurAirports,ID,,INA,Asia,South-eastern Asia,id_ID,#N/A,IDN
+13535,Namrole Airport,Buru Island,Indonesia,NRE,WAPG,-3.8548,126.7012,31,9,N,\N,airport,OurAirports,ID,,INA,Asia,South-eastern Asia,id_ID,#N/A,IDN
+13538,Namlea Airport,Namlea,Indonesia,NAM,WAPR,-3.235569954,127.0999984741211,41,9,N,\N,airport,OurAirports,ID,,INA,Asia,South-eastern Asia,id_ID,#N/A,IDN
+13540,Rar Gwamar Airport,Dobo,Indonesia,DOB,WAPD,-5.772220135,134.2120056,61,9,N,\N,airport,OurAirports,ID,,INA,Asia,South-eastern Asia,id_ID,#N/A,IDN
+13543,Emalamo Sanana Airport,Sanana,Indonesia,SQN,WAPN,-2.080509901,125.96700286865234,39,9,N,\N,airport,OurAirports,ID,,INA,Asia,South-eastern Asia,id_ID,#N/A,IDN
+13544,Ayawasi Airport,Ayawasi,Indonesia,AYW,WASA,-1.1593,132.4633,1560,9,N,\N,airport,OurAirports,ID,,INA,Asia,South-eastern Asia,id_ID,#N/A,IDN
+13545,Bunyu Airport,Bunyu,Indonesia,BYQ,WALV,3.455719948,117.8669968,118,8,N,\N,airport,OurAirports,ID,,INA,Asia,South-eastern Asia,id_ID,#N/A,IDN
+13546,Buol Airport,Buol,Indonesia,UOL,WAMY,1.1027,121.4141,27,8,N,\N,airport,OurAirports,ID,,INA,Asia,South-eastern Asia,id_ID,#N/A,IDN
+13548,Sugimanuru Airport,Raha,Indonesia,RAQ,WAWR,-4.760557,122.569371,132,8,N,\N,airport,OurAirports,ID,,INA,Asia,South-eastern Asia,id_ID,#N/A,IDN
 13550,Jask Airport,Jask,Iran,JSK,OIZJ,25.653601,57.799301,19,3.5,E,\N,airport,OurAirports,IR,,IRN,Asia,Southern Asia,#N/A,#N/A,IRN
 13572,Baglung Airport,Baglung,Nepal,BGL,VNBL,28.212799072265625,83.66629791259766,3320,5.75,N,\N,airport,OurAirports,NP,,NPL,Asia,Southern Asia,#N/A,#N/A,NPL
 13573,Rajbiraj Airport,Rajbiraj,Nepal,RJB,VNRB,26.510066,86.733902,250,5.45,N,\N,airport,OurAirports,NP,,NPL,Asia,Southern Asia,#N/A,#N/A,NPL
@@ -5720,7 +5720,7 @@ airportID,airportName,City,countryName,IATA,ICAO,Latitude,Longitude,Altitude,Tim
 13598,Croker Island Airport,Croker Island,Australia,CKI,YCKI,-11.16499996,132.48300170898438,16,9.5,N,\N,airport,OurAirports,AU,,AUS,Oceania,Australia and New Zealand,en_AU,#N/A,AUS
 13600,Barimunya Airport,Barimunya,Australia,BYP,YBRY,-22.6739006,119.1660004,2082,8,N,\N,airport,OurAirports,AU,,AUS,Oceania,Australia and New Zealand,en_AU,#N/A,AUS
 13609,Waiheke Reeve Airport,Waiheke Island,New Zealand,WIK,NZKE,-36.80889893,175.08599853515625,226,12,Z,\N,airport,OurAirports,NZ,,NZL,Oceania,Australia and New Zealand,#N/A,#N/A,NZL
-13622,Nop Goliat Airport,Dekai,Indonesia,DEX,WAVD,-4.8557,139.482006,198,9,N,\N,airport,OurAirports,ID,,IDN,Asia,South-eastern Asia,id_ID,#N/A,IDN
+13622,Nop Goliat Airport,Dekai,Indonesia,DEX,WAVD,-4.8557,139.482006,198,9,N,\N,airport,OurAirports,ID,,INA,Asia,South-eastern Asia,id_ID,#N/A,IDN
 13623,Napuka Island Airport,Napuka,French Polynesia,NAU,NTGN,-14.17679977,-141.2669983,7,-10,N,\N,airport,OurAirports,PF,,PYF,Oceania,Polynesia,#N/A,#N/A,PYF
 13624,Faaite Airport,Faaite,French Polynesia,FAC,NTKF,-16.68670082,-145.3289948,7,-10,N,\N,airport,OurAirports,PF,,PYF,Oceania,Polynesia,#N/A,#N/A,PYF
 13625,Nukutavake Airport,Nukutavake,French Polynesia,NUK,NTGW,-19.28499985,-138.7720032,17,-10,N,\N,airport,OurAirports,PF,,PYF,Oceania,Polynesia,#N/A,#N/A,PYF
@@ -5729,7 +5729,7 @@ airportID,airportName,City,countryName,IATA,ICAO,Latitude,Longitude,Altitude,Tim
 13628,Raroia Airport,Raroia,French Polynesia,RRR,NTKO,-16.045,-142.476944,18,-10,N,\N,airport,OurAirports,PF,,PYF,Oceania,Polynesia,#N/A,#N/A,PYF
 13629,Kauehi Airport,Kauehi,French Polynesia,KHZ,NTKA,-15.78079987,-145.1239929,13,-10,N,\N,airport,OurAirports,PF,,PYF,Oceania,Polynesia,#N/A,#N/A,PYF
 13630,Tatakoto Airport,Tatakoto,French Polynesia,TKV,NTGO,-17.3553009,-138.4450073,12,-10,N,\N,airport,OurAirports,PF,,PYF,Oceania,Polynesia,#N/A,#N/A,PYF
-13632,Tanah Merah Airport,Boven Digoel,Indonesia,TMH,WAKT,-6.099219799,140.29800415039062,57,9,N,\N,airport,OurAirports,ID,,IDN,Asia,South-eastern Asia,id_ID,#N/A,IDN
+13632,Tanah Merah Airport,Boven Digoel,Indonesia,TMH,WAKT,-6.099219799,140.29800415039062,57,9,N,\N,airport,OurAirports,ID,,INA,Asia,South-eastern Asia,id_ID,#N/A,IDN
 13671,Noonkanbah Airport,Noonkanbah,Australia,NKB,YNKA,-18.49469948,124.8519974,0,8,N,\N,airport,OurAirports,AU,,AUS,Oceania,Australia and New Zealand,en_AU,#N/A,AUS
 13677,Algeciras Heliport,Algeciras,Spain,AEI,LEAG,36.12888,-5.441118,98,-2,E,\N,airport,OurAirports,ES,,ESP,Europe,Southern Europe,es_ES,EUR,ESP
 13687,Kasese Airport,Kasese,Uganda,KSE,HUKS,0.18299999833106995,30.100000381469727,3146,3,N,\N,airport,OurAirports,UG,,UGA,Africa,Sub-Saharan Africa,#N/A,#N/A,#N/A
@@ -5755,7 +5755,7 @@ airportID,airportName,City,countryName,IATA,ICAO,Latitude,Longitude,Altitude,Tim
 14092,Xingcheng Air Base,,China,XEN,ZYXC,40.580299377399996,120.697998,30,\N,\N,\N,airport,OurAirports,CN,,CHN,Asia,Eastern Asia,#N/A,#N/A,CHN
 14093,Lefkoniko Airport,Geçitkale,Cyprus,GEC,LCGK,35.235947,33.724358,146,\N,\N,\N,airport,OurAirports,CY,,CYP,Asia,Western Asia,tr_TR,EUR,CYP
 14095,Songwe Airport,Mbeya,Tanzania,MBI,HTGW,-8.919942,33.273981,4412,\N,\N,\N,airport,OurAirports,TZ,,TZA,Africa,Sub-Saharan Africa,#N/A,#N/A,#N/A
-14097,Bilogai-Sugapa Airport,Sugapa-Papua Island,Indonesia,UGU,WABV,-3.73956,137.031998,7348,\N,\N,\N,airport,OurAirports,ID,,IDN,Asia,South-eastern Asia,id_ID,#N/A,IDN
+14097,Bilogai-Sugapa Airport,Sugapa-Papua Island,Indonesia,UGU,WABV,-3.73956,137.031998,7348,\N,\N,\N,airport,OurAirports,ID,,INA,Asia,South-eastern Asia,id_ID,#N/A,IDN
 14100,Ramon Airport,Eilat,Israel,ETM,LLER,29.723694,35.011416,288,\N,\N,\N,airport,OurAirports,IL,,ISR,Asia,Western Asia,he_IL,ILS,ISR
 14101,Rustaq Airport,Al Masna'ah,Oman,MNH,OORQ,23.640556,57.4875,349,\N,\N,\N,airport,OurAirports,OM,,OMN,Asia,Western Asia,ar_SA,#N/A,OMN
 14102,Laguindingan Airport,Cagayan de Oro City,Philippines,CGY,RPMY,8.612203,124.456496,190,\N,\N,\N,airport,OurAirports,PH,,PHL,Asia,South-eastern Asia,#N/A,#N/A,PHL

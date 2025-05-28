@@ -1,222 +1,82 @@
-from app.models import Task
-from app.data_fetcher import save_json_data_for_flight_id, fetch_all_pnr_data, fetch_all_pages
-# from app.azure_blob_storage import upload_to_blob_storage, download_from_blob_storage, delete_from_blob_storage, upload_to_blob_storage_txt
-from app.local_storage import upload_to_local_storage, download_from_local_storage, delete_from_local_storage, upload_to_local_storage_txt, list_files_in_directory
-
-from app.similarity_search import find_similar_passengers
+from app.celery_app import celery_app
+from app.utils import compute_relative_age, enrich_location, infer_shards_for_date
+from app.embedding import embed_passengers
+from app.faiss_search import faiss_search_with_metadata
+from app.similarity_metrics import compute_similarity_features
 from app.loc_access import LocDataAccess
-from azure.storage.blob import ContainerClient
-from app.database import SessionLocal
-from app.celery_init import celery
+from app.model_cache import load_model_bundle
+import pandas as pd
 import numpy as np
-import os
-import time
-import asyncio
-import requests
-from datetime import datetime, timedelta
-import shutil
-import urllib
 import logging
-from dotenv import load_dotenv
-
-load_dotenv('environment.env')
 
 
-# AZURE_STORAGE_CONNECTION_STRING = os.getenv('AZURE_STORAGE_CONNECTION_STRING')
-# CONTAINER_NAME = 'taskfiles'
 
-# container_client = ContainerClient.from_connection_string(AZURE_STORAGE_CONNECTION_STRING, CONTAINER_NAME)
-# Helper Functions
-def run_async(func, *args, **kwargs):
-    """Run an asynchronous function in a new event loop."""
-    loop = asyncio.new_event_loop()
-    asyncio.set_event_loop(loop)
-    try:
-        return loop.run_until_complete(func(*args, **kwargs))
-    finally:
-        loop.close()
 
-def get_db_session():
-    """Provide a database session."""
-    session = SessionLocal()
-    try:
-        yield session
-    finally:
-        session.close()
-        logging.info("Database session closed.")
-
-# Celery Tasks
-@celery.task
-def process_task(task_id, arrival_date_from, arrival_date_to, flight_number, folder_name):
-    """Fetch PNR data for a specific flight and save it to the specified folder."""
-    session = SessionLocal()
-    try:
-        logging.info(f"[Task {task_id}] Fetching PNR data for flight {flight_number} from {arrival_date_from} to {arrival_date_to}...")
-
-        # api_url = 'https://tenacity-rmt.eurodyn.com/api/datalist/flights'
-        api_url = os.getenv("FLIGHTS_URL")
-        access_token = os.getenv("ACCESS_TOKEN")
-        params = {
-            'ft_flight_leg_arrival_date_time_from': arrival_date_from.isoformat(),
-            'ft_flight_leg_arrival_date_time_to': arrival_date_to.isoformat(),
-            'ft_flight_leg_flight_number': flight_number
-        }
-
-        # Use asyncio.run to handle asynchronous calls cleanly
-        start_time = time.time()
-        pnr_data, total_pages = asyncio.run(fetch_all_pages(api_url, access_token, params))
-        if pnr_data:
-            print(f"Fetched data from {total_pages} pages")
-        else:
-            print("Failed to fetch data")
-        end_time = time.time()
-        time_first_approach = end_time - start_time
-        logging.info(f"Time for fetching PNR data (first approach): {time_first_approach:.2f} seconds")
-
-        task = session.query(Task).get(task_id)
-        if not task:
-            logging.error(f"[Task {task_id}] Task not found in database.")
-            return
-
-        flight_ids = [flight['flight_id'] for flight in pnr_data]
-        task.flight_ids = ",".join(flight_ids)
-        task.flight_count = len(set(flight_ids))
-
-        start_time = time.time()
-
-        # Use asyncio.run again for the second asynchronous call
-        run_async(fetch_all_pnr_data, flight_ids, folder_name, access_token)
-        end_time = time.time()
-        time_second_approach = end_time - start_time
-        logging.info(f"Time for fetching PNR data concurrently: {time_second_approach:.2f} seconds")
-
-        task.status = 'completed'
-        logging.info(f"Task {task_id} completed")
-
-        session.commit()
-
-        time_comparison_content = (
-            f"Time for fetching PNR data (first approach): {time_first_approach:.2f} seconds\n"
-            f"Time for fetching PNR data concurrently: {time_second_approach:.2f} seconds\n"
-        )
-
-        blob_name = f"{folder_name}/time_comparison.txt"
-        upload_to_local_storage_txt(blob_name, time_comparison_content)
-        logging.info(f"blob_name: {blob_name}")
-
-    except Exception as e:
-        logging.error(f"[Task {task_id}] Error processing task: {e}", exc_info=True)
-        if task:
-            task.status = "failed"
-            session.commit()
-    finally:
-        session.close()
-        logging.info("Database session closed.")
-
-@celery.task
-def retrieveng_from_new_API(start_date, end_date, task_id): 
-    logging.info(f"[Task {task_id}] Fetching data from new API for {start_date} to {end_date}...")
-    session = SessionLocal()
-    api_url = os.getenv("NEW_COMBINED_API")
-    access_token = os.getenv("ACCESS_TOKEN")
-
-     # Ensure start_date and end_date are converted to datetime before extracting date
-    if isinstance(start_date, str):
-        start_date = datetime.strptime(start_date.split()[0], "%Y-%m-%d")  # Remove time before conversion
-    if isinstance(end_date, str):
-        end_date = datetime.strptime(end_date.split()[0], "%Y-%m-%d")  # Convert to datetime
-
-    start_date = start_date.date()
-    end_date = end_date.date()
-
-    startArDate = f"{start_date}T00:00:00Z"
-    endArDate = f"{end_date}T23:59:59Z"
-
-    params = {
-            'startArDate': startArDate,
-            'endArDate': endArDate
-        }
-    start_time = time.time()
-    logging.info(f"[Task {task_id}] Fetching data from new API for {start_date} to {end_date}...")
-    logging.info(f"Request URL: {api_url}?{urllib.parse.urlencode(params)}")
-
-    response = requests.get(api_url, params=params)
-
-    # Log the status code
-    logging.info(f"[Task {task_id}] Request sent to {api_url} with params: {params}")
-    logging.info(f"Response status: {response.status_code}")
-
-    if response.status_code == 200:
-        data = response.json()
-        logging.info(f"[Task {task_id}] Successfully fetched {len(data)} records.")
-    else:
-        # Log the full response if 400 error occurs
-        logging.error(f"[Task {task_id}] Failed to fetch data. Status Code: {response.status_code}, Response: {response.text}")
-        return
-    # Upload full response data to local storage
-    folder_name = f"task_{task_id}"
-    upload_to_local_storage(folder_name, data)
-    logging.info(f"[Task {task_id}] Uploaded data to local storage.")
-
+@celery_app.task
+def process_similarity_task(data):
+    airport_data_access = LocDataAccess.get_instance()
     
+    # Prepare query
+    query = {
+        "firstname": data.get("firstname", ""),
+        "surname": data.get("surname", ""),
+        "dob": data.get("dob", ""),
+        "address": data.get("address", ""),
+        "city": data.get("city_name", ""),
+        "gender": data.get("sex", "unknown"),
+        "nationality": data.get("nationality", "unknown"),
+        "iata_o": data.get("departure_airport", ""),
+        "iata_d": data.get("arrival_airport", ""),
+    }
 
+    # Enrich location
+    query_df = pd.DataFrame([query])
+    query_df = compute_relative_age(query_df)
+    query_df = enrich_location(query_df)
 
-# Task to delete old folders
-@celery.task
-def delete_old_tasks():
-    """Delete tasks older than a certain time threshold."""
-    session = SessionLocal()
-    try:
-        cutoff_time = datetime.utcnow() - timedelta(hours=7)
-        logging.info(f"Cutoff time for old tasks: {cutoff_time}")
+    shard_label = infer_shards_for_date(data["arrival_date_from"], data["shards"])
+    models = load_model_bundle(shard_label)
 
-        old_tasks = session.query(Task).filter(Task.created_at < cutoff_time).all()
-        logging.info(f"Found {len(old_tasks)} old tasks to delete.")
+    # Embed
+    embedding, _, _, _, _ = embed_passengers(query_df, models["encoder"], models["scaler"], models["tfidf"], models["svd"])
+    embedding = np.nan_to_num(embedding.astype("float32"))
 
-        for task in old_tasks:
-            logging.info(f"Deleting task {task.id} created at {task.created_at}")
-            folder_path = task.folder_path
+    matches = faiss_search_with_metadata(embedding, models["index"], models["metadata"]["travel_doc"].values, models["metadata"])
 
-            if os.path.exists(folder_path):
-                shutil.rmtree(folder_path, ignore_errors=True)
-                logging.info(f"Deleted folder: {folder_path}")
-            else:
-                logging.warning(f"Folder not found: {folder_path}")
+    # Get additional fields
+    lon_o, lat_o = airport_data_access.get_airport_lon_lat_by_iata(query["iata_o"])
+    lon_d, lat_d = airport_data_access.get_airport_lon_lat_by_iata(query["iata_d"])
+    lon_c, lat_c = airport_data_access.get_airport_lon_lat_by_city(query["city"])
+    country = airport_data_access.get_country_by_city(query["city"])
+    ctry_org = airport_data_access.get_country_by_airport_iata(query["iata_o"])
+    ctry_dest = airport_data_access.get_country_by_airport_iata(query["iata_d"])
+    city_org = airport_data_access.get_city_by_airport_iata(query["iata_o"])
+    city_dest = airport_data_access.get_city_by_airport_iata(query["iata_d"])
 
-            session.delete(task)
+    sim_df = compute_similarity_features(
+        matches,
+        firstname=query["firstname"],
+        surname=query["surname"],
+        dob=query["dob"],
+        address=query["address"],
+        city_name=query["city"],
+        country=country,
+        sex=query["gender"],
+        nationality=query["nationality"],
+        iata_o=query["iata_o"],
+        city_org=city_org,
+        ctry_org=ctry_org,
+        iata_d=query["iata_d"],
+        city_dest=city_dest,
+        ctry_dest=ctry_dest,
+        lat_o=lon_o,
+        lon_o=lat_o,
+        lat_d=lon_d,
+        lon_d=lat_d,
+    )
 
-        session.commit()
-        logging.info("Old tasks deleted successfully.")
-    except Exception as e:
-        logging.error(f"Error deleting old tasks: {e}", exc_info=True)
-    finally:
-        session.close()
+    enriched_matches = pd.concat([matches, sim_df], axis=1)
+    enriched_matches.replace([np.inf, -np.inf], np.nan, inplace=True)
+    enriched_matches.fillna(0, inplace=True)
 
-@celery.task
-def perform_similarity_search_task(task_id, firstname, surname, dob, iata_o, iata_d, city_name, address, sex, nationality, folder_path, nameThreshold, ageThreshold, locationThreshold):
-    """Perform a similarity search for passengers."""
-    logging.info(f"[Task {task_id}] Starting similarity search...")
-    try:
-        airport_data_access = LocDataAccess.get_instance()
-        similar_passengers = find_similar_passengers(
-            task_id, airport_data_access, firstname, surname, f"{firstname} {surname}", dob, iata_o, iata_d,
-            city_name, address, sex, nationality, folder_path, nameThreshold, ageThreshold, locationThreshold
-        )
-
-        # Replace invalid values
-        similar_passengers.replace([np.inf, -np.inf, np.nan], None, inplace=True)
-
-        # Check for empty DataFrame
-        if similar_passengers.empty:
-            logging.warning(f"[Task {task_id}] No similar passengers found.")
-            return {"status": "success", "data": []}
-
-        # Convert DataFrame to JSON-serializable format
-        similar_passengers_json = similar_passengers.to_dict(orient="records")
-        logging.info(f"[Task {task_id}] Similarity search completed successfully.")
-        return {"status": "success", "data": similar_passengers_json}
-    except Exception as e:
-        logging.error(f"[Task {task_id}] Error during similarity search: {e}", exc_info=True)
-        return {"status": "error", "message": str(e)}
-
-
+    return enriched_matches.to_dict(orient="records")

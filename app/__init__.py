@@ -2,32 +2,22 @@ from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from dotenv import load_dotenv
-from app.database import engine
-from app.models import Base
-from app.celery_init import celery  # Import the initialized Celery instance
-# from starlette.staticfiles import StaticFiles
-
 import os
 
-load_dotenv('environment.env')
+load_dotenv("environment.env")
 
-templates = Jinja2Templates(directory="app/templates")
-
+templates = Jinja2Templates(directory="app_new/templates")  # Adjust path if needed
 
 def create_app():
     app = FastAPI()
 
-    # Mount the static directory to serve static files
-    app.mount("/static", StaticFiles(directory="app/static"), name="static")
+    # Mount static files
+    app.mount("/static", StaticFiles(directory="app_new/static"), name="static")
 
-    # Set up the Jinja2 templates
-    # templates = Jinja2Templates(directory="app/templates")
+    # Include new router
+    from .main import router  # make sure `main.py` has `router = APIRouter()`
+    app.include_router(router)
 
-    from . import main  # Import the routes from main
-    app.include_router(main.router)
-    
     return app
 
-
 app = create_app()
-

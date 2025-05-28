@@ -1,5 +1,6 @@
 # Environment variables
 environment.env
+environment_old.env
 .env*
 
 # macOS system files
@@ -42,3 +43,15 @@ app/__pycache__/schemas.cpython-311.pyc
 app/__pycache__/similarity_search.cpython-311.pyc
 app/__pycache__/tasks.cpython-311.pyc
 *time_comparison.txt
+
+# Ignore specific folder
+app_old/
+model/
+
+# Ignore specific files
+*.log
+matches.csv
+matches_reference.csv
+matches_sheila_reyes.csv
+requirements_old.txt
+requirements_v3.txt

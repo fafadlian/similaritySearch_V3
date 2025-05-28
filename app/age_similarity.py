@@ -1,59 +1,67 @@
 from datetime import datetime
+from fuzzywuzzy import fuzz
 import pandas as pd
 import numpy as np
 import logging
 
 def calculate_age(dob):
-    """Calculate age from DOB, handling invalid inputs."""
-    if not dob:
+    """Calculate age from pandas Timestamp."""
+    if pd.isnull(dob):
         return np.nan
 
     try:
-        dob = datetime.strptime(dob, "%Y-%m-%d")
-    except ValueError:
-        logging.info("Invalid DOB format")
-        return np.nan  # Invalid date format
+        dob = pd.to_datetime(dob)
+    except Exception:
+        logging.info("Invalid DOB value")
+        return np.nan
 
-    today = datetime.today()
+    today = pd.Timestamp.today()
     age = today.year - dob.year - ((today.month, today.day) < (dob.month, dob.day))
-
-    return age if age >= 0 else 0  # Ensure non-negative age
+    return max(age, 0)
 
 def age_similarity_score(query_dob, dob):
-    """Calculate a normalized similarity score for age, safely handling division by zero."""
-    if not query_dob or not dob:
+    """Calculate similarity between two datetime-based DOBs."""
+    if pd.isnull(query_dob) or pd.isnull(dob):
         logging.info("Missing DOB for age similarity calculation")
         return 0
-    
+
     query_age = calculate_age(query_dob)
     actual_age = calculate_age(dob)
 
     if np.isnan(query_age) or np.isnan(actual_age) or query_age == 0 or actual_age == 0:
         logging.info("Invalid DOB for age similarity calculation")
-        return 0  # Invalid ages result in 0 similarity
+        return 0
 
     age_difference = abs(query_age - actual_age)
-
-    # ✅ If the ages are identical, return max similarity
     if age_difference == 0:
-        # logging.info("Identical ages for age similarity calculation")
         return 100
 
     max_age = max(actual_age, query_age)
     min_age = min(actual_age, query_age)
 
-    # ✅ Prevent division by zero (if min_age is zero, return lowest similarity)
     if min_age == 0:
-        logging.info("Zero age for age similarity calculation")
-        return 0  
+        return 0
 
     log_age_diff = np.log(max_age / min_age)
+    return max(0, 100 - (log_age_diff * 100))
 
-    # ✅ Scale log_age_diff to a 0-100 score
-    score = max(0, 100 - (log_age_diff * 100))
 
-    # logging.info(f"Age similarity score: {score:.2f}")
-    return score
+def dob_string_similarity(dob1, dob2):
+    """
+    Compute string similarity on two DOBs (datetime or string).
+    Returns: [similarity, str_dob1, str_dob2, rarity1, rarity2, prob1, prob2]
+    """
+    if pd.isnull(dob1) or pd.isnull(dob2):
+        return pd.Series([np.nan, dob1, dob2, np.nan, np.nan, np.nan, np.nan])
+
+    try:
+        dob1_str = pd.to_datetime(dob1).strftime('%Y-%m-%d')
+        dob2_str = pd.to_datetime(dob2).strftime('%Y-%m-%d')
+    except Exception:
+        return pd.Series([np.nan, dob1, dob2, np.nan, np.nan, np.nan, np.nan])
+
+    str_similarity = fuzz.ratio(dob1_str, dob2_str)
+    return pd.Series([str_similarity, dob1_str, dob2_str, 0, 0, 0, 0])
 
 # Example Usage
 # dob_example = datetime(2000, 1, 1)  # Example DOB

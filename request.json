@@ -1,17 +1,17 @@
 {
-    "arrival_date_from": "2019-02-06",
-    "arrival_date_to": "2019-02-09",
+    "arrival_date_from": "2019-04-01",
+    "arrival_date_to": "2019-04-30",
     "flight_nbr": "",
-    "firstname": "tiles",
-    "surname": "roosenbaumm",
-    "dob": "1991-12-12",
-    "iata_o": "WMI",
-    "iata_d": "ATH",
-    "city_name": "Breda",
+    "firstname": "Reiley",
+    "surname": "Secombe",
+    "dob": "1993-10-10",
+    "iata_o": "",
+    "iata_d": "",
+    "city_name": "",
     "address": "",
-    "sex": "M",
-    "nationality": "NLD",
+    "sex": "F",
+    "nationality": "GRC",
     "nameThreshold": 50,
     "ageThreshold": 50,
-    "locationThreshold": 50
+    "locationThreshold": 30
 }
