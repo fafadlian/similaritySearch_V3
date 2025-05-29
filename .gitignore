@@ -47,6 +47,7 @@ app/__pycache__/tasks.cpython-311.pyc
 # Ignore specific folder
 app_old/
 model/
+old_model/
 
 # Ignore specific files
 *.log
@@ -55,3 +56,6 @@ matches_reference.csv
 matches_sheila_reyes.csv
 requirements_old.txt
 requirements_v3.txt
+requirements_new.txt
+data_processing_comparisson.py
+test_celery.py

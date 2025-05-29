@@ -7,7 +7,7 @@ from app.loc_access import LocDataAccess
 import time
 import logging
 
-def compute_similarity_features(df, firstname, surname, dob, address, city_name, country, sex, nationality, iata_o, city_org, ctry_org, iata_d, city_dest, ctry_dest, lat_o, lon_o, lat_d, lon_d, max_distance=12000):
+def compute_similarity_features(df, firstname, surname, dob, address, city_name, country, sex, nationality, iata_o, city_org, ctry_org, iata_d, city_dest, ctry_dest, lat_o, lon_o, lat_d, lon_d, max_distance=2500):
     """
     Computes all similarity features and ensures expected columns exist.
     """
@@ -44,6 +44,24 @@ def compute_similarity_features(df, firstname, surname, dob, address, city_name,
     similarity_df[['destinationSimilarity', 'destinationExpScore']] = df.apply(lambda row: location_similarity_score(lon_d, lat_d, row['arr_lon'], row['arr_lat'], max_distance), axis=1, result_type='expand')
     similarity_df[['orgdesSimilarity', 'orgdesExpScore']] = df.apply(lambda row: location_similarity_score(lon_o, lat_o, row['arr_lon'], row['arr_lat'], max_distance), axis=1, result_type='expand')
     similarity_df[['desorgSimilarity', 'desorgExpScore']] = df.apply(lambda row: location_similarity_score(lon_d, lat_d, row['dep_lon'], row['arr_lat'], max_distance), axis=1, result_type='expand')
+    
+    # # Add query airport IATA codes to DataFrame (for comparison/debugging)
+    # similarity_df["query_departure_airport"] = iata_o
+    # similarity_df["query_arrival_airport"] = iata_d
+
+    # # Also keep candidate airport IATA codes explicitly
+    # similarity_df["candidate_departure_airport"] = df["departure_airport"]
+    # similarity_df["candidate_arrival_airport"] = df["arrival_airport"]
+    # similarity_df["query_dep_lon"] = lon_o
+    # similarity_df["query_dep_lat"] = lat_o
+    # similarity_df["query_arr_lon"] = lon_d
+    # similarity_df["query_arr_lat"] = lat_d
+
+    # # Candidate airport coordinates (from the matched dataframe)
+    # similarity_df["candidate_dep_lon"] = df["dep_lon"]
+    # similarity_df["candidate_dep_lat"] = df["dep_lat"]
+    # similarity_df["candidate_arr_lon"] = df["arr_lon"]
+    # similarity_df["candidate_arr_lat"] = df["arr_lat"]
 
 
     expected_columns = [

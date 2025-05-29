@@ -10,6 +10,6 @@ def load_model_bundle(shard_label: str):
         "scaler": joblib.load(f"model/scaler_{shard_label}.pkl"),
         "tfidf": joblib.load(f"model/tfidf_{shard_label}.pkl"),
         "svd": joblib.load(f"model/svd_{shard_label}.pkl"),
-        "index": faiss.read_index(f"model/faiss_flat_{shard_label}.index", faiss.IO_FLAG_MMAP),
+        "index": faiss.read_index(f"model/faiss_IVF_{shard_label}.index", faiss.IO_FLAG_MMAP),
         "metadata": pd.read_parquet(f"model/metadata_{shard_label}.parquet")
     }

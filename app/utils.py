@@ -52,8 +52,9 @@ def enrich_location(df):
     df["dep_lon"], df["dep_lat"] = zip(*df["iata_o"].map(loc_access.get_airport_lon_lat_by_iata))
     df["arr_lon"], df["arr_lat"] = zip(*df["iata_d"].map(loc_access.get_airport_lon_lat_by_iata))
 
-    df["dep_lon"] = df["dep_lon"].fillna(0.0)
-    df["dep_lat"] = df["dep_lat"].fillna(0.0)
-    df["arr_lon"] = df["arr_lon"].fillna(0.0)
-    df["arr_lat"] = df["arr_lat"].fillna(0.0)
+    df["dep_lon"] = df["dep_lon"].fillna(0.0).infer_objects(copy=False)
+    df["dep_lat"] = df["dep_lat"].fillna(0.0).infer_objects(copy=False)
+    df["arr_lon"] = df["arr_lon"].fillna(0.0).infer_objects(copy=False)
+    df["arr_lat"] = df["arr_lat"].fillna(0.0).infer_objects(copy=False)
     return df
+

@@ -86,5 +86,7 @@ def location_matching(location1, location2):
         return np.nan
     if pd.isnull(location1) or pd.isnull(location2):
         return np.nan
-    return 100 if location1 == location2 else 0
+
+    return 100 if str(location1).strip().lower() == str(location2).strip().lower() else 0
+
 

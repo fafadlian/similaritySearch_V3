@@ -1,6 +1,6 @@
 import uvicorn
 import logging
-from app_new import app
+from app import app
 
 logging.basicConfig(
     level=logging.INFO,

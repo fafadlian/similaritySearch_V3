@@ -3,152 +3,104 @@
 ## Description
 The Similarity Search WebApp is a Python-Flask-based web application designed to perform advanced similarity searches across PNR data. Utilizing a combination of algorithms for distance and age similarity, it offers users the ability to find a person from a watchlist.
 
-## Step 1: PostgreSQL Setup
-### Install PostgreSQL
-- Install PostgreSQL from the [official website](https://www.postgresql.org/download/) or use a package manager like `apt` (Linux) or `brew` (macOS).
+## ⚙️ Prerequisites
+- [Docker](https://www.docker.com/) installed and running
+- [Docker Compose](https://docs.docker.com/compose/install/) (usually included with Docker Desktop)
 
-### Create a Database and User
-- Access the PostgreSQL command line tool (`psql`) or use a graphical tool like pgAdmin.
-- Execute the following commands:
-  ```sql
-  CREATE DATABASE similaritysearch;
-  CREATE USER similarity_user WITH PASSWORD 'your_password';
-  GRANT ALL PRIVILEGES ON DATABASE similaritysearch TO similarity_user;
-  ```
-  - Replace `your_password` with a strong, secure password.
+---
 
-### Configure Environment Variables
-- In the `environment.env` file, include the connection details:
-  ```sh
-  DATABASE_URL=postgresql+psycopg2://similarity_user:your_password@localhost:5432/similaritysearch
-  ```
+## 🚀 Quick Start
 
-## Step 2: Terminal Run and Installation
-To run this application, ensure you have Docker installed on your machine.
-
-1. Clone the repository to your local machine. 
-2. You will need Python 3.10 to run this project.
-3. Navigate to the project directory.
-4. Install the required libraries: 
-```bash 
-pip install -r requirements_new.txt 
+### 1. Clone the Repository
+```bash
+git clone <your_repo_url>
+cd <repo_name>
 ```
 
-5. Set up environment variables: create an `environment.env` file in the project root and provide the necessary configurations: 
-```sh
-STORAGE_PATH=local_storage
-CELERY_BROKER_URL=redis://localhost:6379/0
-CELERY_RESULT_BACKEND=redis://localhost:6379/0
-DATABASE_URL=postgresql+psycopg2://<db_username>:<db_password>@localhost:5432/similaritysearch
-ACCESS_TOKEN=<your_access_token>
-REFRESH_TOKEN=<your_refresh_token>
-SIAMESE_THERESHOLD=<your threshold>
-```
-   - Replace `<your_access_token>` and `<your_refresh_token>` with values obtained from your API provider or previous deployment records. Ensure these are securely stored and managed.
+### 2. Prepare Required Files
+Manually prepare the following directories before starting:
 
-6. Start Redis from the terminal: 
-```sh 
-redis-server 
-```
-7. Open two terminal tabs and run these to start Celery workers: 
-```sh 
-celery -A app.celery_init.celery worker --loglevel=info --pool=solo
-celery -A app.celery_init.celery beat --loglevel=info --pool=solo
-```
-8. Run the following command to start the application:
-```sh
-uvicorn run:app --host 0.0.0.0 --port 443 --log-level info
-```
+- `model/`: contains prebuilt FAISS index shards and fitted models (e.g., scaler, encoder, TF-IDF, SVD, and parquet metadata)
+- `data/geoCrosswalk`: contains supporting data
 
-9. The documentation for the endpoints can be seen in here: [Documentation](API_Documentation.md)
+> 📦 You must manually place the trained indexes, models, and metadata into these folders. This is not automated.
 
-## Docker run and installation
-1. Docker: Make sure Docker is installed and running on your machine. You can download it from [Docker official website](https://www.docker.com/). 
-2. Docker Compose: Docker Compose should also be installed (it comes with Docker Desktop for Mac and Windows).
-3. Clone the repository to your local machine. 
-4. You will need python 3.10 and postgreSQL to run this project
-5. Navigate to the project directory.
-6. Install the required libraries 
-```bash 
-pip install requirements.txt 
-```
-7. Ensure you have an environment.env file in the root directory with the following settings:
-```sh 
-# Database settings
-POSTGRES_HOST=postgres
-POSTGRES_PORT=5433
-POSTGRES_DB=<your_db_name>>
-POSTGRES_USER=<your_db_username>
-POSTGRES_PASSWORD=<your_db_password>
-POSTGRES_SSLMODE=disable
-DATABASE_URL=postgresql+psycopg2://<your_db_username>:<your_db_password>@postgres:5433/<your_db_name>
+> For access to the required files, please contact: m.f.fadlian@sheffield.ac.uk
 
-# Celery settings
+---
+
+## 📦 Docker Deployment
+
+### 1. Configure Environment Variables
+Create a file named `.env` in the root directory:
+```env
 CELERY_BROKER_URL=redis://redis:6379/0
-CELERY_RESULT_BACKEND=redis://redis:6379/0
-
-# API authentication tokens (replace with valid tokens)
-ACCESS_TOKEN=<your_RMT_access_token>
-REFRESH_TOKEN=<your_RMT_refresh_token>
-USERNAME=<your_RMT_username>
-PASSWORD=<your_RMT_password>
-FLIGHT_URL=<RMT API dataset flight>
-FLIGHTS_URL=<RMT API datalist flights>
-TOKEN_URL=<RMT Token Authorisation API>
-
-# Application settings
-APP_ENV=development
-APP_DEBUG=True
-APP_PORT=8000
-
-# Local Storage
-STORAGE_PATH=local_storage
+result_backend=redis://redis:6379/0
 ```
 
-8. You can use the following docker-compose.yml file to configure your application. This assumes you will fill out the credentials
-```sh 
+### 2. Launch the Services
+```bash
+docker-compose up --build
+```
+
+This will:
+- Build the FastAPI image using [Dockerfile.ss](Dockerfile.ss)
+- Start the web service on [https://localhost:443](https://localhost:443)
+- Start Redis service for optional caching or background task coordination
+
+---
+
+## 🧪 API Documentation
+Once running, access the API documentation 
+📄 [API Docs](./Similarity%20Search%20API%20Documentation.md)
+
+
+<!-- **Swagger UI:**  
+[https://localhost:443/docs](https://localhost:443/docs)
+
+**Redoc:**  
+[https://localhost:443/redoc](https://localhost:443/redoc) -->
+
+---
+
+## 🐳 `docker-compose.yml` Structure
+Here’s an overview of the services used:
+
+```yaml
 services:
   web:
     build:
       context: .
-      dockerfile: Dockerfile.windows
+      dockerfile: Dockerfile.ss
     container_name: fastapi_web
-    command: uvicorn run:app --host 0.0.0.0 --port 443
+    command: uvicorn app.__init__:create_app --factory --host 0.0.0.0 --port 443
     ports:
       - "443:443"
     depends_on:
       - redis
-      - postgres
+    volumes:
+      - ./app:/app/app
+      - ./model:/app/model
+      - ./data:/app/data
     environment:
-      - DATABASE_URL=postgresql+psycopg2://<your_db_username>:<your_db_password>@postgres:5432/<your_db_name>
       - CELERY_BROKER_URL=redis://redis:6379/0
       - CELERY_RESULT_BACKEND=redis://redis:6379/0
 
   celery_worker:
+  
     build:
       context: .
-      dockerfile: Dockerfile.windows
+      dockerfile: Dockerfile.worker
     container_name: celery_worker
-    command: celery -A app.celery_init.celery worker --loglevel=info --concurrency=1
+    command: celery -A app.tasks worker --loglevel=info --concurrency=1
     depends_on:
       - redis
-      - postgres
+    volumes:
+      - ./app:/app/app
+      - ./model:/app/model
+      - ./data:/app/data
+    user: "1000:1000"  
     environment:
-      - DATABASE_URL=postgresql+psycopg2://<your_db_username>:<your_db_password>@postgres:5432/<your_db_name>
-      - CELERY_BROKER_URL=redis://redis:6379/0
-      - CELERY_RESULT_BACKEND=redis://redis:6379/0
-
-  celery_beat:
-    build:
-      context: .
-      dockerfile: Dockerfile.windows
-    container_name: celery_beat
-    command: celery -A app.celery_init.celery beat --loglevel=info --pool=solo
-    depends_on:
-      - redis
-      - postgres
-    environment:
-      - DATABASE_URL=postgresql+psycopg2://<your_db_username>:<your_db_password>@postgres:5432/<your_db_name>
       - CELERY_BROKER_URL=redis://redis:6379/0
       - CELERY_RESULT_BACKEND=redis://redis:6379/0
 
@@ -157,36 +109,28 @@ services:
     container_name: redis
     ports:
       - "6379:6379"
-
-  postgres:
-    image: postgres:14-alpine
-    container_name: postgres
-    environment:
-      POSTGRES_DB: <your_db_name>
-      POSTGRES_USER: <your_db_username>
-      POSTGRES_PASSWORD: <your_db_password>
-    ports:
-      - "5433:5432"
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-
-volumes:
-  postgres_data:
-
 ```
 
-9. Build the docker:
-```sh 
-docker-compose build
+---
+
+## 🗂 Folder Structure
 ```
-10. Run the docker:
-docker-compose up
-```sh 
-docker-compose up
+├── model/                # Pretrained FAISS index + fitted models
+├── data/                 # Parquet metadata files
+├── local_storage/        # Temporary runtime cache
+├── app/                  # Application source code
+├── run.py                # FastAPI entrypoint
+├── docker-compose.yml
+├── Dockerfile.ss
+└── Dockerfile.celery
 ```
 
-11. You can use the Similarity Search Web App on:
-https://localhost:443
+---
+
+## ✅ Done
+Your FAISS similarity search API is now live and accessible at:
+[https://localhost:443](https://localhost:443)
+
 
 
 

@@ -1,30 +1,12 @@
-# Use an official Python runtime as a parent image
-FROM python:3.11-slim
+FROM python:3.10.17-slim
 
-# Set environment variables
-ENV PYTHONUNBUFFERED=1
-
-# Set the working directory in the container
 WORKDIR /app
 
-# Copy the current directory contents into the container at /app
-COPY . /app
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy the model files into the container
-COPY model /app/model
+COPY app ./app
 
-# Copy the environment file
-COPY environment.env /app/environment.env
+EXPOSE 443
 
-# Install any needed packages specified in requirements.txt
-RUN pip install --upgrade pip
-RUN pip install -r requirements.txt
-
-# Expose the port defined in the environment variable or default to 8000
-EXPOSE ${PORT:-443}
-
-# Run the command to start the FastAPI server using run.py
-CMD ["python", "run.py"]
-
-
-
+CMD ["uvicorn", "app.__init__:create_app", "--factory", "--host", "0.0.0.0", "--port", "443"]

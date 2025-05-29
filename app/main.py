@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends
 import logging
 
 
-from app.tasks import process_similarity_task
+from app.pipeline import run_similarity_pipeline
 from fastapi.responses import JSONResponse
 from app.loc_access import LocDataAccess
 
@@ -31,6 +31,6 @@ async def combined_operation(request: CombinedRequest):
         "2019-09-01_2019-10-31",
         "2019-11-01_2019-12-31",
     ]
-    task = process_similarity_task.delay(data)
-    return JSONResponse(status_code=202, content={"task_id": task.id})
+    result = run_similarity_pipeline(data)
+    return result
 

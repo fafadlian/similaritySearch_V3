@@ -1,0 +1,22 @@
+# Bytecode / Python cache
+__pycache__/
+*.pyc
+*.pyo
+
+# Ignore model files (large files will be volume-mounted instead)
+model/
+db-init/
+
+# Local dev folders
+.vscode/
+.env
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db
+
+logs/
+__pycache__/
+*.parquet
+*.pkl
