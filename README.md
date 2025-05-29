@@ -142,53 +142,62 @@ All test case initiated by submitting the PNR Timeframe Parameter (Arrival Date 
 ALL THE SEARCH PARAMETER NEEDS TO BE FILLED.
 
 
-### Test Case A
+## 🧪 Test Case A
 
 | Parameter          | Description                                   | Example Values |
 |--------------------|-----------------------------------------------|----------------|
-| First Name         | The first name of the individual to search    | Dominick          |
-| Surname            | The surname of the individual to search       | Oritz          |
-| Date of Birth      | The DOB individual to search       (dd/mm/yyyy)           | 30/10/1980             |
-| Origin IATA        | 3-letter IATA code for origin airport         | DXB            |
-| Destination IATA   | 3-letter IATA code for destination airport    | ATH            |
-| City Address       | Name of the city on the person's address      | Dubai          |
-| Address            | the person's address                          | 75655 Wilson Junction. Lake Johnshire, MH 63787  |
-| Nationality        | Person's Nationality                          | Macau          |
-| Sex                | Person's Sex                                  | Female           |
-| Name Threshold     | Threshold for the name similarity (0 to 100)  | 70            |
-| Age Threshold      | Threshold for age similarity (0 to 100)       | 50             |
-| Location Threshold | Threshold for location (0 to 100)             | 95             |
+| First Name         | The first name of the individual to search    | Isidoro        |
+| Surname            | The surname of the individual to search       | Soria          |
+| Date of Birth      | The DOB of the individual (yyyy-mm-dd)        | 1980-11-18     |
+| Origin IATA        | 3-letter IATA code for origin airport         | ORY            |
+| Destination IATA   | 3-letter IATA code for destination airport    | LIS            |
+| City Address       | Name of the city on the person's address      | Ties           |
+| Address            | The person's address                          | (empty)        |
+| Nationality        | Person's Nationality                          | ESP            |
+| Sex                | Person's Sex                                  | M              |
+| Name Threshold     | Threshold for the name similarity (0 to 100)  | 30             |
+| Age Threshold      | Threshold for age similarity (0 to 100)       | 20             |
+| Location Threshold | Threshold for location (0 to 100)             | 10             |
 
-This test case will try to search Dominique Ortiz that travels from Dubai (DXB) to Athens (ATH) with address in Dubai. The complete address is 75655 Wilson Junction, Lake Johnshire, MH 63787. We use slightly different values in the query for the purpose of showing how the 'fuzzy' similarity search works. He travels between 1 May 2019 – 3 May 2019
+This test case will try to search **Isidoro Soria** who traveled from **Paris (ORY)** to **Lisbon (LIS)** on **9 June 2019**. This query demonstrates the fuzzy matching capability, especially in city name (`Ties`) and partial address. The address field is intentionally left empty.
+
+### 🔁 Example API Request (cURL)
+```bash
+curl -X POST http://localhost:443/combined_operation   -H "Content-Type: application/json"   -d '{
+    "arrival_date_from": "2019-06-09",
+    "arrival_date_to": "2019-06-09",
+    "flight_nbr": "91QK",
+    "firstname": "Isidoro",
+    "surname": "Soria",
+    "dob": "1980-11-18",
+    "iata_o": "ORY",
+    "iata_d": "LIS",
+    "city_name": "Ties",
+    "address": "",
+    "sex": "M",
+    "nationality": "ESP",
+    "nameThreshold": 30,
+    "ageThreshold": 20,
+    "locationThreshold": 10
+  }'
+```
 
 
 
 
-### Test Case B
-We're looking someone with the name of Tom, one of the associates of the criminal organisation. However, we are uncertain about the surname, some of the authorities said that the name is either Davies, Davids, or Davis. He was born on November 1943. He travels from London to Athens on the first few days of March 2019. He’s known to have an apartment in Bright Gardens, Delacruzburg, London. He has a Malaysian passport.
-
-Things to consider:
-London has 6 airports (LCY, LHR, LGW, LTN, STN, SEN)
-Tom could be a short version of Thomas or Tommy
 
 
-Feel free to adjust the thresholds and see how the threshold affect the output. 
+##  Features
 
+- **FAISS-Based Similarity Search**: Efficient approximate nearest neighbor (ANN) matching using FAISS, with support for millions of records.
+- **Hybrid Feature Matching**: Combines text (name, address), categorical (gender, nationality), numeric (age), and geographic (airport/city coordinates) similarities.
+- **Flexible Threshold Control**: Customizable thresholds for name, age, and location similarity allow precise tuning of match sensitivity.
+- **Geolocation Matching**: Incorporates haversine-based distance computation between departure and arrival airports.
+- **Prebuilt Index Loading**: Uses prepared FAISS indexes and metadata stored in `model/` and `data/` directories.
+- **Dockerized Deployment**: Easily deployable via Docker Compose, including Redis and multiple service containers.
+- **FastAPI Backend**: Clean RESTful interface with real-time scoring and metadata output.
+- **Interactive API Docs**: Swagger and Redoc auto-generated documentation accessible at runtime.
 
-### Test Case C
-We’re looking for a person that travels in the first week of April 2019 from somewhere in London to Athens. He has a Bahrain passport and was born in 1975. His first name is  قيد (Kayad) and his last name is (الدبغ) Aldabg. He is known to live in Rapids Suites, London.
-Things to consider:
-Only type the Latin Alphabet name
-50 name threshold value
-80 age/dob and location threshold value
-
-
-
-## Features
-- **Data Similarity Searches**: Perform searches based on multiple similarity criteria.
-- **Adjustable Sensitivity (Threshold)**: Utilizes custom threshold for the similarity score.
-- **Machine Learning Recommendation**: Utilise machine learing algorithm to assist user for the similarity search.
-- **Interactive Web Interface**: Easy-to-use web interface for all user interactions.
 
 ## Contributing
 Contributions to the Similarity Search WebApp are welcome. Please submit pull requests or open issues to suggest changes or add new features.
