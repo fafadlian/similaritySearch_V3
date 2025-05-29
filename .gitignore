@@ -1,7 +1,8 @@
 # Environment variables
 environment.env
 environment_old.env
-.env*
+.gitignore
+
 
 # macOS system files
 .DS_Store
