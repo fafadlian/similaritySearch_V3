@@ -22,7 +22,17 @@ class LocDataAccess:
     def get_airport_lon_lat_by_iata(self, iata_code):
         if iata_code in self.df_airports.index:
             airport_data = self.df_airports.loc[iata_code]
-            return airport_data['Longitude'], airport_data['Latitude']
+
+            # If multiple rows (DataFrame), pick the first one
+            if isinstance(airport_data, pd.DataFrame):
+                airport_data = airport_data.iloc[0]
+
+            try:
+                lon = float(airport_data['Longitude'])
+                lat = float(airport_data['Latitude'])
+                return lon, lat
+            except (TypeError, ValueError):
+                return None, None
         else:
             return None, None
 

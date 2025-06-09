@@ -31,6 +31,7 @@ async def combined_operation(request: CombinedRequest):
         "2019-09-01_2019-10-31",
         "2019-11-01_2019-12-31",
     ]
+    # data['shards'] = ["2019-01-01_2020-01-01"]  # For testing, use a single shard
     result = run_similarity_pipeline(data)
     return result
 

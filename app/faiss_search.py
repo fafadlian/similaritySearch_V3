@@ -9,7 +9,7 @@ def faiss_search_with_metadata(
     index: faiss.Index,
     db_ids: np.ndarray,
     metadata: pd.DataFrame,
-    top_k: int = 5,
+    top_k: int = 25,
     include_distance: bool = True,
     include_confidence: bool = True
 ) -> pd.DataFrame:

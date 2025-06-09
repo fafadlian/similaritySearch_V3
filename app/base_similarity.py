@@ -1,6 +1,8 @@
 from fuzzywuzzy import fuzz
 import pandas as pd
 import numpy as np
+import logging
+logging.basicConfig(level=logging.INFO)
 
 def count_likelihood2(x, counter, num_records):
     """
@@ -33,6 +35,17 @@ def count_likelihood2(x, counter, num_records):
 
     return pd.Series([rarity, prob])
 
+def safe_string_similarity(s1, s2):
+    try:
+        if pd.isnull(s1) or pd.isnull(s2):
+            return [np.nan, s1, s2, np.nan, np.nan, np.nan, np.nan]
+        similarity = fuzz.ratio(s1.lower(), s2.lower())
+        return [similarity, s1, s2, 0, 0, 0, 0]  # dummy rarity/probability for now
+    except Exception as e:
+        logging.error(f"❌ Error in safe_string_similarity: {e} | s1: {s1} | s2: {s2}")
+        return [np.nan, s1, s2, np.nan, np.nan, np.nan, np.nan]
+
+
     
 def string_similarity(string1, string2):
     """
@@ -61,5 +74,6 @@ def string_similarity(string1, string2):
     
     prob1 = 0
     prob2 = 0
+    
     
     return pd.Series([str_similarity, string1, string2, rarity1, rarity2, prob1, prob2])

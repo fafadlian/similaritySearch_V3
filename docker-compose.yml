@@ -4,7 +4,9 @@ services:
       context: .
       dockerfile: Dockerfile.ss
     container_name: fastapi_web
-    command: uvicorn app.__init__:create_app --factory --host 0.0.0.0 --port 443
+    command: >
+      sh -c "python app/train_during_compose.py &&
+             uvicorn app.__init__:create_app --factory --host 0.0.0.0 --port 443"
     ports:
       - "443:443"
     depends_on:
@@ -13,12 +15,12 @@ services:
       - ./app:/app/app
       - ./model:/app/model
       - ./data:/app/data
+      - ${DATA_PATH:-/no-data}:/app/data/raw_xml
     environment:
       - CELERY_BROKER_URL=redis://redis:6379/0
-      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+      - result_backend=redis://redis:6379/0
 
   celery_worker:
-  
     build:
       context: .
       dockerfile: Dockerfile.worker
@@ -30,10 +32,11 @@ services:
       - ./app:/app/app
       - ./model:/app/model
       - ./data:/app/data
-    user: "1000:1000"  
+      - ${DATA_PATH:-/no-data}:/app/data/raw_xml
+    user: "1000:1000"
     environment:
       - CELERY_BROKER_URL=redis://redis:6379/0
-      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+      - result_backend=redis://redis:6379/0
 
   redis:
     image: redis:alpine

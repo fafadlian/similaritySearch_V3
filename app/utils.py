@@ -39,6 +39,39 @@ def infer_shards_for_date(date_str: str, shard_labels: List[str]) -> str:
     except Exception as e:
         raise ValueError(f"Invalid date input: {date_str}") from e
     
+def infer_shards_for_date_range(start_date_str: str, end_date_str: str, shard_labels: List[str]) -> List[str]:
+    """
+    Given a date range, return all shard labels that overlap with this range.
+
+    Args:
+        start_date_str (str): Start date of the query (e.g. "2019-01-01")
+        end_date_str (str): End date of the query (e.g. "2019-04-30")
+        shard_labels (List[str]): List of shard labels (e.g., ["2019-01-01_2019-02-28", "2019-03-01_2019-04-30", ...])
+
+    Returns:
+        List[str]: Shard labels that overlap with the query date range.
+    """
+    try:
+        start_query = pd.to_datetime(start_date_str)
+        end_query = pd.to_datetime(end_date_str)
+
+        overlapping_shards = []
+        for label in shard_labels:
+            try:
+                start_str, end_str = label.split("_")
+                shard_start = pd.to_datetime(start_str)
+                shard_end = pd.to_datetime(end_str)
+
+                if shard_start <= end_query and shard_end >= start_query:
+                    overlapping_shards.append(label)
+            except Exception as e:
+                print(f"⚠️ Skipping malformed label: {label} | Error: {e}")
+                continue
+
+        return overlapping_shards
+    except Exception as e:
+        raise ValueError(f"Invalid date range input: {start_date_str} to {end_date_str}") from e
+    
 
 def compute_relative_age(df):
     today = pd.Timestamp("today")
