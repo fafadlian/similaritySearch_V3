@@ -13,23 +13,15 @@ Performs similarity search for a person against FAISS-indexed passenger data wit
 
 ### Request Example
 ```json
-{
-  "arrival_date_from": "2019-12-01",
-  "arrival_date_to": "2019-12-20",
-  "flight_nbr": "",
-  "firstname": "Al",
-  "surname": "Clark",
-  "dob": "1970-01-01",
-  "iata_o": "LHR",
-  "iata_d": "ATH",
-  "city_name": "",
-  "address": "44 maurice fort east sian ph24 4jh",
-  "sex": "F",
-  "nationality": "",
-  "nameThreshold": 30,
-  "ageThreshold": 20,
-  "locationThreshold": 20
-}
+{"arrival_date_from":"2019-10-14",
+"arrival_date_to":"2019-12-20",
+"flight_nbr":"",
+"firstname":"","surname":"Christoph",
+"dob":"1939-06-25",
+"iata_o":"ATH","iata_d":"FRA",
+"city_name":"","address":"",
+"sex":"F","nationality":"DEU",
+"nameThreshold":0,"ageThreshold":0,"locationThreshold":100}
 ```
 
 ### Required Fields

@@ -1,8 +1,11 @@
 import numpy as np
 import pandas as pd
 import re
+from dateutil.parser import parse
+from metaphone import doublemetaphone
 from sklearn.preprocessing import StandardScaler, OneHotEncoder
 from sklearn.feature_extraction.text import TfidfVectorizer
+from app.dob_vectorisers import get_dob_char_vectorizer, get_dob_token_vectorizer
 from sklearn.decomposition import TruncatedSVD
 from scipy import sparse as sp
 from app.config import NUMERIC_FEATURES, CATEGORICAL_FEATURES, TEXT_FEATURES
@@ -12,11 +15,25 @@ import logging
 def normalize_text(text: str) -> str:
     if pd.isna(text):
         return ""
-    # Lowercase
     text = text.lower()
-    # Remove non-alphanumeric (keep letters & digits only)
-    text = re.sub(r"[^\w]", "", text)
-    return text
+    return re.sub(r"[^\w]", "", text)
+
+
+def strip_vowels(text: str) -> str:
+    return re.sub(r"[aeiou]", "", text)
+
+
+def get_metaphone_code(text: str) -> str:
+    code = doublemetaphone(text)
+    return code[0] or code[1] or "emptyphon"
+
+def normalize_dob(dob_str):
+    if isinstance(dob_str, str) and re.match(r"^\d{4}-\d{2}-\d{2}$", dob_str):
+        return dob_str
+    return "0000-00-00"
+    
+def dob_tokenizer(dob):
+    return dob.split("-") if isinstance(dob, str) else ["0000", "00", "00"]
 
 
 def embed_passengers(
@@ -27,6 +44,12 @@ def embed_passengers(
     tfidf_addr: TfidfVectorizer,
     svd_name: TruncatedSVD,
     svd_addr: TruncatedSVD,
+    tfidf_consonant: TfidfVectorizer,
+    svd_consonant: TruncatedSVD,
+    tfidf_phonetic: TfidfVectorizer,
+    svd_phonetic: TruncatedSVD,
+    tfidf_dob_char: TfidfVectorizer,
+    tfidf_dob_token: TfidfVectorizer,
 ):
     # === Numeric Features ===
     df_numeric = df[NUMERIC_FEATURES].copy().fillna(-9999)
@@ -36,36 +59,58 @@ def embed_passengers(
     # === Categorical Features ===
     df_cat = df[CATEGORICAL_FEATURES].copy().fillna("unknown")
     categorical_data = encoder.transform(df_cat)
-    categorical_data[:, 0] *= 0.5  # Reduce weight of 'sex'
-    categorical_data[:, 1] *= 0.4  # Reduce weight of 'nationality'
+    categorical_data[:, 0] *= 0.5  # 'sex'
+    categorical_data[:, 1] *= 0.01  # 'nationality'
 
-    # === Text Normalization ===
-    for col in ["firstname", "surname", "address"]:
-        df[col] = df[col].fillna("").apply(normalize_text)
+    # === Normalize text columns ===
+    df["firstname"] = df["firstname"].fillna("").apply(normalize_text)
+    df["surname"] = df["surname"].fillna("").apply(normalize_text)
+    df["address"] = df["address"].fillna("").apply(normalize_text)
+    df["dob"] = df["dob"].fillna("").apply(normalize_dob)
+    dob = df["dob"]
+    dob[dob == ""] = "0000-00-00"
 
-    # === Compose text blocks and prevent empty strings ===
-    full_name = (df["firstname"] + " " + df["surname"]).str.strip()
-    address_block = df["address"].str.strip()
 
-    # Replace fully empty strings with 'emptydoc' to avoid empty TF-IDF vocab
-    full_name = full_name.mask(full_name.str.fullmatch(r"\s*"), "emptydoc")
-    address_block = address_block.mask(address_block.str.fullmatch(r"\s*"), "emptydoc")
+    full_name = (df["firstname"] + " " + df["surname"]).str.strip().replace(r"^\s*$", "emptydoc", regex=True)
+    address_block = df["address"].str.strip().replace(r"^\s*$", "emptydoc", regex=True)
+
+    # === Enrich name representations ===
+    name_consonant = full_name.apply(strip_vowels)
+    name_phonetic = full_name.apply(get_metaphone_code)
 
     # === TF-IDF + SVD on Full Name ===
     X_name = tfidf_name.transform(full_name)
     X_name_reduced = svd_name.transform(X_name)
 
+    # === TF-IDF + SVD on Consonant-only Name ===
+    X_consonant = tfidf_consonant.transform(name_consonant)
+    X_consonant_reduced = svd_consonant.transform(X_consonant)
+
+    # === TF-IDF + SVD on Phonetic Code ===
+    X_phonetic = tfidf_phonetic.transform(name_phonetic)
+    X_phonetic_reduced = svd_phonetic.transform(X_phonetic)
+
     # === TF-IDF + SVD on Address ===
     X_addr = tfidf_addr.transform(address_block)
     X_addr_reduced = svd_addr.transform(X_addr)
 
+    # === TF-IDF + SVD on DOB ===
+    X_dob_char = tfidf_dob_char.transform(dob)
+    X_dob_token = tfidf_dob_token.transform(dob)
+    X_dob_combined = sp.hstack([X_dob_char, X_dob_token], format='csr').toarray()
+    X_dob_combined = X_dob_combined.astype(np.float32)
+
     # === Weighted Concatenation ===
     text_features = np.hstack([
         X_name_reduced * 1.5,
-        X_addr_reduced * 0.8
+        X_consonant_reduced * 1.0,
+        X_phonetic_reduced * 0.8,
+        X_addr_reduced * 0.8,
+        X_dob_combined * 0.7
+
     ])
 
-    # === Final Embedding Concatenation ===
+    # === Final Embedding ===
     embeddings = np.hstack([
         numeric_data,
         categorical_data,
@@ -80,4 +125,4 @@ def embed_passengers(
     logging.info(f"text_features shape    : {text_features.shape}")
     logging.info(f"final embeddings shape : {embeddings.shape}")
 
-    return embeddings, encoder, scaler, tfidf_name, tfidf_addr, svd_name, svd_addr
+    return embeddings

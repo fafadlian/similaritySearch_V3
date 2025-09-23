@@ -1,6 +1,3 @@
-from pydantic import BaseModel, Field
-from datetime import date
-from typing import Optional, Literal
 
 from pydantic import BaseModel, Field, model_validator, field_validator
 from typing import Optional
@@ -78,10 +75,9 @@ class CombinedRequest(BaseModel):
             errors.append("`arrival_date_from` is required. Use 'YYYY-MM-DD' format.")
         if not self.arrival_date_to:
             errors.append("`arrival_date_to` is required. Use 'YYYY-MM-DD' format.")
-        if not self.firstname or not self.firstname.strip():
-            errors.append("`firstname` is required and cannot be empty.")
-        if not self.surname or not self.surname.strip():
-            errors.append("`surname` is required and cannot be empty.")
+        if not (self.firstname and self.firstname.strip()) and not (self.surname and self.surname.strip()):
+            errors.append("At least one of `firstname` or `surname` must be provided and non-empty.")
+
 
         if errors:
             raise ValueError(" | ".join(errors))
